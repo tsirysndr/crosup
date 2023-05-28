@@ -34,6 +34,10 @@ impl Installer for FishInstaller {
         let mut child = std::process::Command::new("brew")
             .arg("install")
             .arg("fish")
+            .env(
+                "PATH",
+                "/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+            )
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .spawn()?;
