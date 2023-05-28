@@ -2,6 +2,7 @@ use anyhow::Error;
 
 pub mod atuin;
 pub mod blesh;
+pub mod devbox;
 pub mod docker;
 pub mod fish;
 pub mod homebrew;

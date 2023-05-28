@@ -68,8 +68,9 @@ impl Installer for NixInstaller {
 
     fn is_installed(&self) -> Result<bool, Error> {
         println!("-> Checking if {} is already installed", self.name);
-        let child = std::process::Command::new("nix")
-            .arg("--version")
+        let child = std::process::Command::new("bash")
+            .arg("-c")
+            .arg(". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix --version")
             .stdout(Stdio::piped())
             .spawn()?;
 
