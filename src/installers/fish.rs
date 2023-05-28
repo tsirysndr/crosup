@@ -48,12 +48,6 @@ impl Installer for FishInstaller {
             println!("   {}", line.unwrap());
         }
 
-        let stderr = child.stderr.take().unwrap();
-        let stderr = std::io::BufReader::new(stderr);
-        for line in stderr.lines() {
-            println!("   {}", line.unwrap());
-        }
-
         let output = child.wait_with_output()?;
 
         if !output.status.success() {
