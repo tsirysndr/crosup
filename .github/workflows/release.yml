@@ -33,10 +33,12 @@ jobs:
           sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
           sudo apt-get update
           sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+          sudo usermod -aG docker $USER
+          newgrp docker
 
       - name: Build and Copy Target
         run: |
-          sudo docker run --rm -v ${{ github.workspace }}:/app -w /app rust:1.69-bullseye \
+          docker run --rm -v ${{ github.workspace }}:/app:z -w /app rust:1.69-bullseye \
             sh -c "apt-get update && apt-get install -y build-essential && cargo build --release && cp -r target/release/* /app"
 
       - name: Show Artifacts
@@ -47,14 +49,14 @@ jobs:
       - name: Packaging final binary
         shell: bash
         run: |
-          cd target/release
+          cp target/release/crosup crosup
           tar czvf crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz crosup
           shasum -a 256 crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz > crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz.sha256
       - name: Releasing assets
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            target/release/crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz
-            target/release/crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz.sha256
+            crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz
+            crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
