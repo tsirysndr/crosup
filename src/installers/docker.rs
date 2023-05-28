@@ -124,16 +124,15 @@ impl DockerInstaller {
             "sudo chmod a+r /etc/apt/keyrings/docker.gpg".bright_green()
         );
 
-        let chmod = std::process::Command::new("sudo")
+        let mut chmod = std::process::Command::new("sudo")
             .arg("chmod")
             .arg("a+r")
             .arg("/etc/apt/keyrings/docker.gpg")
             .stdout(Stdio::piped())
             .spawn()?;
 
-        let output = chmod.wait_with_output()?;
+        chmod.wait()?;
 
-        println!("{}", String::from_utf8_lossy(&output.stdout));
         return Ok(());
     }
 
@@ -147,8 +146,10 @@ impl DockerInstaller {
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null".bright_green()
         );
 
-        let mut child = std::process::Command::new("echo")
-            .arg("deb [arch=\"$(dpkg --print-architecture)\" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \"$(. /etc/os-release && echo \"$VERSION_CODENAME\")\" stable")
+        let mut child = std::process::Command::new("bash")
+            .arg("-c")
+            .arg("echo \\")
+            .arg("\"deb [arch=\"$(dpkg --print-architecture)\" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \"$(. /etc/os-release && echo \"$VERSION_CODENAME\")\" stable\"")
             .stdout(Stdio::piped())
             .spawn()?;
 
