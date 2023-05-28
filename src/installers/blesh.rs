@@ -96,7 +96,7 @@ impl Installer for BleshInstaller {
         );
         let mut child = std::process::Command::new("bash")
             .arg("-c")
-            .arg("make -C ble.sh install PREFIX=~/.local")
+            .arg("mkdir -p ~/.local && make -C ble.sh install PREFIX=~/.local")
             .stdout(std::process::Stdio::piped())
             .stderr(std::process::Stdio::piped())
             .spawn()?;
