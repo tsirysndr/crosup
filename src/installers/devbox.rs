@@ -52,7 +52,7 @@ impl Installer for DevboxInstaller {
         println!("-> Checking if {} is installed", self.name().bright_green());
         let child = std::process::Command::new("bash")
             .arg("-c")
-            .arg("devbox --version")
+            .arg("devbox version")
             .stdout(std::process::Stdio::piped())
             .spawn()?;
         let output = child.wait_with_output()?;
