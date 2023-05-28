@@ -38,8 +38,10 @@ jobs:
 
       - name: Build and Copy Target
         run: |
-          docker run --rm -v ${{ github.workspace }}:/app:z -w /app rust:1.69-bullseye \
-            sh -c "apt-get update && apt-get install -y build-essential && cargo build --release && cp -r target/release/* /app"
+          docker run --rm -v ${{ github.workspace }}:/app -w /app rust:1.69-bullseye \
+            sh -c "apt-get update && apt-get install -y build-essential && cargo build --release \
+
+            "
 
       - name: Show Artifacts
         run: |
@@ -49,9 +51,9 @@ jobs:
       - name: Packaging final binary
         shell: bash
         run: |
-          cp target/release/crosup crosup
-          tar czvf crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz crosup
-          shasum -a 256 crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz > crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz.sha256
+          sudo cp target/release/crosup crosup
+          sudo tar czvf crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz crosup
+          sudo shasum -a 256 crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz > crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz.sha256
       - name: Releasing assets
         uses: softprops/action-gh-release@v1
         with:
