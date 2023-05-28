@@ -31,4 +31,22 @@ rm /tmp/$ASSET_NAME
 
 echo "Installation completed! 🎉"
 
+cat << EOF
+             ______                __  __    
+            / ____/________  _____/ / / /___ 
+           / /   / ___/ __ \/ ___/ / / / __ \\
+          / /___/ /  / /_/ (__  ) /_/ / /_/ /
+          \____/_/   \____/____/\____/ .___/ 
+                                    /_/      
+
+Quickly setup your development environment on your new Chromebook/ChromeOS 🚀 ✨
+
+https://github.com/tsirysndr/crosup
+
+Please file an issue if you encounter any problems!
+
+===============================================================================
+
+EOF
+
 crosup install
