@@ -215,11 +215,9 @@ impl DockerInstaller {
             "sudo usermod -aG docker $USER".bright_green()
         );
 
-        let mut child = std::process::Command::new("sudo")
-            .arg("usermod")
-            .arg("-aG")
-            .arg("docker")
-            .arg("$USER")
+        let mut child = std::process::Command::new("bash")
+            .arg("-c")
+            .arg("sudo usermod -aG docker $USER && newgrp docker")
             .stdout(Stdio::piped())
             .spawn()?;
         let output = child.stdout.take().unwrap();
@@ -230,12 +228,6 @@ impl DockerInstaller {
         }
 
         child.wait()?;
-
-        println!(" You need to logout and login again for the changes to take effect");
-        println!(
-            " You can also run {} to apply the changes",
-            "newgrp docker".bright_green()
-        );
 
         Ok(())
     }
