@@ -36,8 +36,7 @@ impl Installer for FishInstaller {
             .arg("fish")
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
-            .spawn()
-            .expect("failed to execute process");
+            .spawn()?;
 
         let stdout = child.stdout.take().unwrap();
         let stdout = std::io::BufReader::new(stdout);

@@ -271,9 +271,8 @@ impl Installer for DockerInstaller {
         let child = std::process::Command::new("docker")
             .arg("--version")
             .stdout(std::process::Stdio::piped())
-            .spawn()
-            .expect("failed to execute process");
-        let output = child.wait_with_output().expect("failed to wait on child");
+            .spawn()?;
+        let output = child.wait_with_output()?;
         if !output.status.success() {
             println!("-> Failed to check docker version");
             println!("{}", String::from_utf8_lossy(&output.stderr));
