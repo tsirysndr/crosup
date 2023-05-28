@@ -1,10 +1,8 @@
 name: Rust Build
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
+  release:
+    types: [created]
 
 jobs:
   build:
@@ -44,3 +42,19 @@ jobs:
       - name: Show Artifacts
         run: |
           ls -la ${{ github.workspace }}/target/release
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Packaging final binary
+        shell: bash
+        run: |
+          cd target/release
+          tar czvf crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz crosup
+          shasum -a 256 crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz > crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz.sha256
+      - name: Releasing assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            target/release/crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz
+            target/release/crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -21,12 +21,12 @@
 
 Crosup is a CLI tool to help you quickly setup your development environment on a new Chromebook (ChromeOS). It is designed to be simple and easy to use.
 
-## Installation
+## 🚚 Installation
 ```sh
 wget -qO- https://raw.githubusercontent.com/tsirysndr/crosup/master/install.sh | bash
 ```
 
-## Usage
+## 🚀 Usage
 ```
              ______                __  __
             / ____/________  _____/ / / /___
