@@ -1,4 +1,4 @@
-use std::process::Stdio;
+use std::{io::BufRead, process::Stdio};
 
 use super::Installer;
 use anyhow::Error;
@@ -31,6 +31,54 @@ impl Installer for VSCodeInstaller {
         }
 
         println!("-> 🚚 Installing {}", self.name().bright_green());
+        println!("   Running {}", "wget -c https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64 -O vscode-installer.deb".bright_green());
+        let mut child = std::process::Command::new("wget")
+            .arg("-c")
+            .arg("https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64")
+            .arg("-O")
+            .arg("vscode-installer.deb")
+            .stdout(Stdio::piped())
+            .spawn()?;
+
+        let stdout = child.stdout.take().unwrap();
+        let stdout = std::io::BufReader::new(stdout);
+        for line in stdout.lines() {
+            println!("   {}", line.unwrap());
+        }
+
+        let output = child.wait_with_output()?;
+
+        if !output.status.success() {
+            println!("-> Failed to download {}", self.name().bright_green());
+            println!("{}", String::from_utf8_lossy(&output.stderr));
+            return Err(Error::msg(format!("Failed to install {}", self.name())));
+        }
+
+        println!(
+            "   Running {}",
+            "sudo apt install ./vscode-installer.deb".bright_green()
+        );
+        let mut child = std::process::Command::new("sudo")
+            .arg("apt")
+            .arg("install")
+            .arg("./vscode-installer.deb")
+            .stdout(Stdio::piped())
+            .spawn()?;
+        let stdout = child.stdout.take().unwrap();
+        let stdout = std::io::BufReader::new(stdout);
+        for line in stdout.lines() {
+            println!("   {}", line.unwrap());
+        }
+
+        println!("   Running {}", "rm vscode-installer.deb".bright_green());
+        let mut child = std::process::Command::new("rm")
+            .arg("vscode-installer.deb")
+            .stdout(Stdio::piped())
+            .spawn()?;
+
+        child.wait()?;
+
+        println!(" Done! 🚀");
         Ok(())
     }
 
@@ -48,7 +96,6 @@ impl Installer for VSCodeInstaller {
 
         if !output.status.success() {
             println!("-> Failed to check {} version", self.name.bright_green());
-            println!("{}", String::from_utf8_lossy(&output.stderr));
             return Err(Error::msg(format!("Failed to check {} version", self.name)));
         }
 
