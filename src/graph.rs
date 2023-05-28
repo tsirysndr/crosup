@@ -1,5 +1,5 @@
 use crate::installers::{
-    blesh::BleshInstaller, docker::DockerInstaller, fish::FishInstaller,
+    atuin::AtuinInstaller, blesh::BleshInstaller, docker::DockerInstaller, fish::FishInstaller,
     homebrew::HomebrewInstaller, nix::NixInstaller, vscode::VSCodeInstaller, Installer,
 };
 use anyhow::Error;
@@ -31,6 +31,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "nix" => Box::new(NixInstaller::default()),
             "vscode" => Box::new(VSCodeInstaller::default()),
             "ble.sh" => Box::new(BleshInstaller::default()),
+            "atuin" => Box::new(AtuinInstaller::default()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -67,6 +68,9 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     graph.add_vertex(Vertex::from(
         Box::new(BleshInstaller::default()) as Box<dyn Installer>
     ));
+    graph.add_vertex(Vertex::from(
+        Box::new(AtuinInstaller::default()) as Box<dyn Installer>
+    ));
 
     graph.add_edge(fish, homebrew);
 
@@ -77,6 +81,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
         Box::new(NixInstaller::default()) as Box<dyn Installer>,
         Box::new(VSCodeInstaller::default()) as Box<dyn Installer>,
         Box::new(BleshInstaller::default()) as Box<dyn Installer>,
+        Box::new(AtuinInstaller::default()) as Box<dyn Installer>,
     ];
 
     (graph, installers)

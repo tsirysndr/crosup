@@ -22,7 +22,7 @@ ChromeOS developer environment setup tool"#,
             Command::new("install")
                 .arg(arg!([tool] "Tool to install, e.g. docker, nix, homebrew, fish, vscode, ble.sh etc."))
                 .about(
-                    "Install developer tools, possible values are: docker, nix, homebrew, fish, vscode, ble.sh",
+                    "Install developer tools, possible values are: docker, nix, homebrew, fish, vscode, ble.sh, atuin",
                 ),
         )
 }

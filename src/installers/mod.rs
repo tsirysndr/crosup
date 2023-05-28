@@ -1,5 +1,6 @@
 use anyhow::Error;
 
+pub mod atuin;
 pub mod blesh;
 pub mod docker;
 pub mod fish;
