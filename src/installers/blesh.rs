@@ -49,7 +49,7 @@ impl BleshInstaller {
             "sudo apt install -y gawk build-essential".bright_green()
         );
         let mut child = std::process::Command::new("sudo")
-            .arg("apt install -y gawk")
+            .arg("apt install -y gawk build-essential")
             .stdout(std::process::Stdio::piped())
             .stderr(std::process::Stdio::piped())
             .spawn()?;
@@ -96,7 +96,7 @@ impl Installer for BleshInstaller {
         );
         let mut child = std::process::Command::new("bash")
             .arg("-c")
-            .arg("mkdir -p ~/.local && make -C ble.sh install PREFIX=~/.local")
+            .arg("make -C ble.sh install PREFIX=~/.local")
             .stdout(std::process::Stdio::piped())
             .stderr(std::process::Stdio::piped())
             .spawn()?;
