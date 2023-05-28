@@ -44,6 +44,7 @@ impl Installer for NixInstaller {
             .arg("-s")
             .arg("--")
             .arg("install")
+            .arg("--no-confirm")
             .stdin(Stdio::from(curl.stdout.unwrap()))
             .stdout(Stdio::piped())
             .spawn()?;
