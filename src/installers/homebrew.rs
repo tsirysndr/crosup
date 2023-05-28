@@ -70,6 +70,10 @@ impl Installer for HomebrewInstaller {
         );
         let child = std::process::Command::new("brew")
             .arg("--version")
+            .env(
+                "PATH",
+                "/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+            )
             .stdout(Stdio::piped())
             .spawn()?;
 
