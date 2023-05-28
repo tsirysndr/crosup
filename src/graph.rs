@@ -1,5 +1,5 @@
 use crate::installers::{
-    blesh::BleshInstaller, docker::DockerInstaller, fish::FishInstaller, fisher::FisherInstaller,
+    blesh::BleshInstaller, docker::DockerInstaller, fish::FishInstaller,
     homebrew::HomebrewInstaller, nix::NixInstaller, vscode::VSCodeInstaller, Installer,
 };
 use anyhow::Error;
@@ -28,8 +28,6 @@ impl Into<Box<dyn Installer>> for Vertex {
         match self.name.as_str() {
             "docker" => Box::new(DockerInstaller::default()),
             "fish" => Box::new(FishInstaller::default()),
-            "fisher" => Box::new(FisherInstaller::default()),
-            "homebrew" => Box::new(HomebrewInstaller::default()),
             "nix" => Box::new(NixInstaller::default()),
             "vscode" => Box::new(VSCodeInstaller::default()),
             "ble.sh" => Box::new(BleshInstaller::default()),
@@ -57,9 +55,6 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let fish = graph.add_vertex(Vertex::from(
         Box::new(FishInstaller::default()) as Box<dyn Installer>
     ));
-    let fisher = graph.add_vertex(Vertex::from(
-        Box::new(FisherInstaller::default()) as Box<dyn Installer>
-    ));
     let homebrew = graph.add_vertex(Vertex::from(
         Box::new(HomebrewInstaller::default()) as Box<dyn Installer>
     ));
@@ -74,12 +69,10 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     ));
 
     graph.add_edge(fish, homebrew);
-    graph.add_edge(fisher, fish);
 
     let installers = vec![
         Box::new(DockerInstaller::default()) as Box<dyn Installer>,
         Box::new(FishInstaller::default()) as Box<dyn Installer>,
-        Box::new(FisherInstaller::default()) as Box<dyn Installer>,
         Box::new(HomebrewInstaller::default()) as Box<dyn Installer>,
         Box::new(NixInstaller::default()) as Box<dyn Installer>,
         Box::new(VSCodeInstaller::default()) as Box<dyn Installer>,

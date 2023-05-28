@@ -3,7 +3,6 @@ use anyhow::Error;
 pub mod blesh;
 pub mod docker;
 pub mod fish;
-pub mod fisher;
 pub mod homebrew;
 pub mod nix;
 pub mod vscode;
