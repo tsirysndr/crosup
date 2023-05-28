@@ -45,6 +45,10 @@ impl DockerInstaller {
 
     pub fn install_dependencies(&self) -> Result<(), Error> {
         println!("-> 🚚 Installing dependencies");
+        println!(
+            "   Running {}",
+            "sudo apt install -y ca-certificates curl gnupg".bright_green()
+        );
         let child = std::process::Command::new("sudo")
             .arg("apt")
             .arg("install")
@@ -178,12 +182,13 @@ impl DockerInstaller {
 
         println!(
             "   Running {}",
-            "sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin".bright_green()
+            "sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin".bright_green()
         );
 
         let mut child = std::process::Command::new("sudo")
             .arg("apt-get")
             .arg("install")
+            .arg("-y")
             .arg("docker-ce")
             .arg("docker-ce-cli")
             .arg("containerd.io")
