@@ -1,4 +1,4 @@
-use std::io::BufRead;
+use std::{io::BufRead, process::Stdio};
 
 use anyhow::Error;
 use owo_colors::OwoColorize;
@@ -36,10 +36,15 @@ impl Installer for AtuinInstaller {
             "bash <(curl https://raw.githubusercontent.com/ellie/atuin/main/install.sh)"
                 .bright_green()
         );
-        let mut child = std::process::Command::new("sh")
+        let curl = std::process::Command::new("sh")
             .arg("-c")
-            .arg("bash <(curl https://raw.githubusercontent.com/ellie/atuin/main/install.sh)")
-            .stdout(std::process::Stdio::piped())
+            .arg("curl --proto '=https' --tlsv1.2 -sSf -L https://raw.githubusercontent.com/ellie/atuin/main/install.sh")
+            .stdout(Stdio::piped())
+            .spawn()?;
+
+        let mut child = std::process::Command::new("bash")
+            .stdin(Stdio::from(curl.stdout.unwrap()))
+            .stdout(Stdio::piped())
             .spawn()?;
         let output = child.stdout.take().unwrap();
         let output = std::io::BufReader::new(output);
