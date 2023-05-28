@@ -24,21 +24,20 @@ impl Default for DockerInstaller {
 impl DockerInstaller {
     pub fn apt_update(&self) -> Result<(), Error> {
         println!("-> Running {}", "apt update".bright_green());
-        let child = std::process::Command::new("sudo")
+        let mut child = std::process::Command::new("sudo")
             .arg("apt")
             .arg("update")
             .stdout(std::process::Stdio::piped())
             .stderr(std::process::Stdio::piped())
             .spawn()?;
-        let output = child.wait_with_output()?;
+        let output = child.stdout.take().unwrap();
+        let output = std::io::BufReader::new(output);
 
-        if !output.status.success() {
-            println!("-> Failed to update apt");
-            println!("{}", String::from_utf8_lossy(&output.stderr));
-            return Err(Error::msg(format!("Failed to update apt")));
+        for line in output.lines() {
+            println!("{}", line?);
         }
 
-        println!("{}", String::from_utf8_lossy(&output.stdout));
+        child.wait()?;
 
         Ok(())
     }
