@@ -72,7 +72,7 @@ impl Installer for BleshInstaller {
             );
             return Ok(());
         }
-        println!("-> Installing {}", "ble.sh".bright_green());
+        println!("-> 🚚 Installing {}", "ble.sh".bright_green());
         self.apt_update()?;
         self.install_dependencies()?;
 
