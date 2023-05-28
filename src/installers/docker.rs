@@ -97,7 +97,6 @@ impl DockerInstaller {
 
         println!("   Running {}", "curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg".bright_green());
         let mut curl = std::process::Command::new("curl")
-            .arg("curl")
             .arg("-fsSL")
             .arg("https://download.docker.com/linux/debian/gpg")
             .stdout(Stdio::piped())
@@ -105,7 +104,8 @@ impl DockerInstaller {
 
         curl.wait()?;
 
-        let gpg = std::process::Command::new("gpg")
+        let gpg = std::process::Command::new("sudo")
+            .arg("gpg")
             .arg("--dearmor")
             .arg("-o")
             .arg("/etc/apt/keyrings/docker.gpg")
@@ -128,7 +128,8 @@ impl DockerInstaller {
             "sudo chmod a+r /etc/apt/keyrings/docker.gpg".bright_green()
         );
 
-        let chmod = std::process::Command::new("chmod")
+        let chmod = std::process::Command::new("sudo")
+            .arg("chmod")
             .arg("a+r")
             .arg("/etc/apt/keyrings/docker.gpg")
             .stdout(Stdio::piped())
