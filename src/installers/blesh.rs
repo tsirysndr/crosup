@@ -137,6 +137,7 @@ impl Installer for BleshInstaller {
     }
 
     fn is_installed(&self) -> Result<bool, anyhow::Error> {
+        println!("-> Checking if {} is installed", self.name.bright_green());
         let home = std::env::var("HOME")?;
         // verify if ~/.local/share/blesh/ble.sh exists
         if std::path::Path::new(&format!("{}/.local/share/blesh/ble.sh", home)).exists() {
