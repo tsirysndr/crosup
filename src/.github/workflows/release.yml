@@ -1,0 +1,35 @@
+name: Rust Build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+
+      - name: Install Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+
+      - name: Build and Copy Target
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/app -w /app rust:1.69-bullseye \
+            sh -c "apt-get update && apt-get install -y build-essential && cargo build --release && cp target/release/* /app"
+
+      - name: Show Artifacts
+        run: |
+          ls -la ${{ github.workspace }}/target/release
