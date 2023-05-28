@@ -53,18 +53,7 @@ impl Installer for HomebrewInstaller {
             println!("   {}", line.unwrap());
         }
 
-        let output = child.wait_with_output()?;
-
-        if !output.status.success() {
-            println!("-> Failed to install {}", self.name().bright_green());
-            println!("{}", String::from_utf8_lossy(&output.stderr));
-            return Err(Error::msg(format!("Failed to install {}", self.name())));
-        }
-
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        for line in stdout.lines() {
-            println!("   {}", line);
-        }
+        child.wait()?;
 
         Ok(())
     }
