@@ -5,23 +5,23 @@ use owo_colors::OwoColorize;
 
 use super::Installer;
 
-pub struct FishInstaller {
+pub struct TigInstaller {
     name: String,
     version: String,
     dependencies: Vec<String>,
 }
 
-impl Default for FishInstaller {
+impl Default for TigInstaller {
     fn default() -> Self {
         Self {
-            name: "fish".to_string(),
+            name: "tig".to_string(),
             version: "latest".to_string(),
             dependencies: vec!["homebrew".to_string()],
         }
     }
 }
 
-impl Installer for FishInstaller {
+impl Installer for TigInstaller {
     fn install(&self) -> Result<(), Error> {
         if self.is_installed().is_ok() {
             println!(
@@ -33,7 +33,7 @@ impl Installer for FishInstaller {
         println!("-> 🚚 Installing {}", self.name().bright_green());
         let mut child = std::process::Command::new("brew")
             .arg("install")
-            .arg("fish")
+            .arg("tig")
             .env(
                 "PATH",
                 "/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
@@ -64,7 +64,7 @@ impl Installer for FishInstaller {
             "-> Checking if {} is already installed",
             self.name.bright_green()
         );
-        let child = std::process::Command::new("fish")
+        let child = std::process::Command::new("tig")
             .arg("--version")
             .env(
                 "PATH",
@@ -89,7 +89,7 @@ impl Installer for FishInstaller {
     }
 
     fn name(&self) -> &str {
-        "fish"
+        &self.name
     }
 
     fn version(&self) -> &str {

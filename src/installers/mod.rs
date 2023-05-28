@@ -6,6 +6,7 @@ pub mod docker;
 pub mod fish;
 pub mod homebrew;
 pub mod nix;
+pub mod tig;
 pub mod vscode;
 
 pub trait Installer {
