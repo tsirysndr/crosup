@@ -66,7 +66,6 @@ impl Installer for AtuinInstaller {
         let output = child.wait_with_output()?;
         if !output.status.success() {
             println!("-> Failed to check atuin version");
-            println!("{}", String::from_utf8_lossy(&output.stderr));
             return Err(Error::msg(format!("Failed to check {} version", self.name)));
         }
 
