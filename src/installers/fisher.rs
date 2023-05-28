@@ -41,9 +41,13 @@ impl Installer for FisherInstaller {
             .stdout(Stdio::piped())
             .spawn()?;
 
-        let child = std::process::Command::new("bash")
+        let child = std::process::Command::new("fish")
             .arg("-c")
             .arg("source")
+            .env(
+                "PATH",
+                "/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+            )
             .stdin(Stdio::from(curl.stdout.unwrap()))
             .stdout(Stdio::piped())
             .spawn()?;
@@ -57,21 +61,21 @@ impl Installer for FisherInstaller {
 
         println!("{}", String::from_utf8_lossy(&output.stdout));
 
-        let mut child = std::process::Command::new("fisher")
+        let mut child = std::process::Command::new("fish")
+            .arg("-c")
+            .arg("fisher")
             .arg("install")
             .arg("jorgebucaran/fisher")
+            .env(
+                "PATH",
+                "/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+            )
             .stdout(Stdio::piped())
             .spawn()?;
 
         let stdout = child.stdout.take().unwrap();
         let stdout = std::io::BufReader::new(stdout);
         for line in stdout.lines() {
-            println!("   {}", line.unwrap());
-        }
-
-        let stderr = child.stderr.take().unwrap();
-        let stderr = std::io::BufReader::new(stderr);
-        for line in stderr.lines() {
             println!("   {}", line.unwrap());
         }
 
