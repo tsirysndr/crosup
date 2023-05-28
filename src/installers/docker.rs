@@ -148,8 +148,7 @@ impl DockerInstaller {
 
         let mut child = std::process::Command::new("bash")
             .arg("-c")
-            .arg("echo \\")
-            .arg("\"deb [arch=\"$(dpkg --print-architecture)\" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \"$(. /etc/os-release && echo \"$VERSION_CODENAME\")\" stable\"")
+            .arg("echo \"deb [arch=\"$(dpkg --print-architecture)\" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \"$(. /etc/os-release && echo \"$VERSION_CODENAME\")\" stable\"")
             .stdout(Stdio::piped())
             .spawn()?;
 
