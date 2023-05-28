@@ -5,7 +5,7 @@ use anyhow::Error;
 use owo_colors::OwoColorize;
 
 const INSTALL_SCRIPT: &str =
-    r#""$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)""#;
+    "curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh";
 
 pub struct HomebrewInstaller {
     name: String,
@@ -33,10 +33,15 @@ impl Installer for HomebrewInstaller {
             return Ok(());
         }
         println!("-> 🚚 Installing {}", self.name().bright_green());
-        let mut child = std::process::Command::new("bash")
+        let curl = std::process::Command::new("sh")
             .arg("-c")
             .arg(INSTALL_SCRIPT)
+            .stdout(Stdio::piped())
+            .spawn()?;
+
+        let mut child = std::process::Command::new("bash")
             .env("NONINTERACTIVE", "true")
+            .stdin(Stdio::from(curl.stdout.unwrap()))
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .spawn()?;
