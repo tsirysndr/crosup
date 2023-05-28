@@ -1,5 +1,7 @@
 use std::{io::BufRead, process::Stdio};
 
+use crate::macros::pipe_brew_curl;
+
 use super::Installer;
 use anyhow::Error;
 use owo_colors::OwoColorize;
@@ -61,26 +63,8 @@ impl Installer for HomebrewInstaller {
             .stdout(Stdio::piped())
             .spawn()?;
 
-        let mut child = std::process::Command::new("bash")
-            .env("NONINTERACTIVE", "true")
-            .stdin(Stdio::from(curl.stdout.unwrap()))
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()?;
+        pipe_brew_curl!(curl);
 
-        let stdout = child.stdout.take().unwrap();
-        let stdout = std::io::BufReader::new(stdout);
-        for line in stdout.lines() {
-            println!("   {}", line.unwrap());
-        }
-
-        let stderr = child.stderr.take().unwrap();
-        let stderr = std::io::BufReader::new(stderr);
-        for line in stderr.lines() {
-            println!("   {}", line.unwrap());
-        }
-
-        child.wait()?;
         self.setup_bashrc()?;
 
         Ok(())

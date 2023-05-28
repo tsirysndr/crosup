@@ -3,6 +3,8 @@ use std::{io::BufRead, process::Stdio};
 use anyhow::Error;
 use owo_colors::OwoColorize;
 
+use crate::macros::pipe_curl;
+
 use super::Installer;
 
 pub struct AtuinInstaller {
@@ -42,16 +44,7 @@ impl Installer for AtuinInstaller {
             .stdout(Stdio::piped())
             .spawn()?;
 
-        let mut child = std::process::Command::new("bash")
-            .stdin(Stdio::from(curl.stdout.unwrap()))
-            .stdout(Stdio::piped())
-            .spawn()?;
-        let output = child.stdout.take().unwrap();
-        let output = std::io::BufReader::new(output);
-
-        for line in output.lines() {
-            println!("{}", line?);
-        }
+        pipe_curl!(curl);
 
         Ok(())
     }
