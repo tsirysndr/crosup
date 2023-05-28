@@ -23,6 +23,28 @@ impl Default for HomebrewInstaller {
     }
 }
 
+impl HomebrewInstaller {
+    pub fn setup_bashrc(&self) -> Result<(), Error> {
+        println!("-> Setting up bashrc");
+        println!(
+            "-> Running {}",
+            "echo 'export PATH=/home/linuxbrew/.linuxbrew/bin:$PATH' >> ~/.bashrc".bright_green()
+        );
+        let child = std::process::Command::new("bash")
+            .arg("-c")
+            .arg("echo 'export PATH=/home/linuxbrew/.linuxbrew/bin:$PATH' >> ~/.bashrc")
+            .stdout(Stdio::piped())
+            .spawn()?;
+        let output = child.wait_with_output()?;
+        if !output.status.success() {
+            println!("-> Failed to setup bashrc");
+            println!("{}", String::from_utf8_lossy(&output.stderr));
+            return Err(Error::msg("Failed to setup bashrc"));
+        }
+        Ok(())
+    }
+}
+
 impl Installer for HomebrewInstaller {
     fn install(&self) -> Result<(), Error> {
         if self.is_installed().is_ok() {
@@ -59,6 +81,7 @@ impl Installer for HomebrewInstaller {
         }
 
         child.wait()?;
+        self.setup_bashrc()?;
 
         Ok(())
     }
