@@ -71,6 +71,10 @@ impl DockerInstaller {
 
     pub fn install_gpg_key(&self) -> Result<(), Error> {
         println!("-> Installing GPG key");
+        println!(
+            "   Running {}",
+            "sudo install -m 0755 -d /etc/apt/keyrings".bright_green()
+        );
         let child = std::process::Command::new("sudo")
             .arg("install")
             .arg("-m")
@@ -91,12 +95,15 @@ impl DockerInstaller {
 
         println!("{}", String::from_utf8_lossy(&output.stdout));
 
-        let curl = std::process::Command::new("curl")
+        println!("   Running {}", "curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg".bright_green());
+        let mut curl = std::process::Command::new("curl")
             .arg("curl")
             .arg("-fsSL")
             .arg("https://download.docker.com/linux/debian/gpg")
             .stdout(Stdio::piped())
             .spawn()?;
+
+        curl.wait()?;
 
         let gpg = std::process::Command::new("gpg")
             .arg("--dearmor")
@@ -106,7 +113,7 @@ impl DockerInstaller {
             .stdout(Stdio::piped())
             .spawn()?;
 
-        let output = gpg.wait_with_output().expect("failed to wait on child");
+        let output = gpg.wait_with_output()?;
 
         if !output.status.success() {
             println!("-> Failed to install GPG key");
@@ -115,7 +122,122 @@ impl DockerInstaller {
         }
 
         println!("{}", String::from_utf8_lossy(&output.stdout));
+
+        println!(
+            "   Running {}",
+            "sudo chmod a+r /etc/apt/keyrings/docker.gpg".bright_green()
+        );
+
+        let chmod = std::process::Command::new("chmod")
+            .arg("a+r")
+            .arg("/etc/apt/keyrings/docker.gpg")
+            .stdout(Stdio::piped())
+            .spawn()?;
+
+        let output = chmod.wait_with_output()?;
+
+        println!("{}", String::from_utf8_lossy(&output.stdout));
         return Ok(());
+    }
+
+    pub fn setup_repository(&self) -> Result<(), Error> {
+        println!("-> Setting up repository");
+        println!(
+            "   Running {}",
+            "echo \\
+  \"deb [arch=\"$(dpkg --print-architecture)\" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \\
+  \"$(. /etc/os-release && echo \"$VERSION_CODENAME\")\" stable\" | \\
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null".bright_green()
+        );
+
+        let mut child = std::process::Command::new("echo")
+            .arg("deb [arch=\"$(dpkg --print-architecture)\" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \"$(. /etc/os-release && echo \"$VERSION_CODENAME\")\" stable")
+            .stdout(Stdio::piped())
+            .spawn()?;
+
+        child.wait()?;
+
+        let tee = std::process::Command::new("sudo")
+            .arg("tee")
+            .arg("/etc/apt/sources.list.d/docker.list")
+            .stdin(Stdio::from(child.stdout.unwrap()))
+            .stdout(Stdio::piped())
+            .spawn()?;
+
+        let output = tee.wait_with_output()?;
+
+        if !output.status.success() {
+            println!("-> Failed to setup repository");
+            println!("{}", String::from_utf8_lossy(&output.stderr));
+            return Err(Error::msg(format!("Failed to setup repository")));
+        }
+
+        println!("{}", String::from_utf8_lossy(&output.stdout));
+
+        Ok(())
+    }
+
+    pub fn install_docker(&self) -> Result<(), Error> {
+        println!("-> Installing Docker");
+        self.apt_update()?;
+
+        println!(
+            "   Running {}",
+            "sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin".bright_green()
+        );
+
+        let mut child = std::process::Command::new("sudo")
+            .arg("apt-get")
+            .arg("install")
+            .arg("docker-ce")
+            .arg("docker-ce-cli")
+            .arg("containerd.io")
+            .arg("docker-buildx-plugin")
+            .arg("docker-compose-plugin")
+            .stdout(Stdio::piped())
+            .spawn()?;
+        let output = child.stdout.take().unwrap();
+        let output = std::io::BufReader::new(output);
+
+        for line in output.lines() {
+            println!("{}", line?);
+        }
+
+        child.wait()?;
+
+        Ok(())
+    }
+
+    pub fn post_install(&self) -> Result<(), Error> {
+        println!("-> Post install");
+        println!(
+            "   Running {}",
+            "sudo usermod -aG docker $USER".bright_green()
+        );
+
+        let mut child = std::process::Command::new("sudo")
+            .arg("usermod")
+            .arg("-aG")
+            .arg("docker")
+            .arg("$USER")
+            .stdout(Stdio::piped())
+            .spawn()?;
+        let output = child.stdout.take().unwrap();
+        let output = std::io::BufReader::new(output);
+
+        for line in output.lines() {
+            println!("{}", line?);
+        }
+
+        child.wait()?;
+
+        println!(" You need to logout and login again for the changes to take effect");
+        println!(
+            " You can also run {} to apply the changes",
+            "newgrp docker".bright_green()
+        );
+
+        Ok(())
     }
 }
 
@@ -130,32 +252,13 @@ impl Installer for DockerInstaller {
         }
 
         println!("-> Installing {}", self.name.bright_green());
-        let mut child = std::process::Command::new("brew")
-            .arg("cask")
-            .arg("install")
-            .arg("docker")
-            .stdout(std::process::Stdio::piped())
-            .stderr(std::process::Stdio::piped())
-            .spawn()?;
 
-        let stdout = child.stdout.take().unwrap();
-        let stdout = std::io::BufReader::new(stdout);
-        for line in stdout.lines() {
-            println!("   {}", line.unwrap());
-        }
-
-        let stderr = child.stderr.take().unwrap();
-        let stderr = std::io::BufReader::new(stderr);
-        for line in stderr.lines() {
-            println!("   {}", line.unwrap());
-        }
-
-        let output = child.wait_with_output()?;
-        if !output.status.success() {
-            println!("-> Failed to install {}", self.name.bright_green());
-            println!("{}", String::from_utf8_lossy(&output.stderr));
-            return Err(Error::msg(format!("Failed to install {}", self.name)));
-        }
+        self.apt_update()?;
+        self.install_dependencies()?;
+        self.install_gpg_key()?;
+        self.setup_repository()?;
+        self.install_docker()?;
+        self.post_install()?;
 
         Ok(())
     }
