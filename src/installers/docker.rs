@@ -173,7 +173,7 @@ impl DockerInstaller {
     }
 
     pub fn install_docker(&self) -> Result<(), Error> {
-        println!("-> Installing Docker");
+        println!("-> Installing docker packages");
         self.apt_update()?;
 
         println!(
