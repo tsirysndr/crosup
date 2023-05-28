@@ -93,8 +93,6 @@ impl DockerInstaller {
             return Err(Error::msg(format!("Failed to install GPG key")));
         }
 
-        println!("{}", String::from_utf8_lossy(&output.stdout));
-
         println!("   Running {}", "curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg".bright_green());
         let mut curl = std::process::Command::new("curl")
             .arg("-fsSL")
@@ -120,8 +118,6 @@ impl DockerInstaller {
             println!("{}", String::from_utf8_lossy(&output.stderr));
             return Err(Error::msg(format!("Failed to install GPG key")));
         }
-
-        println!("{}", String::from_utf8_lossy(&output.stdout));
 
         println!(
             "   Running {}",
@@ -172,8 +168,6 @@ impl DockerInstaller {
             println!("{}", String::from_utf8_lossy(&output.stderr));
             return Err(Error::msg(format!("Failed to setup repository")));
         }
-
-        println!("{}", String::from_utf8_lossy(&output.stdout));
 
         Ok(())
     }
