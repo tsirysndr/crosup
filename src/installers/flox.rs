@@ -63,22 +63,20 @@ impl Installer for FloxInstaller {
         self.configure_substituers()?;
         println!(
             "   Running {}",
-            r#"sudo -H nix profile install --impure \
-        --profile /nix/var/nix/profiles/default \
-        --experimental-features "nix-command flakes" \
-        --accept-flake-config \
-        'github:flox/floxpkgs#flox.fromCatalog'"#
+            r#"nix profile install --impure \
+            --experimental-features "nix-command flakes" \
+            --accept-flake-config \
+            'github:flox/floxpkgs#flox.fromCatalog'"#
                 .bright_green()
         );
         let mut child = std::process::Command::new("bash")
             .arg("-c")
             .arg(
                 r#". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
-                sudo -H nix profile install --impure \
-            --profile /nix/var/nix/profiles/default \
-            --experimental-features "nix-command flakes" \
-            --accept-flake-config \
-            'github:flox/floxpkgs#flox.fromCatalog'"#,
+                nix profile install --impure \
+      --experimental-features "nix-command flakes" \
+      --accept-flake-config \
+      'github:flox/floxpkgs#flox.fromCatalog'"#,
             )
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
