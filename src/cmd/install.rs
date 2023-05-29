@@ -6,6 +6,11 @@ pub fn execute_install(tool: Option<String>) -> Result<(), Error> {
     let (graph, installers) = build_installer_graph();
     match tool {
         Some(tool) => {
+            let tool = tool.replace(" ", "");
+            let tool = match tool.contains(",") {
+                true => tool.split(",").next().unwrap(),
+                false => tool.as_str(),
+            };
             let tool = installers
                 .into_iter()
                 .find(|installer| installer.name() == tool)
