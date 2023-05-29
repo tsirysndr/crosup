@@ -11,6 +11,7 @@ pub struct NixInstaller {
     name: String,
     version: String,
     dependencies: Vec<String>,
+    default: bool,
 }
 
 impl Default for NixInstaller {
@@ -19,6 +20,7 @@ impl Default for NixInstaller {
             name: "nix".to_string(),
             version: "latest".to_string(),
             dependencies: vec![],
+            default: true,
         }
     }
 }
@@ -91,7 +93,7 @@ impl Installer for NixInstaller {
     }
 
     fn name(&self) -> &str {
-        "nix"
+        &self.name
     }
 
     fn version(&self) -> &str {
@@ -100,5 +102,9 @@ impl Installer for NixInstaller {
 
     fn dependencies(&self) -> Vec<String> {
         self.dependencies.clone()
+    }
+
+    fn is_default(&self) -> bool {
+        self.default
     }
 }

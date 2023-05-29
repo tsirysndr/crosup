@@ -9,6 +9,7 @@ pub struct FishInstaller {
     name: String,
     version: String,
     dependencies: Vec<String>,
+    default: bool,
 }
 
 impl Default for FishInstaller {
@@ -17,6 +18,7 @@ impl Default for FishInstaller {
             name: "fish".to_string(),
             version: "latest".to_string(),
             dependencies: vec!["homebrew".to_string()],
+            default: true,
         }
     }
 }
@@ -89,7 +91,7 @@ impl Installer for FishInstaller {
     }
 
     fn name(&self) -> &str {
-        "fish"
+        &self.name
     }
 
     fn version(&self) -> &str {
@@ -98,5 +100,9 @@ impl Installer for FishInstaller {
 
     fn dependencies(&self) -> Vec<String> {
         self.dependencies.clone()
+    }
+
+    fn is_default(&self) -> bool {
+        self.default
     }
 }

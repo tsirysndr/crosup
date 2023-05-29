@@ -32,5 +32,18 @@ macro_rules! pipe_brew_curl {
     };
 }
 
+macro_rules! append_to_nix_conf {
+    ($echo:ident) => {
+        let mut tee = std::process::Command::new("bash")
+            .arg("-c")
+            .arg("sudo tee -a /etc/nix/nix.conf")
+            .stdin(Stdio::from($echo.stdout.unwrap()))
+            .stdout(Stdio::piped())
+            .spawn()?;
+        tee.wait()?;
+    };
+}
+
+pub(crate) use append_to_nix_conf;
 pub(crate) use pipe_brew_curl;
 pub(crate) use pipe_curl;

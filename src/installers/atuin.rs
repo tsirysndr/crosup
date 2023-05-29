@@ -11,6 +11,7 @@ pub struct AtuinInstaller {
     name: String,
     version: String,
     dependencies: Vec<String>,
+    default: bool,
 }
 
 impl Default for AtuinInstaller {
@@ -19,6 +20,7 @@ impl Default for AtuinInstaller {
             name: "atuin".to_string(),
             version: "latest".to_string(),
             dependencies: vec![],
+            default: true,
         }
     }
 }
@@ -80,5 +82,9 @@ impl Installer for AtuinInstaller {
 
     fn dependencies(&self) -> Vec<String> {
         self.dependencies.clone()
+    }
+
+    fn is_default(&self) -> bool {
+        self.default
     }
 }

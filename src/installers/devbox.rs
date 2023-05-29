@@ -11,6 +11,7 @@ pub struct DevboxInstaller {
     name: String,
     version: String,
     dependencies: Vec<String>,
+    default: bool,
 }
 
 impl Default for DevboxInstaller {
@@ -19,6 +20,7 @@ impl Default for DevboxInstaller {
             name: "devbox".to_string(),
             version: "latest".to_string(),
             dependencies: vec!["nix".to_string()],
+            default: true,
         }
     }
 }
@@ -32,7 +34,7 @@ impl Installer for DevboxInstaller {
             );
             return Ok(());
         }
-        println!("-> Installing {}", self.name().bright_green());
+        println!("-> 🚚 Installing {}", self.name().bright_green());
         println!(
             "   Running {}",
             "curl -fsSL https://get.jetpack.io/devbox | bash".bright_green()
@@ -79,5 +81,9 @@ impl Installer for DevboxInstaller {
 
     fn dependencies(&self) -> Vec<String> {
         self.dependencies.clone()
+    }
+
+    fn is_default(&self) -> bool {
+        self.default
     }
 }
