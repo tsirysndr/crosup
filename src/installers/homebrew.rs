@@ -13,6 +13,7 @@ pub struct HomebrewInstaller {
     name: String,
     version: String,
     dependencies: Vec<String>,
+    default: bool,
 }
 
 impl Default for HomebrewInstaller {
@@ -21,6 +22,7 @@ impl Default for HomebrewInstaller {
             name: "homebrew".to_string(),
             version: "latest".to_string(),
             dependencies: vec![],
+            default: true,
         }
     }
 }
@@ -101,7 +103,7 @@ impl Installer for HomebrewInstaller {
     }
 
     fn name(&self) -> &str {
-        self.name.as_str()
+        &self.name
     }
 
     fn version(&self) -> &str {
@@ -110,5 +112,9 @@ impl Installer for HomebrewInstaller {
 
     fn dependencies(&self) -> Vec<String> {
         self.dependencies.clone()
+    }
+
+    fn is_default(&self) -> bool {
+        self.default
     }
 }

@@ -9,6 +9,7 @@ pub struct TigInstaller {
     name: String,
     version: String,
     dependencies: Vec<String>,
+    default: bool,
 }
 
 impl Default for TigInstaller {
@@ -17,6 +18,7 @@ impl Default for TigInstaller {
             name: "tig".to_string(),
             version: "latest".to_string(),
             dependencies: vec!["homebrew".to_string()],
+            default: true,
         }
     }
 }
@@ -98,5 +100,9 @@ impl Installer for TigInstaller {
 
     fn dependencies(&self) -> Vec<String> {
         self.dependencies.clone()
+    }
+
+    fn is_default(&self) -> bool {
+        self.default
     }
 }

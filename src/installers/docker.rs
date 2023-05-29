@@ -9,6 +9,7 @@ pub struct DockerInstaller {
     name: String,
     version: String,
     dependencies: Vec<String>,
+    default: bool,
 }
 
 impl Default for DockerInstaller {
@@ -17,6 +18,7 @@ impl Default for DockerInstaller {
             name: "docker".to_string(),
             version: "latest".to_string(),
             dependencies: vec![],
+            default: true,
         }
     }
 }
@@ -279,7 +281,7 @@ impl Installer for DockerInstaller {
     }
 
     fn name(&self) -> &str {
-        "docker"
+        &self.name
     }
 
     fn version(&self) -> &str {
@@ -288,5 +290,9 @@ impl Installer for DockerInstaller {
 
     fn dependencies(&self) -> Vec<String> {
         self.dependencies.clone()
+    }
+
+    fn is_default(&self) -> bool {
+        self.default
     }
 }

@@ -5,6 +5,7 @@ pub mod blesh;
 pub mod devbox;
 pub mod docker;
 pub mod fish;
+pub mod flox;
 pub mod homebrew;
 pub mod nix;
 pub mod tig;
@@ -16,4 +17,5 @@ pub trait Installer {
     fn name(&self) -> &str;
     fn version(&self) -> &str;
     fn dependencies(&self) -> Vec<String>;
+    fn is_default(&self) -> bool;
 }
