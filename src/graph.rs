@@ -1,7 +1,8 @@
 use crate::installers::{
     atuin::AtuinInstaller, blesh::BleshInstaller, devbox::DevboxInstaller, docker::DockerInstaller,
     fish::FishInstaller, fzf::FzfInstaller, homebrew::HomebrewInstaller, httpie::HttpieInstaller,
-    nix::NixInstaller, tig::TigInstaller, vscode::VSCodeInstaller, Installer,
+    kubectl::KubectlInstaller, nix::NixInstaller, tig::TigInstaller, vscode::VSCodeInstaller,
+    Installer,
 };
 use anyhow::Error;
 
@@ -38,6 +39,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "devbox" => Box::new(DevboxInstaller::default()),
             "fzf" => Box::new(FzfInstaller::default()),
             "httpie" => Box::new(HttpieInstaller::default()),
+            "kubectl" => Box::new(KubectlInstaller::default()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -89,12 +91,16 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let httpie = graph.add_vertex(Vertex::from(
         Box::new(HttpieInstaller::default()) as Box<dyn Installer>
     ));
+    let kubectl = graph.add_vertex(Vertex::from(
+        Box::new(KubectlInstaller::default()) as Box<dyn Installer>
+    ));
 
     graph.add_edge(fish, homebrew);
     graph.add_edge(tig, homebrew);
     graph.add_edge(devbox, nix);
     graph.add_edge(fzf, homebrew);
     graph.add_edge(httpie, homebrew);
+    graph.add_edge(kubectl, homebrew);
 
     let installers = vec![
         Box::new(DockerInstaller::default()) as Box<dyn Installer>,
@@ -108,6 +114,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
         Box::new(DevboxInstaller::default()) as Box<dyn Installer>,
         Box::new(FzfInstaller::default()) as Box<dyn Installer>,
         Box::new(HttpieInstaller::default()) as Box<dyn Installer>,
+        Box::new(KubectlInstaller::default()) as Box<dyn Installer>,
     ];
 
     (graph, installers)
