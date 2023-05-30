@@ -22,13 +22,13 @@
 Crosup is a CLI tool to help you quickly setup your development environment on a new Chromebook (ChromeOS). It is designed to be simple and easy to use.
 
 ## 📦 Features
+- [x] Install VSCode
 - [x] Install Docker
 - [x] Install Nix
 - [x] Install Flox
 - [x] Install Devbox
 - [x] Install Homebrew
 - [x] Install Fish
-- [x] Install VSCode
 - [x] Install Ble.sh
 - [x] Install Atuin
 - [x] Install Tig
