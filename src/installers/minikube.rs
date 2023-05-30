@@ -91,6 +91,16 @@ impl MinikubeInstaller {
             .unwrap();
         child.wait()?;
 
+        let mut child = std::process::Command::new("sudo")
+            .arg("sed")
+            .arg("-i")
+            .arg("s/#remember_owner = 1/remember_owner = 0/g")
+            .arg("/etc/libvirt/qemu.conf")
+            .stdout(Stdio::piped())
+            .spawn()
+            .unwrap();
+        child.wait()?;
+
         Ok(())
     }
 }
