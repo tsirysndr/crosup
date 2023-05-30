@@ -1,7 +1,17 @@
 use crate::installers::{
-    atuin::AtuinInstaller, blesh::BleshInstaller, devbox::DevboxInstaller, docker::DockerInstaller,
-    fish::FishInstaller, fzf::FzfInstaller, homebrew::HomebrewInstaller, httpie::HttpieInstaller,
-    kubectl::KubectlInstaller, nix::NixInstaller, tig::TigInstaller, vscode::VSCodeInstaller,
+    atuin::AtuinInstaller,
+    blesh::BleshInstaller,
+    devbox::DevboxInstaller,
+    docker::DockerInstaller,
+    fish::FishInstaller,
+    fzf::FzfInstaller,
+    homebrew::HomebrewInstaller,
+    httpie::HttpieInstaller,
+    kubectl::KubectlInstaller,
+    minikube::{self, MinikubeInstaller},
+    nix::NixInstaller,
+    tig::TigInstaller,
+    vscode::VSCodeInstaller,
     Installer,
 };
 use anyhow::Error;
@@ -40,6 +50,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "fzf" => Box::new(FzfInstaller::default()),
             "httpie" => Box::new(HttpieInstaller::default()),
             "kubectl" => Box::new(KubectlInstaller::default()),
+            "minikube" => Box::new(MinikubeInstaller::default()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -94,6 +105,9 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let kubectl = graph.add_vertex(Vertex::from(
         Box::new(KubectlInstaller::default()) as Box<dyn Installer>
     ));
+    let minikube = graph.add_vertex(Vertex::from(
+        Box::new(MinikubeInstaller::default()) as Box<dyn Installer>
+    ));
 
     graph.add_edge(fish, homebrew);
     graph.add_edge(tig, homebrew);
@@ -101,6 +115,8 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     graph.add_edge(fzf, homebrew);
     graph.add_edge(httpie, homebrew);
     graph.add_edge(kubectl, homebrew);
+    graph.add_edge(minikube, homebrew);
+    graph.add_edge(minikube, kubectl);
 
     let installers = vec![
         Box::new(DockerInstaller::default()) as Box<dyn Installer>,
@@ -115,6 +131,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
         Box::new(FzfInstaller::default()) as Box<dyn Installer>,
         Box::new(HttpieInstaller::default()) as Box<dyn Installer>,
         Box::new(KubectlInstaller::default()) as Box<dyn Installer>,
+        Box::new(MinikubeInstaller::default()) as Box<dyn Installer>,
     ];
 
     (graph, installers)
