@@ -8,10 +8,10 @@ pub mod fish;
 pub mod flox;
 pub mod fzf;
 pub mod homebrew;
+pub mod httpie;
 pub mod nix;
 pub mod tig;
 pub mod vscode;
-
 pub trait Installer {
     fn install(&self) -> Result<(), Error>;
     fn is_installed(&self) -> Result<bool, Error>;

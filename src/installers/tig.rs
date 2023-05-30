@@ -3,6 +3,8 @@ use std::{io::BufRead, process::Stdio};
 use anyhow::Error;
 use owo_colors::OwoColorize;
 
+use crate::macros::brew_install;
+
 use super::Installer;
 
 pub struct TigInstaller {
@@ -33,30 +35,7 @@ impl Installer for TigInstaller {
             return Ok(());
         }
         println!("-> 🚚 Installing {}", self.name().bright_green());
-        let mut child = std::process::Command::new("brew")
-            .arg("install")
-            .arg("tig")
-            .env(
-                "PATH",
-                "/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
-            )
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()?;
-
-        let stdout = child.stdout.take().unwrap();
-        let stdout = std::io::BufReader::new(stdout);
-        for line in stdout.lines() {
-            println!("   {}", line.unwrap());
-        }
-
-        let output = child.wait_with_output()?;
-
-        if !output.status.success() {
-            println!("-> Failed to install {}", self.name().bright_green());
-            println!("{}", String::from_utf8_lossy(&output.stderr));
-            return Err(Error::msg(format!("Failed to install {}", self.name())));
-        }
+        brew_install!(self, "tig");
 
         Ok(())
     }
