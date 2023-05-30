@@ -34,7 +34,8 @@ Crosup is a CLI tool to help you quickly setup your development environment on a
 - [x] Install tig
 - [x] Install fzf
 - [x] Install httpie 
-- [x] Install kubectl 
+- [x] Install kubectl
+- [x] Install minikube 
   
 ## 🚚 Installation
 ```sh

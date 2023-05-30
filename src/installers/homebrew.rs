@@ -1,6 +1,6 @@
 use std::{io::BufRead, process::Stdio};
 
-use crate::macros::pipe_brew_curl;
+use crate::macros::{check_version, pipe_brew_curl};
 
 use super::Installer;
 use anyhow::Error;
@@ -77,27 +77,7 @@ impl Installer for HomebrewInstaller {
             "-> Checking if {} is already installed",
             self.name.bright_green()
         );
-        let child = std::process::Command::new("brew")
-            .arg("--version")
-            .env(
-                "PATH",
-                "/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
-            )
-            .stdout(Stdio::piped())
-            .spawn()?;
-
-        let output = child.wait_with_output()?;
-
-        if !output.status.success() {
-            println!("-> Failed to check {} version", self.name.bright_green());
-            println!("{}", String::from_utf8_lossy(&output.stderr));
-            return Err(Error::msg(format!("Failed to check {} version", self.name)));
-        }
-
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        for line in stdout.lines() {
-            println!("   {}", line.cyan());
-        }
+        check_version!(self, "brew", "--version");
 
         Ok(true)
     }

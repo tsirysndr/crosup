@@ -73,7 +73,35 @@ macro_rules! brew_install {
     };
 }
 
+macro_rules! check_version {
+    ($self:ident, $app:expr, $version:expr) => {
+        let child = std::process::Command::new($app)
+            .arg($version)
+            .env(
+                "PATH",
+                "/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+            )
+            .stdout(Stdio::piped())
+            .spawn()?;
+        let output = child.wait_with_output()?;
+
+        if !output.status.success() {
+            println!("-> Failed to check {} version", $self.name.bright_green());
+            println!("{}", String::from_utf8_lossy(&output.stderr));
+            return Err(Error::msg(format!(
+                "Failed to check {} version",
+                $self.name
+            )));
+        }
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        for line in stdout.lines() {
+            println!("   {}", line.cyan());
+        }
+    };
+}
 pub(crate) use append_to_nix_conf;
 pub(crate) use brew_install;
+pub(crate) use check_version;
 pub(crate) use pipe_brew_curl;
 pub(crate) use pipe_curl;

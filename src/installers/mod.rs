@@ -10,6 +10,7 @@ pub mod fzf;
 pub mod homebrew;
 pub mod httpie;
 pub mod kubectl;
+pub mod minikube;
 pub mod nix;
 pub mod tig;
 pub mod vscode;

@@ -1,5 +1,7 @@
 use std::{io::BufRead, process::Stdio};
 
+use crate::macros::check_version;
+
 use super::Installer;
 use anyhow::Error;
 use owo_colors::OwoColorize;
@@ -261,21 +263,7 @@ impl Installer for DockerInstaller {
             "-> Checking if {} is already installed",
             self.name.bright_green()
         );
-        let child = std::process::Command::new("docker")
-            .arg("--version")
-            .stdout(std::process::Stdio::piped())
-            .spawn()?;
-        let output = child.wait_with_output()?;
-        if !output.status.success() {
-            println!("-> Failed to check docker version");
-            println!("{}", String::from_utf8_lossy(&output.stderr));
-            return Err(Error::msg(format!("Failed to check {} version", self.name)));
-        }
-
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        for line in stdout.lines() {
-            println!("   {}", line.cyan());
-        }
+        check_version!(self, "docker", "--version");
 
         Ok(true)
     }

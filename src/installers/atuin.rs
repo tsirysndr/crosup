@@ -3,7 +3,7 @@ use std::{io::BufRead, process::Stdio};
 use anyhow::Error;
 use owo_colors::OwoColorize;
 
-use crate::macros::pipe_curl;
+use crate::macros::{check_version, pipe_curl};
 
 use super::Installer;
 
@@ -53,22 +53,7 @@ impl Installer for AtuinInstaller {
 
     fn is_installed(&self) -> Result<bool, Error> {
         println!("-> Checking if {} is installed", self.name().bright_green());
-        let child = std::process::Command::new("bash")
-            .arg("-c")
-            .arg("atuin --version")
-            .stdout(std::process::Stdio::piped())
-            .spawn()?;
-        let output = child.wait_with_output()?;
-        if !output.status.success() {
-            println!("-> Failed to check atuin version");
-            return Err(Error::msg(format!("Failed to check {} version", self.name)));
-        }
-
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        for line in stdout.lines() {
-            println!("   {}", line.cyan());
-        }
-
+        check_version!(self, "atuin", "--version");
         Ok(true)
     }
 
