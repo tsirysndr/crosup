@@ -11,6 +11,7 @@ use crate::installers::{
     minikube::{self, MinikubeInstaller},
     nix::NixInstaller,
     tig::TigInstaller,
+    tilt::TiltInstaller,
     vscode::VSCodeInstaller,
     Installer,
 };
@@ -51,6 +52,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "httpie" => Box::new(HttpieInstaller::default()),
             "kubectl" => Box::new(KubectlInstaller::default()),
             "minikube" => Box::new(MinikubeInstaller::default()),
+            "tilt" => Box::new(TiltInstaller::default()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -108,6 +110,9 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let minikube = graph.add_vertex(Vertex::from(
         Box::new(MinikubeInstaller::default()) as Box<dyn Installer>
     ));
+    let tilt = graph.add_vertex(Vertex::from(
+        Box::new(TiltInstaller::default()) as Box<dyn Installer>
+    ));
 
     graph.add_edge(fish, homebrew);
     graph.add_edge(tig, homebrew);
@@ -117,6 +122,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     graph.add_edge(kubectl, homebrew);
     graph.add_edge(minikube, homebrew);
     graph.add_edge(minikube, kubectl);
+    graph.add_edge(tilt, homebrew);
 
     let installers = vec![
         Box::new(DockerInstaller::default()) as Box<dyn Installer>,
@@ -132,6 +138,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
         Box::new(HttpieInstaller::default()) as Box<dyn Installer>,
         Box::new(KubectlInstaller::default()) as Box<dyn Installer>,
         Box::new(MinikubeInstaller::default()) as Box<dyn Installer>,
+        Box::new(TiltInstaller::default()) as Box<dyn Installer>,
     ];
 
     (graph, installers)
