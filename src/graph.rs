@@ -13,6 +13,7 @@ use crate::installers::{
     tig::TigInstaller,
     tilt::TiltInstaller,
     vscode::VSCodeInstaller,
+    zellij::ZellijInstaller,
     Installer,
 };
 use anyhow::Error;
@@ -113,6 +114,9 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let tilt = graph.add_vertex(Vertex::from(
         Box::new(TiltInstaller::default()) as Box<dyn Installer>
     ));
+    let zellij = graph.add_vertex(Vertex::from(
+        Box::new(ZellijInstaller::default()) as Box<dyn Installer>
+    ));
 
     graph.add_edge(fish, homebrew);
     graph.add_edge(tig, homebrew);
@@ -123,6 +127,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     graph.add_edge(minikube, homebrew);
     graph.add_edge(minikube, kubectl);
     graph.add_edge(tilt, homebrew);
+    graph.add_edge(zellij, homebrew);
 
     let installers = vec![
         Box::new(DockerInstaller::default()) as Box<dyn Installer>,
@@ -139,6 +144,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
         Box::new(KubectlInstaller::default()) as Box<dyn Installer>,
         Box::new(MinikubeInstaller::default()) as Box<dyn Installer>,
         Box::new(TiltInstaller::default()) as Box<dyn Installer>,
+        Box::new(ZellijInstaller::default()) as Box<dyn Installer>,
     ];
 
     (graph, installers)

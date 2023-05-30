@@ -15,6 +15,7 @@ pub mod nix;
 pub mod tig;
 pub mod tilt;
 pub mod vscode;
+pub mod zellij;
 
 pub trait Installer {
     fn install(&self) -> Result<(), Error>;
