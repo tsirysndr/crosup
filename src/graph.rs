@@ -1,7 +1,7 @@
 use crate::installers::{
     atuin::AtuinInstaller, blesh::BleshInstaller, devbox::DevboxInstaller, docker::DockerInstaller,
-    fish::FishInstaller, homebrew::HomebrewInstaller, nix::NixInstaller, tig::TigInstaller,
-    vscode::VSCodeInstaller, Installer,
+    fish::FishInstaller, fzf::FzfInstaller, homebrew::HomebrewInstaller, nix::NixInstaller,
+    tig::TigInstaller, vscode::VSCodeInstaller, Installer,
 };
 use anyhow::Error;
 
@@ -36,6 +36,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "homebrew" => Box::new(HomebrewInstaller::default()),
             "tig" => Box::new(TigInstaller::default()),
             "devbox" => Box::new(DevboxInstaller::default()),
+            "fzf" => Box::new(FzfInstaller::default()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -81,10 +82,14 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let devbox = graph.add_vertex(Vertex::from(
         Box::new(DevboxInstaller::default()) as Box<dyn Installer>
     ));
+    let fzf = graph.add_vertex(Vertex::from(
+        Box::new(FzfInstaller::default()) as Box<dyn Installer>
+    ));
 
     graph.add_edge(fish, homebrew);
     graph.add_edge(tig, homebrew);
     graph.add_edge(devbox, nix);
+    graph.add_edge(fzf, homebrew);
 
     let installers = vec![
         Box::new(DockerInstaller::default()) as Box<dyn Installer>,
@@ -96,6 +101,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
         Box::new(AtuinInstaller::default()) as Box<dyn Installer>,
         Box::new(TigInstaller::default()) as Box<dyn Installer>,
         Box::new(DevboxInstaller::default()) as Box<dyn Installer>,
+        Box::new(FzfInstaller::default()) as Box<dyn Installer>,
     ];
 
     (graph, installers)
