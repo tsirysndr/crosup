@@ -1,23 +1,21 @@
 use std::{io::BufRead, process::Stdio};
 
+use super::Installer;
+use crate::macros::brew_install;
 use anyhow::Error;
 use owo_colors::OwoColorize;
 
-use crate::macros::brew_install;
-
-use super::Installer;
-
-pub struct FzfInstaller {
+pub struct HttpieInstaller {
     name: String,
     version: String,
     dependencies: Vec<String>,
     default: bool,
 }
 
-impl Default for FzfInstaller {
+impl Default for HttpieInstaller {
     fn default() -> Self {
         Self {
-            name: "fzf".to_string(),
+            name: "httpie".to_string(),
             version: "latest".to_string(),
             dependencies: vec!["homebrew".to_string()],
             default: true,
@@ -25,7 +23,7 @@ impl Default for FzfInstaller {
     }
 }
 
-impl Installer for FzfInstaller {
+impl Installer for HttpieInstaller {
     fn install(&self) -> Result<(), Error> {
         if self.is_installed().is_ok() {
             println!(
@@ -35,7 +33,7 @@ impl Installer for FzfInstaller {
             return Ok(());
         }
         println!("-> 🚚 Installing {}", self.name().bright_green());
-        brew_install!(self, "fzf");
+        brew_install!(self, "httpie");
         Ok(())
     }
 
@@ -44,7 +42,7 @@ impl Installer for FzfInstaller {
             "-> Checking if {} is already installed",
             self.name.bright_green()
         );
-        let child = std::process::Command::new("fzf")
+        let child = std::process::Command::new("http")
             .arg("--version")
             .env(
                 "PATH",
