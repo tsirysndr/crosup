@@ -6,6 +6,7 @@ pub mod devbox;
 pub mod docker;
 pub mod fish;
 pub mod flox;
+pub mod fzf;
 pub mod homebrew;
 pub mod nix;
 pub mod tig;
