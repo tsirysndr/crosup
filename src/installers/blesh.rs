@@ -109,15 +109,6 @@ impl Installer for BleshInstaller {
         }
         child.wait()?;
 
-        println!("-> Running {}", "rm -rf ble.sh".bright_green());
-        let mut child = std::process::Command::new("bash")
-            .arg("-c")
-            .arg("rm -rf ble.sh")
-            .stdout(std::process::Stdio::piped())
-            .stderr(std::process::Stdio::piped())
-            .spawn()?;
-        child.wait()?;
-
         println!(
             "-> Running {}",
             "echo 'source ~/.local/share/blesh/ble.sh' >> ~/.bashrc".bright_green()
