@@ -1,7 +1,7 @@
 [package]
 authors = ["Tsiry Sandratraina <tsiry.sndr@aol.com>"]
 categories = ["command-line-utilities"]
-description = "A simple CLI tool to quickly setup your development environment on ChromeOS."
+description = "A simple CLI tool to quickly setup your development environment on Chomebook (ChromeOS)."
 edition = "2021"
 keywords = ["chromebook", "chromeos", "homebrew", "docker", "nix"]
 license = "MIT"
