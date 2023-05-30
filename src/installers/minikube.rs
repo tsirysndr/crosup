@@ -53,6 +53,46 @@ impl MinikubeInstaller {
 
         Ok(())
     }
+
+    pub fn setup_qemu_config(&self) -> Result<(), Error> {
+        println!("-> Setting up qemu config");
+        // execute the following commands:
+        // sudo sed -i 's/#user = "root"/user = "root"/g' /etc/libvirt/qemu.conf
+        // sudo sed -i 's/#group = "root"/group = "root"/g' /etc/libvirt/qemu.conf
+        // sudo sed -i 's/#dynamic_ownership = 1/dynamic_ownership = 0/g' /etc/libvirt/qemu.conf
+        // sudo sed -i 's/#remember_owner = 1/remember_owner = 0/g' /etc/libvirt/qemu.conf
+        let mut child = std::process::Command::new("sudo")
+            .arg("sed")
+            .arg("-i")
+            .arg("s/#user = \"root\"/user = \"root\"/g")
+            .arg("/etc/libvirt/qemu.conf")
+            .stdout(Stdio::piped())
+            .spawn()
+            .unwrap();
+        child.wait()?;
+
+        let mut child = std::process::Command::new("sudo")
+            .arg("sed")
+            .arg("-i")
+            .arg("s/#group = \"root\"/group = \"root\"/g")
+            .arg("/etc/libvirt/qemu.conf")
+            .stdout(Stdio::piped())
+            .spawn()
+            .unwrap();
+        child.wait()?;
+
+        let mut child = std::process::Command::new("sudo")
+            .arg("sed")
+            .arg("-i")
+            .arg("s/#dynamic_ownership = 1/dynamic_ownership = 0/g")
+            .arg("/etc/libvirt/qemu.conf")
+            .stdout(Stdio::piped())
+            .spawn()
+            .unwrap();
+        child.wait()?;
+
+        Ok(())
+    }
 }
 
 impl Installer for MinikubeInstaller {
@@ -66,6 +106,7 @@ impl Installer for MinikubeInstaller {
         }
         println!("-> 🚚 Installing {}", self.name().bright_green());
         self.install_dependencies()?;
+        self.setup_qemu_config()?;
         brew_install!(self, "minikube");
         Ok(())
     }
