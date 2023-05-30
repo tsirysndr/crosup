@@ -13,6 +13,7 @@ pub mod kubectl;
 pub mod minikube;
 pub mod nix;
 pub mod tig;
+pub mod tilt;
 pub mod vscode;
 
 pub trait Installer {
