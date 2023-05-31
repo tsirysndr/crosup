@@ -40,6 +40,7 @@ Crosup is a CLI tool to help you quickly setup your development environment on a
 - [x] Install zellij
 - [x] Install ripgrep
 - [x] Install fd
+- [x] Install exa
 
 ## 🚚 Installation
 ```sh

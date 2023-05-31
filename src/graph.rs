@@ -3,6 +3,7 @@ use crate::installers::{
     blesh::BleshInstaller,
     devbox::DevboxInstaller,
     docker::DockerInstaller,
+    exa::ExaInstaller,
     fd::FdInstaller,
     fish::FishInstaller,
     fzf::FzfInstaller,
@@ -59,6 +60,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "zellij" => Box::new(ZellijInstaller::default()),
             "ripgrep" => Box::new(RipGrepInstaller::default()),
             "fd" => Box::new(FdInstaller::default()),
+            "exa" => Box::new(ExaInstaller::default()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -128,6 +130,9 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let fd = graph.add_vertex(Vertex::from(
         Box::new(FdInstaller::default()) as Box<dyn Installer>
     ));
+    let exa = graph.add_vertex(Vertex::from(
+        Box::new(ExaInstaller::default()) as Box<dyn Installer>
+    ));
 
     graph.add_edge(fish, homebrew);
     graph.add_edge(tig, homebrew);
@@ -141,6 +146,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     graph.add_edge(zellij, homebrew);
     graph.add_edge(ripgrep, homebrew);
     graph.add_edge(fd, homebrew);
+    graph.add_edge(exa, homebrew);
 
     let installers = vec![
         Box::new(DockerInstaller::default()) as Box<dyn Installer>,
@@ -160,6 +166,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
         Box::new(ZellijInstaller::default()) as Box<dyn Installer>,
         Box::new(RipGrepInstaller::default()) as Box<dyn Installer>,
         Box::new(FdInstaller::default()) as Box<dyn Installer>,
+        Box::new(ExaInstaller::default()) as Box<dyn Installer>,
     ];
 
     (graph, installers)
