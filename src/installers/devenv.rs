@@ -1,6 +1,6 @@
 use std::process::Stdio;
 
-use crate::macros::{exec_bash, exec_bash_with_output, exec_piped_sudo, exec_sudo};
+use crate::macros::{exec_bash, exec_bash_with_output};
 use anyhow::Error;
 use owo_colors::OwoColorize;
 use std::io::BufRead;
@@ -41,8 +41,21 @@ impl DevenvInstaller {
             .spawn()?;
         echo.wait()?;
 
-        exec_piped_sudo!("tee -a /etc/nix/nix.conf", echo);
-        exec_sudo!("pkill nix-daemon");
+        let mut child = std::process::Command::new("sudo")
+            .arg("tee")
+            .arg("-a")
+            .arg("/etc/nix/nix.conf")
+            .stdin(Stdio::from(echo.stdout.unwrap()))
+            .stdout(Stdio::piped())
+            .spawn()?;
+        child.wait()?;
+
+        let mut child = std::process::Command::new("sudo")
+            .arg("pkill")
+            .arg("nix-daemon")
+            .stdout(Stdio::piped())
+            .spawn()?;
+        child.wait()?;
 
         println!("   Running {}", "cachix use devenv".bright_green());
         exec_bash!("cachix use devenv");
