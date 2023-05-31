@@ -10,6 +10,7 @@ pub mod fd;
 pub mod fish;
 pub mod flox;
 pub mod fzf;
+pub mod glow;
 pub mod homebrew;
 pub mod httpie;
 pub mod kubectl;
