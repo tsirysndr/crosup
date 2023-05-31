@@ -10,6 +10,7 @@ macro_rules! pipe_curl {
         for line in output.lines() {
             println!("{}", line?);
         }
+        child.wait()?;
     };
 }
 
@@ -100,8 +101,62 @@ macro_rules! check_version {
         }
     };
 }
+
+macro_rules! exec_bash {
+    ($command:expr) => {
+        let mut child = std::process::Command::new("bash")
+            .arg("-c")
+            .arg($command)
+            .stdout(Stdio::piped())
+            .spawn()?;
+        child.wait()?;
+    };
+}
+
+macro_rules! exec_bash_with_output {
+    ($command:expr) => {
+        let mut child = std::process::Command::new("bash")
+            .arg("-c")
+            .arg($command)
+            .stdout(Stdio::piped())
+            .spawn()?;
+        let output = child.stdout.take().unwrap();
+        let output = std::io::BufReader::new(output);
+
+        for line in output.lines() {
+            println!("{}", line?);
+        }
+        child.wait()?;
+    };
+}
+
+macro_rules! exec_sudo {
+    ($command:expr) => {
+        let mut child = std::process::Command::new("sudo")
+            .arg($command)
+            .stdout(Stdio::piped())
+            .spawn()?;
+        child.wait()?;
+    };
+}
+
+macro_rules! exec_piped_sudo {
+    ($command:expr, $stdin:ident) => {
+        let mut child = std::process::Command::new("sudo")
+            .arg($command)
+            .stdin(Stdio::from($stdin.stdout.unwrap()))
+            .stdout(Stdio::piped())
+            .spawn()?;
+        child.wait()?;
+    };
+}
+
 pub(crate) use append_to_nix_conf;
 pub(crate) use brew_install;
 pub(crate) use check_version;
+pub(crate) use exec_bash;
+pub(crate) use exec_bash_with_output;
+pub(crate) use exec_piped_sudo;
+pub(crate) use exec_sudo;
 pub(crate) use pipe_brew_curl;
 pub(crate) use pipe_curl;

@@ -3,6 +3,7 @@ use crate::installers::{
     bat::BatInstaller,
     blesh::BleshInstaller,
     devbox::DevboxInstaller,
+    devenv::DevenvInstaller,
     docker::DockerInstaller,
     exa::ExaInstaller,
     fd::FdInstaller,
@@ -65,6 +66,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "exa" => Box::new(ExaInstaller::default()),
             "bat" => Box::new(BatInstaller::default()),
             "glow" => Box::new(GlowInstaller::default()),
+            "devenv" => Box::new(DevenvInstaller::default()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -143,6 +145,9 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let glow = graph.add_vertex(Vertex::from(
         Box::new(GlowInstaller::default()) as Box<dyn Installer>
     ));
+    let devenv = graph.add_vertex(Vertex::from(
+        Box::new(DevenvInstaller::default()) as Box<dyn Installer>
+    ));
 
     graph.add_edge(fish, homebrew);
     graph.add_edge(tig, homebrew);
@@ -159,6 +164,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     graph.add_edge(exa, homebrew);
     graph.add_edge(bat, homebrew);
     graph.add_edge(glow, homebrew);
+    graph.add_edge(devenv, nix);
 
     let installers = vec![
         Box::new(DockerInstaller::default()) as Box<dyn Installer>,
@@ -181,6 +187,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
         Box::new(ExaInstaller::default()) as Box<dyn Installer>,
         Box::new(BatInstaller::default()) as Box<dyn Installer>,
         Box::new(GlowInstaller::default()) as Box<dyn Installer>,
+        Box::new(DevenvInstaller::default()) as Box<dyn Installer>,
     ];
 
     (graph, installers)

@@ -43,6 +43,7 @@ Crosup is a CLI tool to help you quickly setup your development environment on a
 - [x] Install exa
 - [x] Install bat
 - [x] Install glow
+- [x] Install devenv
 ## 🚚 Installation
 ```sh
 curl -sSL https://raw.githubusercontent.com/tsirysndr/crosup/master/install.sh | bash
