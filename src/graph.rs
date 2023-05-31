@@ -1,5 +1,6 @@
 use crate::installers::{
     atuin::AtuinInstaller,
+    bat::BatInstaller,
     blesh::BleshInstaller,
     devbox::DevboxInstaller,
     docker::DockerInstaller,
@@ -133,6 +134,9 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let exa = graph.add_vertex(Vertex::from(
         Box::new(ExaInstaller::default()) as Box<dyn Installer>
     ));
+    let bat = graph.add_vertex(Vertex::from(
+        Box::new(BatInstaller::default()) as Box<dyn Installer>
+    ));
 
     graph.add_edge(fish, homebrew);
     graph.add_edge(tig, homebrew);
@@ -147,6 +151,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     graph.add_edge(ripgrep, homebrew);
     graph.add_edge(fd, homebrew);
     graph.add_edge(exa, homebrew);
+    graph.add_edge(bat, homebrew);
 
     let installers = vec![
         Box::new(DockerInstaller::default()) as Box<dyn Installer>,
@@ -167,6 +172,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
         Box::new(RipGrepInstaller::default()) as Box<dyn Installer>,
         Box::new(FdInstaller::default()) as Box<dyn Installer>,
         Box::new(ExaInstaller::default()) as Box<dyn Installer>,
+        Box::new(BatInstaller::default()) as Box<dyn Installer>,
     ];
 
     (graph, installers)
