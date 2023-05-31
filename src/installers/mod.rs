@@ -4,6 +4,7 @@ pub mod atuin;
 pub mod blesh;
 pub mod devbox;
 pub mod docker;
+pub mod exa;
 pub mod fd;
 pub mod fish;
 pub mod flox;
@@ -18,7 +19,6 @@ pub mod tig;
 pub mod tilt;
 pub mod vscode;
 pub mod zellij;
-
 pub trait Installer {
     fn install(&self) -> Result<(), Error>;
     fn is_installed(&self) -> Result<bool, Error>;
