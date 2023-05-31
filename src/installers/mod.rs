@@ -4,6 +4,7 @@ pub mod atuin;
 pub mod blesh;
 pub mod devbox;
 pub mod docker;
+pub mod fd;
 pub mod fish;
 pub mod flox;
 pub mod fzf;
