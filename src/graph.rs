@@ -62,6 +62,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "ripgrep" => Box::new(RipGrepInstaller::default()),
             "fd" => Box::new(FdInstaller::default()),
             "exa" => Box::new(ExaInstaller::default()),
+            "bat" => Box::new(BatInstaller::default()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
