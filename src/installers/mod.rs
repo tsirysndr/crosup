@@ -12,6 +12,7 @@ pub mod httpie;
 pub mod kubectl;
 pub mod minikube;
 pub mod nix;
+pub mod ripgrep;
 pub mod tig;
 pub mod tilt;
 pub mod vscode;
