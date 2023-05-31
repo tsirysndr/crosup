@@ -70,5 +70,6 @@ OPTIONS:
 SUBCOMMANDS:
     help       Print this message or the help of the given subcommand(s)
     install    Install developer tools, possible values are: docker, nix, devbox, homebrew,
-                   flox, fish, vscode, ble.sh, atuin, tig
+                   flox, fish, vscode, ble.sh, atuin, tig, fzf, httpie, kubectl, minikube, tilt,
+                   zellij, ripgrep, fd, exa, bat, glow, devenv
 ```
