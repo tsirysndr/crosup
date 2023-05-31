@@ -38,6 +38,8 @@ Crosup is a CLI tool to help you quickly setup your development environment on a
 - [x] Install minikube
 - [x] Install tilt
 - [x] Install zellij
+- [x] Install ripgrep
+
 ## 🚚 Installation
 ```sh
 curl -sSL https://raw.githubusercontent.com/tsirysndr/crosup/master/install.sh | bash

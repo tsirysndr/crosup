@@ -10,6 +10,7 @@ use crate::installers::{
     kubectl::KubectlInstaller,
     minikube::{self, MinikubeInstaller},
     nix::NixInstaller,
+    ripgrep::RipGrepInstaller,
     tig::TigInstaller,
     tilt::TiltInstaller,
     vscode::VSCodeInstaller,
@@ -54,6 +55,8 @@ impl Into<Box<dyn Installer>> for Vertex {
             "kubectl" => Box::new(KubectlInstaller::default()),
             "minikube" => Box::new(MinikubeInstaller::default()),
             "tilt" => Box::new(TiltInstaller::default()),
+            "zellij" => Box::new(ZellijInstaller::default()),
+            "ripgrep" => Box::new(RipGrepInstaller::default()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -117,6 +120,9 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let zellij = graph.add_vertex(Vertex::from(
         Box::new(ZellijInstaller::default()) as Box<dyn Installer>
     ));
+    let ripgrep = graph.add_vertex(Vertex::from(
+        Box::new(RipGrepInstaller::default()) as Box<dyn Installer>
+    ));
 
     graph.add_edge(fish, homebrew);
     graph.add_edge(tig, homebrew);
@@ -128,6 +134,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     graph.add_edge(minikube, kubectl);
     graph.add_edge(tilt, homebrew);
     graph.add_edge(zellij, homebrew);
+    graph.add_edge(ripgrep, homebrew);
 
     let installers = vec![
         Box::new(DockerInstaller::default()) as Box<dyn Installer>,
@@ -145,6 +152,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
         Box::new(MinikubeInstaller::default()) as Box<dyn Installer>,
         Box::new(TiltInstaller::default()) as Box<dyn Installer>,
         Box::new(ZellijInstaller::default()) as Box<dyn Installer>,
+        Box::new(RipGrepInstaller::default()) as Box<dyn Installer>,
     ];
 
     (graph, installers)
