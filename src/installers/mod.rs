@@ -1,6 +1,7 @@
 use anyhow::Error;
 
 pub mod atuin;
+pub mod bat;
 pub mod blesh;
 pub mod devbox;
 pub mod docker;
