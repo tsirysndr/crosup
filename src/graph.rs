@@ -14,6 +14,7 @@ use crate::installers::{
     httpie::HttpieInstaller,
     kubectl::KubectlInstaller,
     minikube::{self, MinikubeInstaller},
+    neovim::NeoVimInstaller,
     nix::NixInstaller,
     ripgrep::RipGrepInstaller,
     tig::TigInstaller,
@@ -67,6 +68,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "bat" => Box::new(BatInstaller::default()),
             "glow" => Box::new(GlowInstaller::default()),
             "devenv" => Box::new(DevenvInstaller::default()),
+            "neovim" => Box::new(NeoVimInstaller::default()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -148,6 +150,9 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let devenv = graph.add_vertex(Vertex::from(
         Box::new(DevenvInstaller::default()) as Box<dyn Installer>
     ));
+    let neovim = graph.add_vertex(Vertex::from(
+        Box::new(NeoVimInstaller::default()) as Box<dyn Installer>
+    ));
 
     graph.add_edge(fish, homebrew);
     graph.add_edge(tig, homebrew);
@@ -165,6 +170,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     graph.add_edge(bat, homebrew);
     graph.add_edge(glow, homebrew);
     graph.add_edge(devenv, nix);
+    graph.add_edge(neovim, homebrew);
 
     let installers = vec![
         Box::new(DockerInstaller::default()) as Box<dyn Installer>,
@@ -188,6 +194,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
         Box::new(BatInstaller::default()) as Box<dyn Installer>,
         Box::new(GlowInstaller::default()) as Box<dyn Installer>,
         Box::new(DevenvInstaller::default()) as Box<dyn Installer>,
+        Box::new(NeoVimInstaller::default()) as Box<dyn Installer>,
     ];
 
     (graph, installers)

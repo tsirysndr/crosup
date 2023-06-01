@@ -16,12 +16,14 @@ pub mod homebrew;
 pub mod httpie;
 pub mod kubectl;
 pub mod minikube;
+pub mod neovim;
 pub mod nix;
 pub mod ripgrep;
 pub mod tig;
 pub mod tilt;
 pub mod vscode;
 pub mod zellij;
+
 pub trait Installer {
     fn install(&self) -> Result<(), Error>;
     fn is_installed(&self) -> Result<bool, Error>;
