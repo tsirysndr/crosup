@@ -21,6 +21,7 @@ use crate::installers::{
     tilt::TiltInstaller,
     vscode::VSCodeInstaller,
     zellij::ZellijInstaller,
+    zoxide::ZoxideInstaller,
     Installer,
 };
 use anyhow::Error;
@@ -69,6 +70,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "glow" => Box::new(GlowInstaller::default()),
             "devenv" => Box::new(DevenvInstaller::default()),
             "neovim" => Box::new(NeoVimInstaller::default()),
+            "zoxide" => Box::new(ZoxideInstaller::default()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -153,6 +155,9 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let neovim = graph.add_vertex(Vertex::from(
         Box::new(NeoVimInstaller::default()) as Box<dyn Installer>
     ));
+    let zoxide = graph.add_vertex(Vertex::from(
+        Box::new(ZoxideInstaller::default()) as Box<dyn Installer>
+    ));
 
     graph.add_edge(fish, homebrew);
     graph.add_edge(tig, homebrew);
@@ -171,6 +176,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     graph.add_edge(glow, homebrew);
     graph.add_edge(devenv, nix);
     graph.add_edge(neovim, homebrew);
+    graph.add_edge(zoxide, homebrew);
 
     let installers = vec![
         Box::new(DockerInstaller::default()) as Box<dyn Installer>,
@@ -195,6 +201,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
         Box::new(GlowInstaller::default()) as Box<dyn Installer>,
         Box::new(DevenvInstaller::default()) as Box<dyn Installer>,
         Box::new(NeoVimInstaller::default()) as Box<dyn Installer>,
+        Box::new(ZoxideInstaller::default()) as Box<dyn Installer>,
     ];
 
     (graph, installers)

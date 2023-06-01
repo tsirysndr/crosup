@@ -23,6 +23,7 @@ pub mod tig;
 pub mod tilt;
 pub mod vscode;
 pub mod zellij;
+pub mod zoxide;
 
 pub trait Installer {
     fn install(&self) -> Result<(), Error>;
