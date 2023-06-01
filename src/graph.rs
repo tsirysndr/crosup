@@ -4,6 +4,7 @@ use crate::installers::{
     blesh::BleshInstaller,
     devbox::DevboxInstaller,
     devenv::DevenvInstaller,
+    direnv::DirEnvInstaller,
     docker::DockerInstaller,
     exa::ExaInstaller,
     fd::FdInstaller,
@@ -71,6 +72,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "devenv" => Box::new(DevenvInstaller::default()),
             "neovim" => Box::new(NeoVimInstaller::default()),
             "zoxide" => Box::new(ZoxideInstaller::default()),
+            "direnv" => Box::new(DirEnvInstaller::default()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -158,6 +160,9 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let zoxide = graph.add_vertex(Vertex::from(
         Box::new(ZoxideInstaller::default()) as Box<dyn Installer>
     ));
+    let direnv = graph.add_vertex(Vertex::from(
+        Box::new(DirEnvInstaller::default()) as Box<dyn Installer>
+    ));
 
     graph.add_edge(fish, homebrew);
     graph.add_edge(tig, homebrew);
@@ -177,6 +182,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     graph.add_edge(devenv, nix);
     graph.add_edge(neovim, homebrew);
     graph.add_edge(zoxide, homebrew);
+    graph.add_edge(direnv, homebrew);
 
     let installers = vec![
         Box::new(DockerInstaller::default()) as Box<dyn Installer>,
@@ -202,6 +208,7 @@ pub fn build_installer_graph() -> (InstallerGraph, Vec<Box<dyn Installer>>) {
         Box::new(DevenvInstaller::default()) as Box<dyn Installer>,
         Box::new(NeoVimInstaller::default()) as Box<dyn Installer>,
         Box::new(ZoxideInstaller::default()) as Box<dyn Installer>,
+        Box::new(DirEnvInstaller::default()) as Box<dyn Installer>,
     ];
 
     (graph, installers)

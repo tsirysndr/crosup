@@ -46,6 +46,7 @@ Crosup is a CLI tool to help you quickly setup your development environment on a
 - [x] Install devenv
 - [x] Install neovim
 - [x] Install zoxide
+- [x] Install direnv
 ## 🚚 Installation
 ```sh
 curl -sSL https://raw.githubusercontent.com/tsirysndr/crosup/master/install.sh | bash
@@ -73,5 +74,5 @@ SUBCOMMANDS:
     help       Print this message or the help of the given subcommand(s)
     install    Install developer tools, possible values are: docker, nix, devbox, homebrew,
                    flox, fish, vscode, ble.sh, atuin, tig, fzf, httpie, kubectl, minikube, tilt,
-                   zellij, ripgrep, fd, exa, bat, glow, devenv, neovim, zoxide
+                   zellij, ripgrep, fd, exa, bat, glow, devenv, neovim, zoxide, direnv
 ```
