@@ -5,6 +5,7 @@ pub mod bat;
 pub mod blesh;
 pub mod devbox;
 pub mod devenv;
+pub mod direnv;
 pub mod docker;
 pub mod exa;
 pub mod fd;
