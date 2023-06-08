@@ -47,7 +47,10 @@ impl NixInstaller {
         if let Some(command) = self.preinstall.clone() {
             println!("-> Running preinstall command:\n{}", command.bright_green());
             for cmd in command.split("\n") {
-                exec_bash_with_output!(cmd);
+                exec_bash_with_output!(format!(
+                    ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && {}",
+                    cmd
+                ));
             }
         }
         Ok(())
