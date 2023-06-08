@@ -195,6 +195,11 @@ curl "install" {
   script "devbox" {
     url = "https://get.jetpack.io/devbox"
     version_check = "devbox version"
+
+    env {
+      FORCE = "1"
+    }
+
     shell = "bash"
     depends_on = [
       "nix"
@@ -299,6 +304,9 @@ url = "https://get.jetpack.io/devbox"
 version_check = "devbox version"
 shell = "bash"
 depends_on = ["nix"]
+
+[curl.install.script.devbox.env]
+FORCE = "1"
 
 [curl.install.script.atuin]
 url = "https://raw.githubusercontent.com/ellie/atuin/main/install.sh"
