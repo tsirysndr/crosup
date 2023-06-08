@@ -79,9 +79,9 @@ impl Installer for GitInstaller {
         self.preinstall()?;
 
         let repo_dir = self.url.split("/").last().unwrap();
-        let repo_dir = repo_dir.split(".").next().unwrap();
+        let repo_dir = repo_dir.replace(".git", "");
 
-        if !Path::exists(Path::new(repo_dir)) {
+        if !Path::exists(Path::new(&repo_dir)) {
             println!(
                 "-> Cloning {} into {}",
                 self.url.bright_green(),
