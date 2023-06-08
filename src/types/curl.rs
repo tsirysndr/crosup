@@ -80,6 +80,7 @@ pub fn default_curl_install() -> IndexMap<String, CurlConfiguration> {
             version_check: Some("devbox version".into()),
             shell: Some("bash".into()),
             depends_on: Some(vec!["nix".into()]),
+            env: Some([("FORCE".into(), "1".into())].iter().cloned().collect()),
             ..Default::default()
         },
     );
