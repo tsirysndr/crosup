@@ -1,27 +1,59 @@
-use std::{any::Any, io::BufRead, process::Stdio};
-
-use super::Installer;
 use anyhow::Error;
 use owo_colors::OwoColorize;
+use std::{any::Any, io::BufRead, process::Stdio, vec};
 
-const INSTALL_SCRIPT: &str =
-    "curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix";
+use crate::{
+    macros::{check_version, exec_bash_with_output},
+    types::nix::Package,
+};
 
+use super::Installer;
+
+#[derive(Default, Clone, Debug)]
 pub struct NixInstaller {
-    name: String,
-    version: String,
-    dependencies: Vec<String>,
-    default: bool,
+    pub name: String,
+    pub version: String,
+    pub dependencies: Vec<String>,
+    pub impure: Option<bool>,
+    pub experimental_features: Option<String>,
+    pub accept_flake_config: Option<bool>,
+    pub preinstall: Option<String>,
+    pub flake: String,
+    pub version_check: Option<String>,
+    pub provider: String,
 }
 
-impl Default for NixInstaller {
-    fn default() -> Self {
+impl From<Package> for NixInstaller {
+    fn from(pkg: Package) -> Self {
+        let mut dependencies = vec!["nix".into()];
+        dependencies.extend(pkg.depends_on.unwrap_or(vec![]));
         Self {
-            name: "nix".to_string(),
-            version: "latest".to_string(),
-            dependencies: vec![],
-            default: true,
+            name: pkg.name,
+            impure: pkg.impure,
+            experimental_features: pkg.experimental_features,
+            accept_flake_config: pkg.accept_flake_config,
+            preinstall: pkg.preinstall,
+            flake: pkg.flake,
+            dependencies,
+            version_check: pkg.version_check,
+            provider: "nix".into(),
+            ..Default::default()
         }
+    }
+}
+
+impl NixInstaller {
+    fn preinstall(&self) -> Result<(), Error> {
+        if let Some(command) = self.preinstall.clone() {
+            println!("-> Running preinstall command:\n{}", command.bright_green());
+            for cmd in command.split("\n") {
+                exec_bash_with_output!(format!(
+                    ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && {}",
+                    cmd
+                ));
+            }
+        }
+        Ok(())
     }
 }
 
@@ -34,62 +66,50 @@ impl Installer for NixInstaller {
             );
             return Ok(());
         }
+        println!("-> 🚚 Installing {}", self.name().bright_green());
+        self.preinstall()?;
 
-        println!("-> 🚚 Installing {}", self.name.bright_green());
-        let curl = std::process::Command::new("sh")
-            .arg("-c")
-            .arg(INSTALL_SCRIPT)
-            .stdout(std::process::Stdio::piped())
-            .spawn()?;
-        let mut child = std::process::Command::new("sudo")
-            .arg("sh")
-            .arg("-s")
-            .arg("--")
-            .arg("install")
-            .arg("--no-confirm")
-            .stdin(Stdio::from(curl.stdout.unwrap()))
-            .stdout(Stdio::piped())
-            .spawn()?;
+        let impure = match self.impure {
+            Some(impure) => match impure {
+                true => "--impure",
+                false => "",
+            },
+            None => "",
+        };
 
-        let stdout = child.stdout.take().unwrap();
-        let stdout = std::io::BufReader::new(stdout);
-        for line in stdout.lines() {
-            println!("   {}", line.unwrap());
-        }
+        let experimental_features = match self.experimental_features.clone() {
+            Some(features) => format!("--experimental-features \"{}\"", features),
+            None => "".to_string(),
+        };
 
-        let output = child.wait_with_output()?;
+        let accept_flake_config = match self.accept_flake_config {
+            Some(accept) => match accept {
+                true => "--accept-flake-config",
+                false => "",
+            },
+            None => "",
+        };
 
-        if !output.status.success() {
-            println!("-> Failed to install {}", self.name().bright_green());
-            println!("{}", String::from_utf8_lossy(&output.stderr));
-            return Err(Error::msg(format!("Failed to install {}", self.name())));
-        }
+        let command = format!(
+            r#". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
+        nix profile install {} {} {} \
+'{}'"#,
+            impure, experimental_features, accept_flake_config, self.flake
+        );
+        exec_bash_with_output!(command);
 
         Ok(())
     }
 
     fn is_installed(&self) -> Result<bool, Error> {
-        println!("-> Checking if {} is already installed", self.name);
-        let child = std::process::Command::new("bash")
-            .arg("-c")
-            .arg(". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix --version")
-            .stdout(Stdio::piped())
-            .spawn()?;
-
-        let output = child.wait_with_output()?;
-
-        if !output.status.success() {
-            println!("-> Failed to check {} version", self.name.bright_green());
-            println!("{}", String::from_utf8_lossy(&output.stderr));
-            return Err(Error::msg(format!("Failed to check {} version", self.name)));
+        if let Some(command) = self.version_check.clone() {
+            println!(
+                "-> Checking if {} is already installed",
+                self.name.bright_green()
+            );
+            check_version!(self, command);
         }
-
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        for line in stdout.lines() {
-            println!("   {}", line.cyan());
-        }
-
-        Ok(true)
+        Ok(false)
     }
 
     fn name(&self) -> &str {
@@ -105,11 +125,11 @@ impl Installer for NixInstaller {
     }
 
     fn is_default(&self) -> bool {
-        self.default
+        true
     }
 
     fn provider(&self) -> &str {
-        ""
+        &self.provider
     }
 
     fn as_any(&self) -> &dyn Any {
