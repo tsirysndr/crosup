@@ -75,7 +75,7 @@ impl Installer for NixInstaller {
         };
 
         let experimental_features = match self.experimental_features.clone() {
-            Some(features) => format!("--experimental-features {}", features),
+            Some(features) => format!("--experimental-features \"{}\"", features),
             None => "".to_string(),
         };
 
