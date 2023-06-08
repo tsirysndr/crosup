@@ -100,7 +100,14 @@ impl Installer for CurlInstaller {
         for line in output.lines() {
             println!("{}", line?);
         }
-        child.wait()?;
+        let status = child.wait()?;
+
+        if !status.success() {
+            return Err(anyhow::anyhow!(
+                "Failed to install {}",
+                self.name.bright_green()
+            ));
+        }
 
         self.postinstall()?;
         Ok(())

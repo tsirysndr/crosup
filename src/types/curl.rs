@@ -57,6 +57,7 @@ pub fn default_brew_installer() -> Script {
                 .cloned()
                 .collect(),
         ),
+        shell: Some("bash".into()),
         ..Default::default()
     }
 }
