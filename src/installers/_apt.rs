@@ -174,7 +174,10 @@ impl Installer for AptInstaller {
 
         if let Some(gpg_key) = self.gpg_key.clone() {
             if let Some(gpg_path) = self.gpg_path.clone() {
-                println!("-> Adding GPG key");
+                println!(
+                    "-> Adding GPG key {}",
+                    "sudo install -m 0755 -d /etc/apt/keyrings".bright_green()
+                );
                 exec_sudo!("install -m 0755 -d /etc/apt/keyrings");
                 exec_bash!(format!(
                     "curl -fsSL {} | sudo gpg --dearmor -o {}",
@@ -185,7 +188,7 @@ impl Installer for AptInstaller {
         }
 
         if let Some(setup_repository) = self.setup_repository.clone() {
-            println!("-> Adding repository");
+            println!("-> Adding repository {}", setup_repository.bright_green());
             exec_bash!(setup_repository);
         }
 
