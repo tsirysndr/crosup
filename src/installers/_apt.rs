@@ -100,7 +100,7 @@ impl AptInstaller {
         let url = self.url.clone().unwrap();
         let package_name = format!("{}.deb", self.name.clone());
 
-        let command = format!("wget -c {} -O {}.deb", url, package_name);
+        let command = format!("wget -c {} -O {}", url, package_name);
         println!("   Running {}", command.bright_green());
         let mut child = std::process::Command::new("wget")
             .arg("-c")

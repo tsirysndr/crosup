@@ -15,19 +15,27 @@ pub struct Script {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enable_sudo: Option<bool>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub postinstall: Option<String>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub version_check: Option<String>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub args: Option<String>,
+
     #[serde(
         skip_serializing_if = "Option::is_none",
         serialize_with = "hcl::ser::block"
     )]
     pub env: Option<IndexMap<String, String>>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shell: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub depends_on: Option<Vec<String>>,
 }
 
 pub fn default_nix_installer() -> Script {
@@ -71,6 +79,7 @@ pub fn default_curl_install() -> IndexMap<String, CurlConfiguration> {
             url: "https://get.jetpack.io/devbox".into(),
             version_check: Some("devbox version".into()),
             shell: Some("bash".into()),
+            depends_on: Some(vec!["nix".into()]),
             ..Default::default()
         },
     );

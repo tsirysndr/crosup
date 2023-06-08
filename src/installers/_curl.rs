@@ -30,7 +30,7 @@ impl From<Script> for CurlInstaller {
         Self {
             name: config.name,
             version: "latest".to_string(),
-            dependencies: vec![],
+            dependencies: config.depends_on.unwrap_or(vec![]),
             url: config.url,
             enable_sudo: config.enable_sudo,
             version_check: config.version_check,
