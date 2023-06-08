@@ -19,7 +19,7 @@
 
 <img src="./preview.png" width="100%" style="margin-top: 20px; margin-bottom: 20px;" />
 
-Crosup is a CLI tool to help you quickly setup your development environment on a new Chromebook (ChromeOS). It is designed to be simple and easy to use.
+Crosup is a CLI tool to help you quickly setup your development environment on a new Chromebook (ChromeOS), Mac or any Debian-based Linux. It is designed to be simple and easy to use.
 
 ## 📦 Features
 - [x] Install vscode
