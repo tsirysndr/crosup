@@ -1,0 +1,128 @@
+use anyhow::Error;
+use owo_colors::OwoColorize;
+use std::{any::Any, io::BufRead, process::Stdio};
+
+use crate::{
+    macros::{brew_install, check_version, exec_bash_with_output},
+    types::brew::{BrewConfiguration, Package},
+};
+
+use super::Installer;
+
+#[derive(Default, Clone, Debug)]
+pub struct BrewInstaller {
+    pub name: String,
+    pub version: String,
+    pub dependencies: Vec<String>,
+    pub brew_dependencies: Vec<String>,
+    pub pkgs: Vec<String>,
+    pub preinstall: Option<String>,
+    pub postinstall: Option<String>,
+    pub version_check: Option<String>,
+    pub provider: String,
+}
+
+impl From<BrewConfiguration> for BrewInstaller {
+    fn from(config: BrewConfiguration) -> Self {
+        Self {
+            name: "brew".to_string(),
+            version: "latest".to_string(),
+            dependencies: vec!["homebrew".into()],
+            pkgs: config.pkgs.unwrap_or(vec![]),
+            provider: "brew".into(),
+            ..Default::default()
+        }
+    }
+}
+
+impl From<Package> for BrewInstaller {
+    fn from(pkg: Package) -> Self {
+        Self {
+            name: pkg.name,
+            version: "latest".to_string(),
+            dependencies: vec!["homebrew".into()],
+            preinstall: pkg.preinstall,
+            postinstall: pkg.postinstall,
+            provider: "brew".into(),
+            version_check: pkg.version_check,
+            ..Default::default()
+        }
+    }
+}
+
+impl BrewInstaller {
+    fn preinstall(&self) -> Result<(), Error> {
+        if let Some(command) = self.preinstall.clone() {
+            println!("-> Running preinstall command:\n{}", command.bright_green());
+            for cmd in command.split("\n") {
+                exec_bash_with_output!(cmd);
+            }
+        }
+        Ok(())
+    }
+
+    fn postinstall(&self) -> Result<(), Error> {
+        if let Some(command) = self.postinstall.clone() {
+            println!(
+                "-> Running postinstall command:\n{}",
+                command.bright_green()
+            );
+            for cmd in command.split("\n") {
+                exec_bash_with_output!(cmd);
+            }
+        }
+        Ok(())
+    }
+}
+
+impl Installer for BrewInstaller {
+    fn install(&self) -> Result<(), Error> {
+        if self.is_installed().is_ok() {
+            println!(
+                "-> {} is already installed, skipping",
+                self.name().bright_green()
+            );
+            return Ok(());
+        }
+        println!("-> 🚚 Installing {}", self.name().bright_green());
+        self.preinstall()?;
+        brew_install!(self, &self.name);
+        self.postinstall()?;
+        Ok(())
+    }
+
+    fn is_installed(&self) -> Result<bool, Error> {
+        if let Some(command) = self.version_check.clone() {
+            println!(
+                "-> Checking if {} is already installed",
+                self.name.bright_green()
+            );
+            check_version!(self, command);
+        }
+        Ok(true)
+    }
+
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    fn version(&self) -> &str {
+        &self.version
+    }
+
+    fn dependencies(&self) -> Vec<String> {
+        self.dependencies.clone()
+    }
+
+    fn is_default(&self) -> bool {
+        true
+    }
+
+    fn provider(&self) -> &str {
+        &self.provider
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}

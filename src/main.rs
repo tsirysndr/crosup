@@ -1,6 +1,9 @@
 use anyhow::Error;
 use clap::{arg, Command};
-use crosup::cmd::install::execute_install;
+use crosup::{
+    cmd::{init::execute_init, install::execute_install},
+    types::configuration::ConfigFormat,
+};
 
 fn cli() -> Command<'static> {
     const VERSION: &'static str = env!("CARGO_PKG_VERSION");
@@ -19,6 +22,11 @@ ChromeOS developer environment setup tool"#,
         )
         .author("Tsiry Sandratraina <tsiry.sndr@aol.com>")
         .subcommand(
+            Command::new("init")
+            .arg(arg!(--toml "Generate a default configuration file in toml format")) 
+            .about("Generate a default configuration file"),
+        )
+        .subcommand(
             Command::new("install")
                 .arg(arg!([tool] "Tool to install, e.g. docker, nix, devbox, homebrew, fish, vscode, ble.sh etc."))
                 .about(
@@ -33,6 +41,13 @@ fn main() -> Result<(), Error> {
         Some(("install", args)) => {
             let tool = args.value_of("tool").map(|tool| tool.to_string());
             execute_install(tool)?;
+        }
+        Some(("init", args)) => {
+            let toml = args.is_present("toml");
+            match toml {
+                true => execute_init(ConfigFormat::TOML)?,
+                false => execute_init(ConfigFormat::HCL)?,
+            }
         }
         _ => {
             cli().print_help().unwrap();
