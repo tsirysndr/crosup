@@ -8,6 +8,7 @@ pub fn execute_install(tool: Option<String>) -> Result<(), Error> {
     match tool {
         Some(tool) => {
             let tool = tool.replace(" ", "");
+            let tool = tool.replace("ble.sh", "blesh");
             let tools = match tool.contains(",") {
                 true => tool.split(",").collect(),
                 false => vec![tool.as_str()],
