@@ -135,7 +135,7 @@ macro_rules! apt_install {
     ($package:expr) => {
         let mut child = std::process::Command::new("bash")
             .arg("-c")
-            .arg(format!("sudo apt install -y {}", $package))
+            .arg(format!("sudo apt-get install -y {}", $package))
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .spawn()?;

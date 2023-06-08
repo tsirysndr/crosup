@@ -33,7 +33,7 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
         super::brew::Package {
             name: "minikube".into(),
             preinstall: Some(
-                "sudo apt install -y qemu-system libvirt-clients libvirt-daemon-system".into(),
+                "sudo apt-get install -y qemu-system libvirt-clients libvirt-daemon-system".into(),
             ),
             postinstall: Some(
                 r#"sudo sed -i 's/#user = "root"/user = "root"/g' /etc/libvirt/qemu.conf

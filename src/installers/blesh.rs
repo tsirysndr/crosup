@@ -25,9 +25,9 @@ impl Default for BleshInstaller {
 
 impl BleshInstaller {
     fn apt_update(&self) -> Result<(), Error> {
-        println!("-> Running {}", "apt update".bright_green());
+        println!("-> Running {}", "apt-get update".bright_green());
         let mut child = std::process::Command::new("sudo")
-            .arg("apt")
+            .arg("apt-get")
             .arg("update")
             .stdout(std::process::Stdio::piped())
             .stderr(std::process::Stdio::piped())
@@ -48,10 +48,10 @@ impl BleshInstaller {
         println!("-> 🚚 Installing dependencies");
         println!(
             "   Running {}",
-            "sudo apt install -y gawk build-essential".bright_green()
+            "sudo apt=get install -y gawk build-essential".bright_green()
         );
         let mut child = std::process::Command::new("sudo")
-            .arg("apt install -y gawk build-essential")
+            .arg("apt-get install -y gawk build-essential")
             .stdout(std::process::Stdio::piped())
             .stderr(std::process::Stdio::piped())
             .spawn()?;

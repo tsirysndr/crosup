@@ -58,10 +58,10 @@ impl Installer for VSCodeInstaller {
 
         println!(
             "   Running {}",
-            "sudo apt install -y ./vscode-installer.deb".bright_green()
+            "sudo apt-get install -y ./vscode-installer.deb".bright_green()
         );
         let mut child = std::process::Command::new("sudo")
-            .arg("apt")
+            .arg("apt-get")
             .arg("install")
             .arg("-y")
             .arg("./vscode-installer.deb")

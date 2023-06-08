@@ -77,9 +77,9 @@ impl AptInstaller {
             return Ok(());
         }
 
-        println!("-> Running {}", "apt update".bright_green());
+        println!("-> Running {}", "apt-get update".bright_green());
         let mut child = std::process::Command::new("sudo")
-            .arg("apt")
+            .arg("apt-get")
             .arg("update")
             .stdout(std::process::Stdio::piped())
             .stderr(std::process::Stdio::piped())
@@ -124,10 +124,10 @@ impl AptInstaller {
             return Err(Error::msg(format!("Failed to install {}", self.name())));
         }
 
-        let command = format!("sudo apt install -y ./{}", package_name);
+        let command = format!("sudo apt-get install -y ./{}", package_name);
         println!("   Running {}", command.bright_green());
         let mut child = std::process::Command::new("sudo")
-            .arg("apt")
+            .arg("apt-get")
             .arg("install")
             .arg("-y")
             .arg(format!("./{}", package_name))
@@ -201,7 +201,13 @@ impl Installer for AptInstaller {
             return Ok(());
         }
 
-        apt_install!(self.name);
+        if let Some(packages) = self.packages.clone() {
+            let packages = packages.join(" ");
+            let command = format!("sudo apt-get install -y {}", packages);
+            println!("-> Running {}", command.bright_green());
+            apt_install!(packages);
+        }
+
         self.postinstall()?;
         Ok(())
     }

@@ -27,9 +27,9 @@ impl Default for DockerInstaller {
 
 impl DockerInstaller {
     pub fn apt_update(&self) -> Result<(), Error> {
-        println!("-> Running {}", "apt update".bright_green());
+        println!("-> Running {}", "apt-get update".bright_green());
         let mut child = std::process::Command::new("sudo")
-            .arg("apt")
+            .arg("apt-get")
             .arg("update")
             .stdout(std::process::Stdio::piped())
             .stderr(std::process::Stdio::piped())
@@ -50,10 +50,10 @@ impl DockerInstaller {
         println!("-> 🚚 Installing dependencies");
         println!(
             "   Running {}",
-            "sudo apt install -y ca-certificates curl gnupg".bright_green()
+            "sudo apt-get install -y ca-certificates curl gnupg".bright_green()
         );
         let child = std::process::Command::new("sudo")
-            .arg("apt")
+            .arg("apt-get")
             .arg("install")
             .arg("-y")
             .arg("ca-certificates")

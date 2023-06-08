@@ -41,7 +41,7 @@ pub fn default_git_install() -> IndexMap<String, GitConfiguration> {
             name: "blesh".into(),
             url: "https://github.com/akinomyoga/ble.sh.git".into(),
             install: "make -C ble.sh install PREFIX=~/.local".into(),
-            preinstall: Some("sudo apt install -y gawk build-essential".into()),
+            preinstall: Some("sudo apt-get install -y gawk build-essential".into()),
             postinstall: Some("echo 'source ~/.local/share/blesh/ble.sh' >> ~/.bashrc".into()),
             install_check: Some("~/.local/share/blesh/ble.sh".into()),
             recursive: Some(true),

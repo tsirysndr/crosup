@@ -31,10 +31,11 @@ impl MinikubeInstaller {
         );
         println!(
             "->   Running {}",
-            "sudo apt install -y qemu-system libvirt-clients libvirt-daemon-system".bright_green()
+            "sudo apt-get install -y qemu-system libvirt-clients libvirt-daemon-system"
+                .bright_green()
         );
         let mut child = std::process::Command::new("sudo")
-            .arg("apt")
+            .arg("apt-get")
             .arg("install")
             .arg("-y")
             .arg("qemu-system")
