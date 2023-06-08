@@ -1,4 +1,4 @@
-use std::{io::BufRead, process::Stdio};
+use std::{any::Any, io::BufRead, process::Stdio};
 
 use super::Installer;
 use crate::macros::{brew_install, check_version};
@@ -42,7 +42,7 @@ impl Installer for KubectlInstaller {
             "-> Checking if {} is already installed",
             self.name.bright_green()
         );
-        check_version!(self, "kubectl", "--help");
+        check_version!(self, "kubectl --help");
         Ok(true)
     }
 
@@ -60,5 +60,13 @@ impl Installer for KubectlInstaller {
 
     fn is_default(&self) -> bool {
         self.default
+    }
+
+    fn provider(&self) -> &str {
+        ""
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }

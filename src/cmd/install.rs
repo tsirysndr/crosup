@@ -1,8 +1,10 @@
 use anyhow::Error;
 
-use crate::graph::build_installer_graph;
+use crate::{config::verify_if_config_file_is_present, graph::build_installer_graph};
 
 pub fn execute_install(tool: Option<String>) -> Result<(), Error> {
+    let config = verify_if_config_file_is_present()?;
+
     match tool {
         Some(tool) => {
             let tool = tool.replace(" ", "");
@@ -11,7 +13,7 @@ pub fn execute_install(tool: Option<String>) -> Result<(), Error> {
                 false => vec![tool.as_str()],
             };
             for tool in tools {
-                let (graph, installers) = build_installer_graph();
+                let (graph, installers) = build_installer_graph(&config);
                 let tool = installers
                     .into_iter()
                     .find(|installer| installer.name() == tool)
@@ -21,7 +23,7 @@ pub fn execute_install(tool: Option<String>) -> Result<(), Error> {
             }
         }
         None => {
-            let (graph, _) = build_installer_graph();
+            let (graph, _) = build_installer_graph(&config);
             graph.install_all()?;
         }
     }

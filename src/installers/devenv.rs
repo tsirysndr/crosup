@@ -1,4 +1,4 @@
-use std::process::Stdio;
+use std::{any::Any, process::Stdio};
 
 use crate::macros::{exec_bash, exec_bash_with_output};
 use anyhow::Error;
@@ -124,5 +124,13 @@ impl Installer for DevenvInstaller {
 
     fn is_default(&self) -> bool {
         self.default
+    }
+
+    fn provider(&self) -> &str {
+        ""
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }

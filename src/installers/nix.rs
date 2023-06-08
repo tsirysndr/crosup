@@ -1,4 +1,4 @@
-use std::{io::BufRead, process::Stdio};
+use std::{any::Any, io::BufRead, process::Stdio};
 
 use super::Installer;
 use anyhow::Error;
@@ -106,5 +106,13 @@ impl Installer for NixInstaller {
 
     fn is_default(&self) -> bool {
         self.default
+    }
+
+    fn provider(&self) -> &str {
+        ""
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }

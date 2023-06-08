@@ -1,4 +1,4 @@
-use std::{io::BufRead, process::Stdio};
+use std::{any::Any, io::BufRead, process::Stdio};
 
 use anyhow::Error;
 use owo_colors::OwoColorize;
@@ -44,7 +44,7 @@ impl Installer for FishInstaller {
             "-> Checking if {} is already installed",
             self.name.bright_green()
         );
-        check_version!(self, "fish", "--version");
+        check_version!(self, "fish --version");
         Ok(true)
     }
 
@@ -62,5 +62,13 @@ impl Installer for FishInstaller {
 
     fn is_default(&self) -> bool {
         self.default
+    }
+
+    fn provider(&self) -> &str {
+        ""
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }

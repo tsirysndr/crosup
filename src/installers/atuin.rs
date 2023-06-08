@@ -1,4 +1,4 @@
-use std::{io::BufRead, process::Stdio};
+use std::{any::Any, io::BufRead, process::Stdio};
 
 use anyhow::Error;
 use owo_colors::OwoColorize;
@@ -53,7 +53,7 @@ impl Installer for AtuinInstaller {
 
     fn is_installed(&self) -> Result<bool, Error> {
         println!("-> Checking if {} is installed", self.name().bright_green());
-        check_version!(self, "atuin", "--version");
+        check_version!(self, "atuin --version");
         Ok(true)
     }
 
@@ -71,5 +71,13 @@ impl Installer for AtuinInstaller {
 
     fn is_default(&self) -> bool {
         self.default
+    }
+
+    fn provider(&self) -> &str {
+        ""
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }

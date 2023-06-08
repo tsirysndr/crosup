@@ -1,4 +1,4 @@
-use std::{io::BufRead, process::Stdio};
+use std::{any::Any, io::BufRead, process::Stdio};
 
 use anyhow::Error;
 use owo_colors::OwoColorize;
@@ -45,7 +45,7 @@ impl Installer for GlowInstaller {
             "-> Checking if {} is already installed",
             self.name.bright_green()
         );
-        check_version!(self, "glow", "--version");
+        check_version!(self, "glow --version");
         Ok(true)
     }
 
@@ -59,6 +59,14 @@ impl Installer for GlowInstaller {
 
     fn dependencies(&self) -> Vec<String> {
         self.dependencies.clone()
+    }
+
+    fn provider(&self) -> &str {
+        ""
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 
     fn is_default(&self) -> bool {

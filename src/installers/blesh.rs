@@ -1,4 +1,4 @@
-use std::io::BufRead;
+use std::{any::Any, io::BufRead};
 
 use anyhow::Error;
 use owo_colors::OwoColorize;
@@ -153,5 +153,12 @@ impl Installer for BleshInstaller {
 
     fn is_default(&self) -> bool {
         self.default
+    }
+
+    fn provider(&self) -> &str {
+        ""
+    }
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
