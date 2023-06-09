@@ -25,7 +25,7 @@ Crosup is a CLI tool to help you quickly setup your development environment on a
 - [x] Compatible with ChromeOS, Debian-based Linux, OpenSUSE, Fedora, RedHat, CentOS, Alpine and more!
 - [x] Detects your OS and installs the appropriate tools
 - [x] HCL/TOML configuration file
-- [x] Install developer tools like docker, nix, devbox, homebrew, flox, fish, vscode, ble.sh, atuin, tig, fzf, httpie, kubectl, minikube, tilt, zellij, ripgrep, fd, exa, bat, glow, devenv and more!
+- [x] Installs developer tools like docker, nix, devbox, homebrew, flox, fish, vscode, ble.sh, atuin, tig, fzf, httpie, kubectl, minikube, tilt, zellij, ripgrep, fd, exa, bat, glow, devenv and more!
   
 ## 🚚 Installation
 ```sh
