@@ -18,7 +18,7 @@ fn cli() -> Command<'static> {
           \____/_/   \____/____/\____/ .___/ 
                                     /_/      
 
-ChromeOS developer environment setup tool"#,
+Quickly install your development tools on your new Chromebook or any Linux distribution"#,
         )
         .author("Tsiry Sandratraina <tsiry.sndr@aol.com>")
         .subcommand(

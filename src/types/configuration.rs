@@ -9,6 +9,7 @@ use super::{
     dnf::DnfConfiguration,
     emerge::EmergeConfiguration,
     git::{default_git_install, GitConfiguration},
+    install::InstallConfiguration,
     nix::{default_nix_install, NixConfiguration},
     pacman::PacmanConfiguration,
     yum::YumConfiguration,
@@ -22,6 +23,11 @@ pub enum ConfigFormat {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Configuration {
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "hcl::ser::block"
+    )]
+    pub install: Option<InstallConfiguration>,
     #[serde(
         skip_serializing_if = "Option::is_none",
         serialize_with = "hcl::ser::labeled_block"
@@ -92,6 +98,7 @@ pub struct Configuration {
 impl Default for Configuration {
     fn default() -> Self {
         Configuration {
+            install: None,
             brew: Some(default_brew_install()),
             git: Some(default_git_install()),
             nix: Some(default_nix_install()),

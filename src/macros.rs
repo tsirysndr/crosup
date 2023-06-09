@@ -384,6 +384,17 @@ macro_rules! downcast_installer {
     };
 }
 
+macro_rules! convert_generic_installer {
+    ($config: ident, $generic_install: ident, $installer: ident) => {
+        $config.$installer = Some(
+            [("install".into(), $generic_install.clone().into())]
+                .into_iter()
+                .chain($config.clone().$installer.unwrap_or_default().into_iter())
+                .collect(),
+        );
+    };
+}
+
 pub(crate) use add_vertex;
 pub(crate) use add_vertex_with_condition;
 pub(crate) use apk_add;
@@ -391,6 +402,7 @@ pub(crate) use append_to_nix_conf;
 pub(crate) use apt_install;
 pub(crate) use brew_install;
 pub(crate) use check_version;
+pub(crate) use convert_generic_installer;
 pub(crate) use dnf_install;
 pub(crate) use downcast_installer;
 pub(crate) use emerge_install;

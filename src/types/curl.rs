@@ -52,12 +52,18 @@ pub fn default_nix_installer() -> Script {
 }
 
 pub fn default_brew_installer() -> Script {
+    let postinstall = match std::env::consts::OS {
+        "macos" => Some("echo 'eval $(/opt/homebrew/bin/brew shellenv)' >> ~/.zprofile".into()),
+        "linux" => {
+            Some("echo 'eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)' >> ~/.bashrc".into())
+        }
+        _ => None,
+    };
+
     Script {
         name: "homebrew".into(),
         url: "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh".into(),
-        postinstall: Some(
-            "echo 'eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)' >> ~/.bashrc".into(),
-        ),
+        postinstall,
         version_check: Some("brew --version".into()),
         env: Some(
             [("NONINTERACTIVE".into(), "true".into())]
