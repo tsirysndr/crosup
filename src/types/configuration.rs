@@ -9,6 +9,7 @@ use super::{
     dnf::DnfConfiguration,
     git::{default_git_install, GitConfiguration},
     nix::{default_nix_install, NixConfiguration},
+    pacman::PacmanConfiguration,
     yum::YumConfiguration,
     zypper::ZypperConfiguration,
 };
@@ -73,6 +74,12 @@ pub struct Configuration {
         serialize_with = "hcl::ser::labeled_block"
     )]
     pub apk: Option<IndexMap<String, ApkConfiguration>>,
+
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "hcl::ser::labeled_block"
+    )]
+    pub pacman: Option<IndexMap<String, PacmanConfiguration>>,
 }
 
 impl Default for Configuration {
@@ -87,6 +94,7 @@ impl Default for Configuration {
             dnf: None,
             zypper: None,
             apk: None,
+            pacman: None,
         }
     }
 }

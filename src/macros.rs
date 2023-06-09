@@ -68,7 +68,9 @@ macro_rules! brew_install {
 
         if !output.status.success() {
             println!("-> Failed to install {}", $self.name().bright_green());
-            println!("{}", String::from_utf8_lossy(&output.stderr));
+            if !output.stderr.is_empty() {
+                println!("{}", String::from_utf8_lossy(&output.stderr));
+            }
             return Err(Error::msg(format!("Failed to install {}", $self.name())));
         }
     };
@@ -89,7 +91,9 @@ macro_rules! check_version {
 
         if !output.status.success() {
             println!("-> Failed to check {} version", $self.name.bright_green());
-            println!("{}", String::from_utf8_lossy(&output.stderr));
+            if !output.stderr.is_empty() {
+                println!("{}", String::from_utf8_lossy(&output.stderr));
+            }
             return Err(Error::msg(format!(
                 "Failed to check {} version",
                 $self.name
@@ -264,6 +268,27 @@ macro_rules! apk_add {
     };
 }
 
+macro_rules! pacman_install {
+    ($package:expr) => {
+        let mut child = std::process::Command::new("sh")
+            .arg("-c")
+            .arg(format!("sudo pacman -S {}", $package))
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()?;
+        let output = child.stdout.take().unwrap();
+        let output = std::io::BufReader::new(output);
+
+        for line in output.lines() {
+            println!("{}", line?);
+        }
+        let status = child.wait()?;
+        if !status.success() {
+            return Err(Error::msg(format!("Failed to install {}", $package)));
+        }
+    };
+}
+
 macro_rules! exec_sudo {
     ($command:expr) => {
         let mut child = std::process::Command::new("sh")
@@ -353,6 +378,7 @@ pub(crate) use exec_piped_sudo;
 pub(crate) use exec_sh;
 pub(crate) use exec_sh_with_output;
 pub(crate) use exec_sudo;
+pub(crate) use pacman_install;
 pub(crate) use pipe_brew_curl;
 pub(crate) use pipe_curl;
 pub(crate) use yum_install;
