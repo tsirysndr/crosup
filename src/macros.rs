@@ -243,6 +243,27 @@ macro_rules! zypper_install {
     };
 }
 
+macro_rules! apk_add {
+    ($package:expr, $options:expr) => {
+        let mut child = std::process::Command::new("sh")
+            .arg("-c")
+            .arg(format!("sudo apk install {} {}", $options, $package))
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()?;
+        let output = child.stdout.take().unwrap();
+        let output = std::io::BufReader::new(output);
+
+        for line in output.lines() {
+            println!("{}", line?);
+        }
+        let status = child.wait()?;
+        if !status.success() {
+            return Err(Error::msg(format!("Failed to install {}", $package)));
+        }
+    };
+}
+
 macro_rules! exec_sudo {
     ($command:expr) => {
         let mut child = std::process::Command::new("sh")
@@ -304,6 +325,7 @@ macro_rules! add_vertex_with_condition {
 
 pub(crate) use add_vertex;
 pub(crate) use add_vertex_with_condition;
+pub(crate) use apk_add;
 pub(crate) use append_to_nix_conf;
 pub(crate) use apt_install;
 pub(crate) use brew_install;

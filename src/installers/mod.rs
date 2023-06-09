@@ -2,6 +2,7 @@ use std::any::Any;
 
 use anyhow::Error;
 
+pub mod apk;
 pub mod apt;
 pub mod brew;
 pub mod curl;
