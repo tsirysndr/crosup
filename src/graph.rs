@@ -1,7 +1,7 @@
 use crate::{
     installers::{
         apt::AptInstaller, brew::BrewInstaller, curl::CurlInstaller, git::GitInstaller,
-        nix::NixInstaller, Installer,
+        nix::NixInstaller, yum::YumInstaller, Installer,
     },
     macros::{add_vertex, add_vertex_with_condition},
     types::{
@@ -21,6 +21,7 @@ pub struct Vertex {
     curl: Option<CurlInstaller>,
     git: Option<GitInstaller>,
     nix: Option<NixInstaller>,
+    yum: Option<YumInstaller>,
 }
 
 impl From<Box<dyn Installer + 'static>> for Vertex {
@@ -83,6 +84,16 @@ impl From<Box<dyn Installer + 'static>> for Vertex {
                 ),
                 _ => None,
             },
+            yum: match installer.provider() {
+                "yum" => Some(
+                    installer
+                        .as_any()
+                        .downcast_ref::<YumInstaller>()
+                        .map(|x| x.clone())
+                        .unwrap(),
+                ),
+                _ => None,
+            },
         }
     }
 }
@@ -95,10 +106,12 @@ impl Into<Box<dyn Installer>> for Vertex {
             "curl" => Box::new(self.curl.unwrap()),
             "git" => Box::new(self.git.unwrap()),
             "nix" => Box::new(self.nix.unwrap()),
+            "yum" => Box::new(self.yum.unwrap()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
 }
+
 #[derive(Clone, Debug)]
 pub struct Edge {
     from: usize,
@@ -148,6 +161,7 @@ pub fn build_installer_graph(config: &Configuration) -> (InstallerGraph, Vec<Box
     add_vertex!(graph, CurlInstaller, config, curl, script);
     add_vertex!(graph, GitInstaller, config, git, repo);
     add_vertex!(graph, NixInstaller, config, nix, pkg);
+    add_vertex!(graph, YumInstaller, config, yum, pkg);
     add_vertex_with_condition!(graph, BrewInstaller, config, brew, pkg);
 
     setup_dependencies(&mut graph);

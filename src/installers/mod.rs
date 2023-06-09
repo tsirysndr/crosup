@@ -7,6 +7,7 @@ pub mod brew;
 pub mod curl;
 pub mod git;
 pub mod nix;
+pub mod yum;
 
 pub trait Installer {
     fn install(&self) -> Result<(), Error>;

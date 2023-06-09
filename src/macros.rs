@@ -114,6 +114,17 @@ macro_rules! exec_bash {
     };
 }
 
+macro_rules! exec_sh {
+    ($command:expr) => {
+        let mut child = std::process::Command::new("sh")
+            .arg("-c")
+            .arg($command)
+            .stdout(Stdio::piped())
+            .spawn()?;
+        child.wait()?;
+    };
+}
+
 macro_rules! exec_bash_with_output {
     ($command:expr) => {
         let mut child = std::process::Command::new("bash")
@@ -131,11 +142,46 @@ macro_rules! exec_bash_with_output {
     };
 }
 
+macro_rules! exec_sh_with_output {
+    ($command:expr) => {
+        let mut child = std::process::Command::new("sh")
+            .arg("-c")
+            .arg($command)
+            .stdout(Stdio::piped())
+            .spawn()?;
+        let output = child.stdout.take().unwrap();
+        let output = std::io::BufReader::new(output);
+
+        for line in output.lines() {
+            println!("{}", line?);
+        }
+        child.wait()?;
+    };
+}
+
 macro_rules! apt_install {
     ($package:expr) => {
-        let mut child = std::process::Command::new("bash")
+        let mut child = std::process::Command::new("sh")
             .arg("-c")
             .arg(format!("sudo apt-get install -y {}", $package))
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()?;
+        let output = child.stdout.take().unwrap();
+        let output = std::io::BufReader::new(output);
+
+        for line in output.lines() {
+            println!("{}", line?);
+        }
+        child.wait()?;
+    };
+}
+
+macro_rules! yum_install {
+    ($package:expr) => {
+        let mut child = std::process::Command::new("sh")
+            .arg("-c")
+            .arg(format!("sudo yum install -y {}", $package))
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .spawn()?;
@@ -217,6 +263,9 @@ pub(crate) use check_version;
 pub(crate) use exec_bash;
 pub(crate) use exec_bash_with_output;
 pub(crate) use exec_piped_sudo;
+pub(crate) use exec_sh;
+pub(crate) use exec_sh_with_output;
 pub(crate) use exec_sudo;
 pub(crate) use pipe_brew_curl;
 pub(crate) use pipe_curl;
+pub(crate) use yum_install;
