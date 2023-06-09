@@ -1,7 +1,7 @@
 use crate::{
     installers::{
-        apt::AptInstaller, brew::BrewInstaller, curl::CurlInstaller, git::GitInstaller,
-        nix::NixInstaller, yum::YumInstaller, Installer,
+        apt::AptInstaller, brew::BrewInstaller, curl::CurlInstaller, dnf::DnfInstaller,
+        git::GitInstaller, nix::NixInstaller, yum::YumInstaller, Installer,
     },
     macros::{add_vertex, add_vertex_with_condition},
     types::{
@@ -22,6 +22,7 @@ pub struct Vertex {
     git: Option<GitInstaller>,
     nix: Option<NixInstaller>,
     yum: Option<YumInstaller>,
+    dnf: Option<DnfInstaller>,
 }
 
 impl From<Box<dyn Installer + 'static>> for Vertex {
@@ -94,6 +95,16 @@ impl From<Box<dyn Installer + 'static>> for Vertex {
                 ),
                 _ => None,
             },
+            dnf: match installer.provider() {
+                "dnf" => Some(
+                    installer
+                        .as_any()
+                        .downcast_ref::<DnfInstaller>()
+                        .map(|x| x.clone())
+                        .unwrap(),
+                ),
+                _ => None,
+            },
         }
     }
 }
@@ -107,6 +118,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "git" => Box::new(self.git.unwrap()),
             "nix" => Box::new(self.nix.unwrap()),
             "yum" => Box::new(self.yum.unwrap()),
+            "dnf" => Box::new(self.dnf.unwrap()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -162,6 +174,7 @@ pub fn build_installer_graph(config: &Configuration) -> (InstallerGraph, Vec<Box
     add_vertex!(graph, GitInstaller, config, git, repo);
     add_vertex!(graph, NixInstaller, config, nix, pkg);
     add_vertex!(graph, YumInstaller, config, yum, pkg);
+    add_vertex!(graph, DnfInstaller, config, dnf, pkg);
     add_vertex_with_condition!(graph, BrewInstaller, config, brew, pkg);
 
     setup_dependencies(&mut graph);

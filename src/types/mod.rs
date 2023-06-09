@@ -2,6 +2,7 @@ pub mod apt;
 pub mod brew;
 pub mod configuration;
 pub mod curl;
+pub mod dnf;
 pub mod git;
 pub mod nix;
 pub mod yum;

@@ -173,7 +173,10 @@ macro_rules! apt_install {
         for line in output.lines() {
             println!("{}", line?);
         }
-        child.wait()?;
+        let status = child.wait()?;
+        if !status.success() {
+            return Err(Error::msg(format!("Failed to install {}", $package)));
+        }
     };
 }
 
@@ -191,7 +194,31 @@ macro_rules! yum_install {
         for line in output.lines() {
             println!("{}", line?);
         }
-        child.wait()?;
+        let status = child.wait()?;
+        if !status.success() {
+            return Err(Error::msg(format!("Failed to install {}", $package)));
+        }
+    };
+}
+
+macro_rules! dnf_install {
+    ($package:expr) => {
+        let mut child = std::process::Command::new("sh")
+            .arg("-c")
+            .arg(format!("sudo dnf install -y {}", $package))
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()?;
+        let output = child.stdout.take().unwrap();
+        let output = std::io::BufReader::new(output);
+
+        for line in output.lines() {
+            println!("{}", line?);
+        }
+        let status = child.wait()?;
+        if !status.success() {
+            return Err(Error::msg(format!("Failed to install {}", $package)));
+        }
     };
 }
 
@@ -260,6 +287,7 @@ pub(crate) use append_to_nix_conf;
 pub(crate) use apt_install;
 pub(crate) use brew_install;
 pub(crate) use check_version;
+pub(crate) use dnf_install;
 pub(crate) use exec_bash;
 pub(crate) use exec_bash_with_output;
 pub(crate) use exec_piped_sudo;
