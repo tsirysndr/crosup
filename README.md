@@ -79,7 +79,7 @@ SUBCOMMANDS:
 ```
 
 ## 📝 Configuration
-Crosup uses a configuration file to determine which tools to install. The default configuation is embedded in the binary, but you can generate a default configuration file (Crosfile.hcl) using the `crosup init` subcommand, you can specify the default format using the `--toml` flag.
+Crosup uses a configuration file to determine which tools to install. The default configuration is embedded in the binary, but you can generate a default configuration file (Crosfile.hcl) using the `crosup init` subcommand, you can specify the default format using the `--toml` flag.
 
 Example configuration file in HCL format:
 
