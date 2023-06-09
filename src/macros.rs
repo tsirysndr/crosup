@@ -222,6 +222,27 @@ macro_rules! dnf_install {
     };
 }
 
+macro_rules! zypper_install {
+    ($package:expr, $options:expr) => {
+        let mut child = std::process::Command::new("sh")
+            .arg("-c")
+            .arg(format!("sudo zypper install {} {}", $options, $package))
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()?;
+        let output = child.stdout.take().unwrap();
+        let output = std::io::BufReader::new(output);
+
+        for line in output.lines() {
+            println!("{}", line?);
+        }
+        let status = child.wait()?;
+        if !status.success() {
+            return Err(Error::msg(format!("Failed to install {}", $package)));
+        }
+    };
+}
+
 macro_rules! exec_sudo {
     ($command:expr) => {
         let mut child = std::process::Command::new("sh")
@@ -297,3 +318,4 @@ pub(crate) use exec_sudo;
 pub(crate) use pipe_brew_curl;
 pub(crate) use pipe_curl;
 pub(crate) use yum_install;
+pub(crate) use zypper_install;
