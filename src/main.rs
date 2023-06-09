@@ -28,6 +28,7 @@ Quickly install your development tools on your new Chromebook or any Linux distr
         )
         .subcommand(
             Command::new("install")
+                .arg(arg!(--ask -a "Ask for confirmation before installing tools"))
                 .arg(arg!([tool] "Tool to install, e.g. docker, nix, devbox, homebrew, fish, vscode, ble.sh etc."))
                 .about(
                     "Install developer tools, possible values are: docker, nix, devbox, homebrew, flox, fish, vscode, ble.sh, atuin, tig, fzf, httpie, kubectl, minikube, tilt, zellij, ripgrep, fd, exa, bat, glow, devenv",
@@ -39,8 +40,9 @@ fn main() -> Result<(), Error> {
     let matches = cli().get_matches();
     match matches.subcommand() {
         Some(("install", args)) => {
+            let ask = args.is_present("ask");
             let tool = args.value_of("tool").map(|tool| tool.to_string());
-            execute_install(tool)?;
+            execute_install(tool, ask)?;
         }
         Some(("init", args)) => {
             let toml = args.is_present("toml");
