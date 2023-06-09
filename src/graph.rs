@@ -4,7 +4,7 @@ use crate::{
         dnf::DnfInstaller, git::GitInstaller, nix::NixInstaller, yum::YumInstaller,
         zypper::ZypperInstaller, Installer,
     },
-    macros::{add_vertex, add_vertex_with_condition},
+    macros::{add_vertex, add_vertex_with_condition, downcast_installer},
     types::{
         configuration::Configuration,
         curl::{default_brew_installer, default_nix_installer},
@@ -38,96 +38,15 @@ impl From<Box<dyn Installer + 'static>> for Vertex {
                 .map(|x| x.to_string())
                 .collect(),
             provider: installer.provider().to_string(),
-            apt: match installer.provider() {
-                "apt" => Some(
-                    installer
-                        .as_any()
-                        .downcast_ref::<AptInstaller>()
-                        .map(|x| x.clone())
-                        .unwrap(),
-                ),
-                _ => None,
-            },
-            brew: match installer.provider() {
-                "brew" => Some(
-                    installer
-                        .as_any()
-                        .downcast_ref::<BrewInstaller>()
-                        .map(|x| x.clone())
-                        .unwrap(),
-                ),
-                _ => None,
-            },
-            curl: match installer.provider() {
-                "curl" => Some(
-                    installer
-                        .as_any()
-                        .downcast_ref::<CurlInstaller>()
-                        .map(|x| x.clone())
-                        .unwrap(),
-                ),
-                _ => None,
-            },
-            git: match installer.provider() {
-                "git" => Some(
-                    installer
-                        .as_any()
-                        .downcast_ref::<GitInstaller>()
-                        .map(|x| x.clone())
-                        .unwrap(),
-                ),
-                _ => None,
-            },
-            nix: match installer.provider() {
-                "nix" => Some(
-                    installer
-                        .as_any()
-                        .downcast_ref::<NixInstaller>()
-                        .map(|x| x.clone())
-                        .unwrap(),
-                ),
-                _ => None,
-            },
-            yum: match installer.provider() {
-                "yum" => Some(
-                    installer
-                        .as_any()
-                        .downcast_ref::<YumInstaller>()
-                        .map(|x| x.clone())
-                        .unwrap(),
-                ),
-                _ => None,
-            },
-            dnf: match installer.provider() {
-                "dnf" => Some(
-                    installer
-                        .as_any()
-                        .downcast_ref::<DnfInstaller>()
-                        .map(|x| x.clone())
-                        .unwrap(),
-                ),
-                _ => None,
-            },
-            zypper: match installer.provider() {
-                "zypper" => Some(
-                    installer
-                        .as_any()
-                        .downcast_ref::<ZypperInstaller>()
-                        .map(|x| x.clone())
-                        .unwrap(),
-                ),
-                _ => None,
-            },
-            apk: match installer.provider() {
-                "apk" => Some(
-                    installer
-                        .as_any()
-                        .downcast_ref::<ApkInstaller>()
-                        .map(|x| x.clone())
-                        .unwrap(),
-                ),
-                _ => None,
-            },
+            apt: downcast_installer!("apt", installer, AptInstaller),
+            brew: downcast_installer!("brew", installer, BrewInstaller),
+            curl: downcast_installer!("curl", installer, CurlInstaller),
+            git: downcast_installer!("git", installer, GitInstaller),
+            nix: downcast_installer!("nix", installer, NixInstaller),
+            yum: downcast_installer!("yum", installer, YumInstaller),
+            dnf: downcast_installer!("dnf", installer, DnfInstaller),
+            zypper: downcast_installer!("zypper", installer, ZypperInstaller),
+            apk: downcast_installer!("apk", installer, ApkInstaller),
         }
     }
 }

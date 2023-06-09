@@ -323,6 +323,21 @@ macro_rules! add_vertex_with_condition {
     };
 }
 
+macro_rules! downcast_installer {
+    ($label: expr,$installer: ident, $installer_type: ident) => {
+        match $installer.provider() {
+            $label => Some(
+                $installer
+                    .as_any()
+                    .downcast_ref::<$installer_type>()
+                    .map(|x| x.clone())
+                    .unwrap(),
+            ),
+            _ => None,
+        }
+    };
+}
+
 pub(crate) use add_vertex;
 pub(crate) use add_vertex_with_condition;
 pub(crate) use apk_add;
@@ -331,6 +346,7 @@ pub(crate) use apt_install;
 pub(crate) use brew_install;
 pub(crate) use check_version;
 pub(crate) use dnf_install;
+pub(crate) use downcast_installer;
 pub(crate) use exec_bash;
 pub(crate) use exec_bash_with_output;
 pub(crate) use exec_piped_sudo;
