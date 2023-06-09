@@ -120,7 +120,9 @@ impl AptInstaller {
 
         if !output.status.success() {
             println!("-> Failed to download {}", self.name().bright_green());
-            println!("{}", String::from_utf8_lossy(&output.stderr));
+            if !output.stdout.is_empty() {
+                println!("{}", String::from_utf8_lossy(&output.stdout));
+            }
             return Err(Error::msg(format!("Failed to install {}", self.name())));
         }
 

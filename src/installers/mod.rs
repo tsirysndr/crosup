@@ -9,6 +9,7 @@ pub mod curl;
 pub mod dnf;
 pub mod git;
 pub mod nix;
+pub mod pacman;
 pub mod yum;
 pub mod zypper;
 
