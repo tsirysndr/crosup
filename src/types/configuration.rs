@@ -7,6 +7,7 @@ use super::{
     brew::{default_brew_install, BrewConfiguration},
     curl::{default_curl_install, CurlConfiguration},
     dnf::DnfConfiguration,
+    emerge::EmergeConfiguration,
     git::{default_git_install, GitConfiguration},
     nix::{default_nix_install, NixConfiguration},
     pacman::PacmanConfiguration,
@@ -80,6 +81,12 @@ pub struct Configuration {
         serialize_with = "hcl::ser::labeled_block"
     )]
     pub pacman: Option<IndexMap<String, PacmanConfiguration>>,
+
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "hcl::ser::labeled_block"
+    )]
+    pub emerge: Option<IndexMap<String, EmergeConfiguration>>,
 }
 
 impl Default for Configuration {
@@ -95,6 +102,7 @@ impl Default for Configuration {
             zypper: None,
             apk: None,
             pacman: None,
+            emerge: None,
         }
     }
 }
