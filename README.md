@@ -69,7 +69,7 @@ SUBCOMMANDS:
                    zellij, ripgrep, fd, exa, bat, glow, devenv
 ```
 
-## Minimal Configuration
+## 🛠️ Minimal Configuration
 This is a minimal configuration file to install vim and git:
 
 ```toml
