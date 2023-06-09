@@ -4,13 +4,17 @@ use crate::{
         dnf::DnfInstaller, emerge::EmergeInstaller, git::GitInstaller, nix::NixInstaller,
         pacman::PacmanInstaller, yum::YumInstaller, zypper::ZypperInstaller, Installer,
     },
-    macros::{add_vertex, add_vertex_with_condition, downcast_installer},
+    macros::{
+        add_vertex, add_vertex_with_condition, convert_generic_installer, downcast_installer,
+    },
     types::{
         configuration::Configuration,
         curl::{default_brew_installer, default_nix_installer},
     },
 };
 use anyhow::Error;
+use os_release::OsRelease;
+use owo_colors::OwoColorize;
 
 #[derive(Debug, Clone)]
 pub struct Vertex {
@@ -92,7 +96,62 @@ impl Into<Vec<Box<dyn Installer>>> for InstallerGraph {
     }
 }
 
-pub fn build_installer_graph(config: &Configuration) -> (InstallerGraph, Vec<Box<dyn Installer>>) {
+pub fn autodetect_installer(config: &mut Configuration) {
+    if let Some(generic_install) = &config.install {
+        // detect linux
+        if cfg!(target_os = "linux") {
+            // determine linux distribution using os-release
+            if let Ok(os_release) = OsRelease::new() {
+                let os = os_release.id.to_lowercase();
+                let os = os.as_str();
+
+                let package_manager = match os {
+                    "ubuntu" | "debian" | "linuxmint" | "pop" | "elementary" | "zorin" => {
+                        convert_generic_installer!(config, generic_install, apt);
+                        "apt-get"
+                    }
+                    "fedora" | "centos" | "rhel" | "rocky" | "amazon" => {
+                        convert_generic_installer!(config, generic_install, dnf);
+                        "dnf"
+                    }
+                    "opensuse" | "sles" => {
+                        convert_generic_installer!(config, generic_install, zypper);
+                        "zypper"
+                    }
+                    "arch" | "manjaro" => {
+                        convert_generic_installer!(config, generic_install, pacman);
+                        "pacman"
+                    }
+                    "gentoo" => {
+                        convert_generic_installer!(config, generic_install, emerge);
+                        "emerge"
+                    }
+                    "alpine" => {
+                        convert_generic_installer!(config, generic_install, apk);
+                        "apk"
+                    }
+                    _ => panic!("Unsupported OS: {}", os),
+                };
+
+                let os_pretty = os_release.pretty_name;
+                println!("-> Detected OS:🐧 {}", os_pretty.magenta());
+                println!(
+                    "-> Using package manager: 📦 {}",
+                    package_manager.bright_green()
+                );
+            }
+        }
+        if cfg!(target_os = "macos") {
+            println!("-> Detected OS: 🍎 macOS");
+            println!("-> Using package manager: 📦 {}", "brew".bright_green());
+            convert_generic_installer!(config, generic_install, brew);
+        }
+    }
+}
+
+pub fn build_installer_graph(
+    config: &mut Configuration,
+) -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let mut graph = InstallerGraph::new();
 
     if config.clone().nix.is_some() {
@@ -118,6 +177,8 @@ pub fn build_installer_graph(config: &Configuration) -> (InstallerGraph, Vec<Box
             }
         }
     }
+
+    autodetect_installer(config);
 
     add_vertex!(graph, AptInstaller, config, apt, pkg);
     add_vertex!(graph, CurlInstaller, config, curl, script);
