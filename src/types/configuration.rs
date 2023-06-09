@@ -2,6 +2,7 @@ use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 
 use super::{
+    apk::ApkConfiguration,
     apt::{default_apt_install, AptConfiguration},
     brew::{default_brew_install, BrewConfiguration},
     curl::{default_curl_install, CurlConfiguration},
@@ -66,6 +67,12 @@ pub struct Configuration {
         serialize_with = "hcl::ser::labeled_block"
     )]
     pub zypper: Option<IndexMap<String, ZypperConfiguration>>,
+
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "hcl::ser::labeled_block"
+    )]
+    pub apk: Option<IndexMap<String, ApkConfiguration>>,
 }
 
 impl Default for Configuration {
@@ -79,6 +86,7 @@ impl Default for Configuration {
             yum: None,
             dnf: None,
             zypper: None,
+            apk: None,
         }
     }
 }

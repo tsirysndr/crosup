@@ -1,8 +1,8 @@
 use crate::{
     installers::{
-        apt::AptInstaller, brew::BrewInstaller, curl::CurlInstaller, dnf::DnfInstaller,
-        git::GitInstaller, nix::NixInstaller, yum::YumInstaller, zypper::ZypperInstaller,
-        Installer,
+        apk::ApkInstaller, apt::AptInstaller, brew::BrewInstaller, curl::CurlInstaller,
+        dnf::DnfInstaller, git::GitInstaller, nix::NixInstaller, yum::YumInstaller,
+        zypper::ZypperInstaller, Installer,
     },
     macros::{add_vertex, add_vertex_with_condition},
     types::{
@@ -25,6 +25,7 @@ pub struct Vertex {
     yum: Option<YumInstaller>,
     dnf: Option<DnfInstaller>,
     zypper: Option<ZypperInstaller>,
+    apk: Option<ApkInstaller>,
 }
 
 impl From<Box<dyn Installer + 'static>> for Vertex {
@@ -117,6 +118,16 @@ impl From<Box<dyn Installer + 'static>> for Vertex {
                 ),
                 _ => None,
             },
+            apk: match installer.provider() {
+                "apk" => Some(
+                    installer
+                        .as_any()
+                        .downcast_ref::<ApkInstaller>()
+                        .map(|x| x.clone())
+                        .unwrap(),
+                ),
+                _ => None,
+            },
         }
     }
 }
@@ -132,6 +143,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "yum" => Box::new(self.yum.unwrap()),
             "dnf" => Box::new(self.dnf.unwrap()),
             "zypper" => Box::new(self.zypper.unwrap()),
+            "apk" => Box::new(self.apk.unwrap()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -189,6 +201,7 @@ pub fn build_installer_graph(config: &Configuration) -> (InstallerGraph, Vec<Box
     add_vertex!(graph, YumInstaller, config, yum, pkg);
     add_vertex!(graph, DnfInstaller, config, dnf, pkg);
     add_vertex!(graph, ZypperInstaller, config, zypper, pkg);
+    add_vertex!(graph, ApkInstaller, config, apk, pkg);
     add_vertex_with_condition!(graph, BrewInstaller, config, brew, pkg);
 
     setup_dependencies(&mut graph);
