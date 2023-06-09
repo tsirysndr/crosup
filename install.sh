@@ -49,4 +49,4 @@ Please file an issue if you encounter any problems!
 
 EOF
 
-crosup install
+crosup install --ask
