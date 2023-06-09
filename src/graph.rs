@@ -1,8 +1,8 @@
 use crate::{
     installers::{
         apk::ApkInstaller, apt::AptInstaller, brew::BrewInstaller, curl::CurlInstaller,
-        dnf::DnfInstaller, git::GitInstaller, nix::NixInstaller, pacman::PacmanInstaller,
-        yum::YumInstaller, zypper::ZypperInstaller, Installer,
+        dnf::DnfInstaller, emerge::EmergeInstaller, git::GitInstaller, nix::NixInstaller,
+        pacman::PacmanInstaller, yum::YumInstaller, zypper::ZypperInstaller, Installer,
     },
     macros::{add_vertex, add_vertex_with_condition, downcast_installer},
     types::{
@@ -27,6 +27,7 @@ pub struct Vertex {
     zypper: Option<ZypperInstaller>,
     apk: Option<ApkInstaller>,
     pacman: Option<PacmanInstaller>,
+    emerge: Option<EmergeInstaller>,
 }
 
 impl From<Box<dyn Installer + 'static>> for Vertex {
@@ -49,6 +50,7 @@ impl From<Box<dyn Installer + 'static>> for Vertex {
             zypper: downcast_installer!("zypper", installer, ZypperInstaller),
             apk: downcast_installer!("apk", installer, ApkInstaller),
             pacman: downcast_installer!("pacman", installer, PacmanInstaller),
+            emerge: downcast_installer!("emerge", installer, EmergeInstaller),
         }
     }
 }
@@ -66,6 +68,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "zypper" => Box::new(self.zypper.unwrap()),
             "apk" => Box::new(self.apk.unwrap()),
             "pacman" => Box::new(self.pacman.unwrap()),
+            "emerge" => Box::new(self.emerge.unwrap()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -125,6 +128,7 @@ pub fn build_installer_graph(config: &Configuration) -> (InstallerGraph, Vec<Box
     add_vertex!(graph, ZypperInstaller, config, zypper, pkg);
     add_vertex!(graph, ApkInstaller, config, apk, pkg);
     add_vertex!(graph, PacmanInstaller, config, pacman, pkg);
+    add_vertex!(graph, EmergeInstaller, config, emerge, pkg);
     add_vertex_with_condition!(graph, BrewInstaller, config, brew, pkg);
 
     setup_dependencies(&mut graph);

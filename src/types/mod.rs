@@ -4,6 +4,7 @@ pub mod brew;
 pub mod configuration;
 pub mod curl;
 pub mod dnf;
+pub mod emerge;
 pub mod git;
 pub mod nix;
 pub mod pacman;

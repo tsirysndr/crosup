@@ -7,6 +7,7 @@ pub mod apt;
 pub mod brew;
 pub mod curl;
 pub mod dnf;
+pub mod emerge;
 pub mod git;
 pub mod nix;
 pub mod pacman;

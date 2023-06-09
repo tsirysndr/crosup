@@ -289,6 +289,27 @@ macro_rules! pacman_install {
     };
 }
 
+macro_rules! emerge_install {
+    ($package:expr, $options:expr) => {
+        let mut child = std::process::Command::new("sh")
+            .arg("-c")
+            .arg(format!("sudo emerge {} {}", $options, $package))
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()?;
+        let output = child.stdout.take().unwrap();
+        let output = std::io::BufReader::new(output);
+
+        for line in output.lines() {
+            println!("{}", line?);
+        }
+        let status = child.wait()?;
+        if !status.success() {
+            return Err(Error::msg(format!("Failed to install {}", $package)));
+        }
+    };
+}
+
 macro_rules! exec_sudo {
     ($command:expr) => {
         let mut child = std::process::Command::new("sh")
@@ -372,6 +393,7 @@ pub(crate) use brew_install;
 pub(crate) use check_version;
 pub(crate) use dnf_install;
 pub(crate) use downcast_installer;
+pub(crate) use emerge_install;
 pub(crate) use exec_bash;
 pub(crate) use exec_bash_with_output;
 pub(crate) use exec_piped_sudo;
