@@ -5,6 +5,7 @@ use super::{
     apt::{default_apt_install, AptConfiguration},
     brew::{default_brew_install, BrewConfiguration},
     curl::{default_curl_install, CurlConfiguration},
+    dnf::DnfConfiguration,
     git::{default_git_install, GitConfiguration},
     nix::{default_nix_install, NixConfiguration},
     yum::YumConfiguration,
@@ -52,6 +53,12 @@ pub struct Configuration {
         serialize_with = "hcl::ser::labeled_block"
     )]
     pub yum: Option<IndexMap<String, YumConfiguration>>,
+
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "hcl::ser::labeled_block"
+    )]
+    pub dnf: Option<IndexMap<String, DnfConfiguration>>,
 }
 
 impl Default for Configuration {
@@ -63,6 +70,7 @@ impl Default for Configuration {
             curl: Some(default_curl_install()),
             apt: Some(default_apt_install()),
             yum: None,
+            dnf: None,
         }
     }
 }
