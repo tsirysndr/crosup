@@ -9,6 +9,7 @@ use super::{
     git::{default_git_install, GitConfiguration},
     nix::{default_nix_install, NixConfiguration},
     yum::YumConfiguration,
+    zypper::ZypperConfiguration,
 };
 
 pub enum ConfigFormat {
@@ -59,6 +60,12 @@ pub struct Configuration {
         serialize_with = "hcl::ser::labeled_block"
     )]
     pub dnf: Option<IndexMap<String, DnfConfiguration>>,
+
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "hcl::ser::labeled_block"
+    )]
+    pub zypper: Option<IndexMap<String, ZypperConfiguration>>,
 }
 
 impl Default for Configuration {
@@ -71,6 +78,7 @@ impl Default for Configuration {
             apt: Some(default_apt_install()),
             yum: None,
             dnf: None,
+            zypper: None,
         }
     }
 }

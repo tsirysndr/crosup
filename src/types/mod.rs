@@ -6,6 +6,7 @@ pub mod dnf;
 pub mod git;
 pub mod nix;
 pub mod yum;
+pub mod zypper;
 
 pub const CROSFILE_TOML: &str = "Crosfile.toml";
 pub const CROSFILE_HCL: &str = "Crosfile.hcl";

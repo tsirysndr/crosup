@@ -9,6 +9,7 @@ pub mod dnf;
 pub mod git;
 pub mod nix;
 pub mod yum;
+pub mod zypper;
 
 pub trait Installer {
     fn install(&self) -> Result<(), Error>;
