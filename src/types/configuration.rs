@@ -7,6 +7,7 @@ use super::{
     curl::{default_curl_install, CurlConfiguration},
     git::{default_git_install, GitConfiguration},
     nix::{default_nix_install, NixConfiguration},
+    yum::YumConfiguration,
 };
 
 pub enum ConfigFormat {
@@ -45,6 +46,12 @@ pub struct Configuration {
         serialize_with = "hcl::ser::labeled_block"
     )]
     pub apt: Option<IndexMap<String, AptConfiguration>>,
+
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "hcl::ser::labeled_block"
+    )]
+    pub yum: Option<IndexMap<String, YumConfiguration>>,
 }
 
 impl Default for Configuration {
@@ -55,6 +62,7 @@ impl Default for Configuration {
             nix: Some(default_nix_install()),
             curl: Some(default_curl_install()),
             apt: Some(default_apt_install()),
+            yum: None,
         }
     }
 }
