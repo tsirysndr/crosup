@@ -4,15 +4,21 @@ use anyhow::Error;
 use inquire::Confirm;
 use owo_colors::OwoColorize;
 
-use crosup_types::configuration::{ConfigFormat, Configuration};
+use crosup_types::{
+    configuration::{ConfigFormat, Configuration},
+    inventory::Inventory,
+};
 
-pub fn execute_init(cfg_format: ConfigFormat) -> Result<(), Error> {
+pub fn execute_init(cfg_format: ConfigFormat, inventory: bool) -> Result<(), Error> {
     let ext = match cfg_format {
         ConfigFormat::HCL => "hcl",
         ConfigFormat::TOML => "toml",
     };
 
-    let filename = format!("Crosfile.{}", ext);
+    let filename = match inventory {
+        true => format!("Inventory.{}", ext),
+        false => format!("Crosfile.{}", ext),
+    };
 
     if std::path::Path::new(&filename).exists() {
         let answer = Confirm::new(
@@ -29,6 +35,19 @@ pub fn execute_init(cfg_format: ConfigFormat) -> Result<(), Error> {
             println!("Exiting...");
             return Ok(());
         }
+    }
+
+    if inventory {
+        let inventory = Inventory::default();
+        let serialized = match cfg_format {
+            ConfigFormat::HCL => hcl::to_string(&inventory).unwrap(),
+            ConfigFormat::TOML => toml::to_string_pretty(&inventory).unwrap(),
+        };
+
+        let mut file = std::fs::File::create(&filename).unwrap();
+        file.write_all(serialized.as_bytes()).unwrap();
+        println!("Created {} ✨", filename.bright_green());
+        return Ok(());
     }
 
     let config = Configuration::default();

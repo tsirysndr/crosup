@@ -1,14 +1,25 @@
 use anyhow::Error;
-use crosup_core::{config::verify_if_config_file_is_present, graph::build_installer_graph};
+use crosup_core::{
+    config::{verify_if_config_file_is_present, verify_if_inventory_config_file_is_present},
+    graph::build_installer_graph,
+};
+use crosup_ssh::setup_ssh_connection;
 use crosup_types::configuration::Configuration;
 use owo_colors::OwoColorize;
+use ssh2::Session;
 
-pub fn execute_install(tool: Option<String>, ask: bool) -> Result<(), Error> {
+use crate::types::InstallArgs;
+
+pub fn execute_install(args: InstallArgs) -> Result<(), Error> {
     let mut config = verify_if_config_file_is_present()?;
 
-    ask_confirmation(ask, &mut config);
+    ask_confirmation(args.ask, &mut config);
 
-    match tool {
+    if args.remote_is_present {
+        parse_args(&args)?;
+    }
+
+    match args.tool {
         Some(tool) => {
             let tool = tool.replace(" ", "");
             let tool = tool.replace("ble.sh", "blesh");
@@ -55,6 +66,36 @@ fn ask_confirmation(ask: bool, config: &mut Configuration) {
         match input.trim() {
             "y" | "Y" => {}
             _ => std::process::exit(0),
+        }
+    }
+}
+
+fn parse_args(args: &InstallArgs) -> Result<Vec<Session>, Error> {
+    let remote = args.remote.as_ref();
+
+    match remote {
+        Some(remote) => {
+            if args.username.is_none() {
+                return Err(Error::msg(
+                    "username is required, please use -u or --username",
+                ));
+            }
+            let port = args.port.unwrap_or(22);
+            let username = args.username.as_ref().unwrap();
+            let addr = format!("{}:{}", *remote, port);
+            let session = setup_ssh_connection(&addr, username)?;
+            Ok(vec![session])
+        }
+        None => {
+            let config = verify_if_inventory_config_file_is_present()?;
+            let mut sessions = Vec::new();
+            for (_, server) in config.server.iter() {
+                let port = server.port.unwrap_or(22);
+                let addr = format!("{}:{}", server.host, port);
+                let session = setup_ssh_connection(&addr, &server.username).unwrap();
+                sessions.push(session);
+            }
+            return Ok(sessions);
         }
     }
 }
