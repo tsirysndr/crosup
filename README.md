@@ -29,7 +29,7 @@ Crosup is a CLI tool to help you quickly setup your development environment on a
   
 ## 🚚 Installation
 ```sh
-curl -sSL https://raw.githubusercontent.com/tsirysndr/crosup/master/install.sh | bash
+bash <(curl -sSL https://raw.githubusercontent.com/tsirysndr/crosup/master/install.sh)
 ```
 
 ## 📦 Supported OS
