@@ -39,7 +39,7 @@ jobs:
       - name: Build and Copy Target
         run: |
           docker run --rm -v ${{ github.workspace }}:/app -w /app rust:1.69-bullseye \
-            sh -c "apt-get update && apt-get install -y build-essential && cargo build --release \
+            sh -c "apt-get update && apt-get install -y build-essential && cargo build -p crosup --release \
 
             "
 
