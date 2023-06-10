@@ -3,10 +3,8 @@ use indexmap::IndexMap;
 use owo_colors::OwoColorize;
 use std::{any::Any, io::BufRead, process::Stdio};
 
-use crate::{
-    macros::{check_version, exec_bash_with_output},
-    types::curl::Script,
-};
+use crosup_macros::{check_version, exec_bash_with_output};
+use crosup_types::curl::Script;
 
 use super::Installer;
 

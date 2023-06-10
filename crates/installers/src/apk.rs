@@ -1,63 +1,51 @@
+use crosup_macros::{apk_add, check_version, exec_sh_with_output};
+use crosup_types::apk::Package;
+
 use anyhow::Error;
 use owo_colors::OwoColorize;
 use std::{any::Any, io::BufRead, process::Stdio};
 
-use crate::{
-    macros::{brew_install, check_version, exec_bash_with_output},
-    types::brew::{BrewConfiguration, Package},
-};
-
 use super::Installer;
 
 #[derive(Default, Clone, Debug)]
-pub struct BrewInstaller {
+pub struct ApkInstaller {
     pub name: String,
     pub version: String,
     pub dependencies: Vec<String>,
-    pub brew_dependencies: Vec<String>,
-    pub pkgs: Vec<String>,
-    pub preinstall: Option<String>,
+    pub apk_dependencies: Vec<String>,
+    pub packages: Option<Vec<String>>,
     pub postinstall: Option<String>,
     pub version_check: Option<String>,
+    pub interactive: bool,
     pub provider: String,
 }
 
-impl From<BrewConfiguration> for BrewInstaller {
-    fn from(config: BrewConfiguration) -> Self {
-        Self {
-            name: "brew".to_string(),
-            version: "latest".to_string(),
-            dependencies: vec!["homebrew".into()],
-            pkgs: config.pkgs.unwrap_or(vec![]),
-            provider: "brew".into(),
-            ..Default::default()
-        }
-    }
-}
-
-impl From<Package> for BrewInstaller {
+impl From<Package> for ApkInstaller {
     fn from(pkg: Package) -> Self {
         Self {
             name: pkg.name,
-            version: "latest".to_string(),
-            dependencies: vec!["homebrew".into()],
-            preinstall: pkg.preinstall,
-            postinstall: pkg.postinstall,
-            provider: "brew".into(),
+            packages: pkg.packages,
+            apk_dependencies: pkg.depends_on.unwrap_or(vec![]),
+            provider: "apk".into(),
             version_check: pkg.version_check,
+            interactive: pkg.interactive.unwrap_or(false),
             ..Default::default()
         }
     }
 }
 
-impl BrewInstaller {
-    fn preinstall(&self) -> Result<(), Error> {
-        if let Some(command) = self.preinstall.clone() {
-            println!("-> Running preinstall command:\n{}", command.bright_green());
-            for cmd in command.split("\n") {
-                exec_bash_with_output!(cmd);
-            }
+impl ApkInstaller {
+    pub fn install_dependencies(&self) -> Result<(), Error> {
+        if self.apk_dependencies.is_empty() {
+            return Ok(());
         }
+
+        println!(
+            "-> Installing dependencies for {}",
+            self.name.bright_green()
+        );
+        let deps = self.apk_dependencies.join(" ");
+        apk_add!(deps, "");
         Ok(())
     }
 
@@ -68,25 +56,38 @@ impl BrewInstaller {
                 command.bright_green()
             );
             for cmd in command.split("\n") {
-                exec_bash_with_output!(cmd);
+                exec_sh_with_output!(cmd);
             }
         }
         Ok(())
     }
 }
 
-impl Installer for BrewInstaller {
+impl Installer for ApkInstaller {
     fn install(&self) -> Result<(), Error> {
         if self.is_installed().is_ok() {
-            println!(
-                "-> {} is already installed, skipping",
-                self.name().bright_green()
-            );
-            return Ok(());
+            if self.is_installed().unwrap() {
+                println!(
+                    "-> {} is already installed, skipping",
+                    self.name().bright_green()
+                );
+                return Ok(());
+            }
         }
-        println!("-> 🚚 Installing {}", self.name().bright_green());
-        self.preinstall()?;
-        brew_install!(self, &self.name);
+
+        self.install_dependencies()?;
+
+        if let Some(packages) = self.packages.clone() {
+            let options = match self.interactive {
+                true => "--interactive",
+                false => "",
+            };
+            let packages = packages.join(" ");
+            let command = format!("sudo apk add {} {}", options, packages);
+            println!("-> Running {}", command.bright_green());
+            apk_add!(packages, options);
+        }
+
         self.postinstall()?;
         Ok(())
     }
@@ -98,8 +99,9 @@ impl Installer for BrewInstaller {
                 self.name.bright_green()
             );
             check_version!(self, command);
+            return Ok(true);
         }
-        Ok(true)
+        Ok(false)
     }
 
     fn name(&self) -> &str {

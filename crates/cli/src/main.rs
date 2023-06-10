@@ -1,9 +1,9 @@
+use crate::cmd::{init::execute_init, install::execute_install};
 use anyhow::Error;
 use clap::{arg, Command};
-use crosup::{
-    cmd::{init::execute_init, install::execute_install},
-    types::configuration::ConfigFormat,
-};
+use crosup_types::configuration::ConfigFormat;
+
+pub mod cmd;
 
 fn cli() -> Command<'static> {
     const VERSION: &'static str = env!("CARGO_PKG_VERSION");

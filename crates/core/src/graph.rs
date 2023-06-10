@@ -1,18 +1,16 @@
-use crate::{
-    installers::{
-        apk::ApkInstaller, apt::AptInstaller, brew::BrewInstaller, curl::CurlInstaller,
-        dnf::DnfInstaller, emerge::EmergeInstaller, git::GitInstaller, nix::NixInstaller,
-        pacman::PacmanInstaller, yum::YumInstaller, zypper::ZypperInstaller, Installer,
-    },
-    macros::{
-        add_vertex, add_vertex_with_condition, convert_generic_installer, downcast_installer,
-    },
-    types::{
-        configuration::Configuration,
-        curl::{default_brew_installer, default_nix_installer},
-    },
-};
 use anyhow::Error;
+use crosup_installers::{
+    apk::ApkInstaller, apt::AptInstaller, brew::BrewInstaller, curl::CurlInstaller,
+    dnf::DnfInstaller, emerge::EmergeInstaller, git::GitInstaller, nix::NixInstaller,
+    pacman::PacmanInstaller, yum::YumInstaller, zypper::ZypperInstaller, Installer,
+};
+use crosup_macros::{
+    add_vertex, add_vertex_with_condition, convert_generic_installer, downcast_installer,
+};
+use crosup_types::{
+    configuration::Configuration,
+    curl::{default_brew_installer, default_nix_installer},
+};
 use os_release::OsRelease;
 use owo_colors::OwoColorize;
 

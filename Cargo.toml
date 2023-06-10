@@ -1,25 +1,5 @@
-[package]
-authors = ["Tsiry Sandratraina <tsiry.sndr@aol.com>"]
-categories = ["command-line-utilities"]
-description = "A simple CLI tool to quickly setup your development environment on Chomebook (ChromeOS)."
-edition = "2021"
-keywords = ["chromebook", "chromeos", "homebrew", "docker", "nix"]
-license = "MIT"
-name = "crosup"
-readme = "README.md"
-repository = "https://github.com/tsirysndr/crosup"
-version = "0.2.3"
+[workspace]
+default-members = ["crates/cli"]
+members = ["crates/*"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-anyhow = "1.0.71"
-clap = "3.2.20"
-hcl-rs = "0.14.2"
-indexmap = {version = "1.9.3", features = ["serde"]}
-inquire = "0.6.2"
-os-release = "0.1.0"
-owo-colors = "3.5.0"
-serde = "1.0.163"
-spinners = "4.1.0"
-toml = "0.7.4"

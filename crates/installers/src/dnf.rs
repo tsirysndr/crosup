@@ -1,43 +1,39 @@
-use crate::{
-    macros::{check_version, exec_sh_with_output, zypper_install},
-    types::zypper::Package,
-};
 use anyhow::Error;
+use crosup_macros::{check_version, dnf_install, exec_sh_with_output};
+use crosup_types::dnf::Package;
 use owo_colors::OwoColorize;
 use std::{any::Any, io::BufRead, process::Stdio};
 
 use super::Installer;
 
 #[derive(Default, Clone, Debug)]
-pub struct ZypperInstaller {
+pub struct DnfInstaller {
     pub name: String,
     pub version: String,
     pub dependencies: Vec<String>,
-    pub zypper_dependencies: Vec<String>,
+    pub dnf_dependencies: Vec<String>,
     pub packages: Option<Vec<String>>,
     pub postinstall: Option<String>,
     pub version_check: Option<String>,
-    pub non_interactive: bool,
     pub provider: String,
 }
 
-impl From<Package> for ZypperInstaller {
+impl From<Package> for DnfInstaller {
     fn from(pkg: Package) -> Self {
         Self {
             name: pkg.name,
             packages: pkg.packages,
-            zypper_dependencies: pkg.depends_on.unwrap_or(vec![]),
-            provider: "zypper".into(),
+            dnf_dependencies: pkg.depends_on.unwrap_or(vec![]),
+            provider: "dnf".into(),
             version_check: pkg.version_check,
-            non_interactive: pkg.non_interactive.unwrap_or(true),
             ..Default::default()
         }
     }
 }
 
-impl ZypperInstaller {
+impl DnfInstaller {
     pub fn install_dependencies(&self) -> Result<(), Error> {
-        if self.zypper_dependencies.is_empty() {
+        if self.dnf_dependencies.is_empty() {
             return Ok(());
         }
 
@@ -45,8 +41,8 @@ impl ZypperInstaller {
             "-> Installing dependencies for {}",
             self.name.bright_green()
         );
-        let deps = self.zypper_dependencies.join(" ");
-        zypper_install!(deps, "--non-interactive");
+        let deps = self.dnf_dependencies.join(" ");
+        dnf_install!(deps);
         Ok(())
     }
 
@@ -64,7 +60,7 @@ impl ZypperInstaller {
     }
 }
 
-impl Installer for ZypperInstaller {
+impl Installer for DnfInstaller {
     fn install(&self) -> Result<(), Error> {
         if self.is_installed().is_ok() {
             if self.is_installed().unwrap() {
@@ -79,14 +75,10 @@ impl Installer for ZypperInstaller {
         self.install_dependencies()?;
 
         if let Some(packages) = self.packages.clone() {
-            let options = match self.non_interactive {
-                true => "--non-interactive",
-                false => "",
-            };
             let packages = packages.join(" ");
-            let command = format!("sudo zypper install {} {}", options, packages);
+            let command = format!("sudo dnf install -y {}", packages);
             println!("-> Running {}", command.bright_green());
-            zypper_install!(packages, options);
+            dnf_install!(packages);
         }
 
         self.postinstall()?;

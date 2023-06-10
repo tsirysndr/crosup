@@ -2,7 +2,8 @@ use anyhow::Error;
 use owo_colors::OwoColorize;
 use std::{any::Any, io::BufRead, path::Path, process::Stdio};
 
-use crate::{macros::exec_bash_with_output, types::git::Repository};
+use crosup_macros::exec_bash_with_output;
+use crosup_types::git::Repository;
 
 use super::Installer;
 

@@ -1,7 +1,7 @@
 use anyhow::Error;
 use std::path::Path;
 
-use crate::types::{configuration::Configuration, CROSFILE_HCL, CROSFILE_TOML};
+use crosup_types::{configuration::Configuration, CROSFILE_HCL, CROSFILE_TOML};
 
 pub fn verify_if_config_file_is_present() -> Result<Configuration, Error> {
     if !Path::new(CROSFILE_HCL).exists() && !Path::new(CROSFILE_TOML).exists() {

@@ -4,7 +4,7 @@ use anyhow::Error;
 use inquire::Confirm;
 use owo_colors::OwoColorize;
 
-use crate::types::configuration::{ConfigFormat, Configuration};
+use crosup_types::configuration::{ConfigFormat, Configuration};
 
 pub fn execute_init(cfg_format: ConfigFormat) -> Result<(), Error> {
     let ext = match cfg_format {

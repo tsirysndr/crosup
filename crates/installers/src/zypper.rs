@@ -1,45 +1,41 @@
-use crate::{
-    macros::{check_version, emerge_install, exec_sh_with_output},
-    types::emerge::Package,
-};
 use anyhow::Error;
+use crosup_macros::{check_version, exec_sh_with_output, zypper_install};
+use crosup_types::zypper::Package;
 use owo_colors::OwoColorize;
 use std::{any::Any, io::BufRead, process::Stdio};
 
 use super::Installer;
 
 #[derive(Default, Clone, Debug)]
-pub struct EmergeInstaller {
+pub struct ZypperInstaller {
     pub name: String,
     pub version: String,
     pub dependencies: Vec<String>,
-    pub emerge_dependencies: Vec<String>,
+    pub zypper_dependencies: Vec<String>,
     pub packages: Option<Vec<String>>,
     pub postinstall: Option<String>,
     pub version_check: Option<String>,
-    pub ask: bool,
-    pub verbose: bool,
+    pub non_interactive: bool,
     pub provider: String,
 }
 
-impl From<Package> for EmergeInstaller {
+impl From<Package> for ZypperInstaller {
     fn from(pkg: Package) -> Self {
         Self {
             name: pkg.name,
             packages: pkg.packages,
-            emerge_dependencies: pkg.depends_on.unwrap_or(vec![]),
-            provider: "emerge".into(),
+            zypper_dependencies: pkg.depends_on.unwrap_or(vec![]),
+            provider: "zypper".into(),
             version_check: pkg.version_check,
-            ask: pkg.ask.unwrap_or(false),
-            verbose: pkg.verbose.unwrap_or(false),
+            non_interactive: pkg.non_interactive.unwrap_or(true),
             ..Default::default()
         }
     }
 }
 
-impl EmergeInstaller {
+impl ZypperInstaller {
     pub fn install_dependencies(&self) -> Result<(), Error> {
-        if self.emerge_dependencies.is_empty() {
+        if self.zypper_dependencies.is_empty() {
             return Ok(());
         }
 
@@ -47,8 +43,8 @@ impl EmergeInstaller {
             "-> Installing dependencies for {}",
             self.name.bright_green()
         );
-        let deps = self.emerge_dependencies.join(" ");
-        emerge_install!(deps, "--ask --verbose");
+        let deps = self.zypper_dependencies.join(" ");
+        zypper_install!(deps, "--non-interactive");
         Ok(())
     }
 
@@ -66,7 +62,7 @@ impl EmergeInstaller {
     }
 }
 
-impl Installer for EmergeInstaller {
+impl Installer for ZypperInstaller {
     fn install(&self) -> Result<(), Error> {
         if self.is_installed().is_ok() {
             if self.is_installed().unwrap() {
@@ -81,18 +77,14 @@ impl Installer for EmergeInstaller {
         self.install_dependencies()?;
 
         if let Some(packages) = self.packages.clone() {
-            let options = match self.ask {
-                true => "--ask",
+            let options = match self.non_interactive {
+                true => "--non-interactive",
                 false => "",
             };
-            let options = match self.verbose {
-                true => format!("{} --verbose", options),
-                false => format!("{}", options),
-            };
             let packages = packages.join(" ");
-            let command = format!("sudo emerge install {} {}", options, packages);
+            let command = format!("sudo zypper install {} {}", options, packages);
             println!("-> Running {}", command.bright_green());
-            emerge_install!(packages, options);
+            zypper_install!(packages, options);
         }
 
         self.postinstall()?;

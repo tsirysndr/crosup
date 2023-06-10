@@ -1,50 +1,61 @@
-use crate::{
-    macros::{check_version, exec_sh_with_output, yum_install},
-    types::yum::Package,
-};
 use anyhow::Error;
 use owo_colors::OwoColorize;
 use std::{any::Any, io::BufRead, process::Stdio};
 
+use crosup_macros::{brew_install, check_version, exec_bash_with_output};
+use crosup_types::brew::{BrewConfiguration, Package};
+
 use super::Installer;
 
 #[derive(Default, Clone, Debug)]
-pub struct YumInstaller {
+pub struct BrewInstaller {
     pub name: String,
     pub version: String,
     pub dependencies: Vec<String>,
-    pub yum_dependencies: Vec<String>,
-    pub packages: Option<Vec<String>>,
+    pub brew_dependencies: Vec<String>,
+    pub pkgs: Vec<String>,
+    pub preinstall: Option<String>,
     pub postinstall: Option<String>,
     pub version_check: Option<String>,
     pub provider: String,
 }
 
-impl From<Package> for YumInstaller {
+impl From<BrewConfiguration> for BrewInstaller {
+    fn from(config: BrewConfiguration) -> Self {
+        Self {
+            name: "brew".to_string(),
+            version: "latest".to_string(),
+            dependencies: vec!["homebrew".into()],
+            pkgs: config.pkgs.unwrap_or(vec![]),
+            provider: "brew".into(),
+            ..Default::default()
+        }
+    }
+}
+
+impl From<Package> for BrewInstaller {
     fn from(pkg: Package) -> Self {
         Self {
             name: pkg.name,
-            packages: pkg.packages,
-            yum_dependencies: pkg.depends_on.unwrap_or(vec![]),
-            provider: "yum".into(),
+            version: "latest".to_string(),
+            dependencies: vec!["homebrew".into()],
+            preinstall: pkg.preinstall,
+            postinstall: pkg.postinstall,
+            provider: "brew".into(),
             version_check: pkg.version_check,
             ..Default::default()
         }
     }
 }
 
-impl YumInstaller {
-    pub fn install_dependencies(&self) -> Result<(), Error> {
-        if self.yum_dependencies.is_empty() {
-            return Ok(());
+impl BrewInstaller {
+    fn preinstall(&self) -> Result<(), Error> {
+        if let Some(command) = self.preinstall.clone() {
+            println!("-> Running preinstall command:\n{}", command.bright_green());
+            for cmd in command.split("\n") {
+                exec_bash_with_output!(cmd);
+            }
         }
-
-        println!(
-            "-> Installing dependencies for {}",
-            self.name.bright_green()
-        );
-        let deps = self.yum_dependencies.join(" ");
-        yum_install!(deps);
         Ok(())
     }
 
@@ -55,34 +66,25 @@ impl YumInstaller {
                 command.bright_green()
             );
             for cmd in command.split("\n") {
-                exec_sh_with_output!(cmd);
+                exec_bash_with_output!(cmd);
             }
         }
         Ok(())
     }
 }
 
-impl Installer for YumInstaller {
+impl Installer for BrewInstaller {
     fn install(&self) -> Result<(), Error> {
         if self.is_installed().is_ok() {
-            if self.is_installed().unwrap() {
-                println!(
-                    "-> {} is already installed, skipping",
-                    self.name().bright_green()
-                );
-                return Ok(());
-            }
+            println!(
+                "-> {} is already installed, skipping",
+                self.name().bright_green()
+            );
+            return Ok(());
         }
-
-        self.install_dependencies()?;
-
-        if let Some(packages) = self.packages.clone() {
-            let packages = packages.join(" ");
-            let command = format!("sudo yum install -y {}", packages);
-            println!("-> Running {}", command.bright_green());
-            yum_install!(packages);
-        }
-
+        println!("-> 🚚 Installing {}", self.name().bright_green());
+        self.preinstall()?;
+        brew_install!(self, &self.name);
         self.postinstall()?;
         Ok(())
     }
@@ -94,9 +96,8 @@ impl Installer for YumInstaller {
                 self.name.bright_green()
             );
             check_version!(self, command);
-            return Ok(true);
         }
-        Ok(false)
+        Ok(true)
     }
 
     fn name(&self) -> &str {

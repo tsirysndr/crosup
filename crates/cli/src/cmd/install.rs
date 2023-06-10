@@ -1,10 +1,7 @@
 use anyhow::Error;
+use crosup_core::{config::verify_if_config_file_is_present, graph::build_installer_graph};
+use crosup_types::configuration::Configuration;
 use owo_colors::OwoColorize;
-
-use crate::{
-    config::verify_if_config_file_is_present, graph::build_installer_graph,
-    types::configuration::Configuration,
-};
 
 pub fn execute_install(tool: Option<String>, ask: bool) -> Result<(), Error> {
     let mut config = verify_if_config_file_is_present()?;

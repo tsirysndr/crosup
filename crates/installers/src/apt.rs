@@ -2,10 +2,8 @@ use anyhow::Error;
 use owo_colors::OwoColorize;
 use std::{any::Any, io::BufRead, process::Stdio};
 
-use crate::{
-    macros::{apt_install, check_version, exec_bash, exec_bash_with_output, exec_sudo},
-    types::apt::Package,
-};
+use crosup_macros::{apt_install, check_version, exec_bash, exec_bash_with_output, exec_sudo};
+use crosup_types::apt::Package;
 
 use super::Installer;
 

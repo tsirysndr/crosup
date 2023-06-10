@@ -1,42 +1,43 @@
-use crate::{
-    macros::{check_version, exec_sh_with_output, pacman_install},
-    types::pacman::Package,
-};
 use anyhow::Error;
+use crosup_macros::{check_version, emerge_install, exec_sh_with_output};
+use crosup_types::emerge::Package;
 use owo_colors::OwoColorize;
 use std::{any::Any, io::BufRead, process::Stdio};
 
 use super::Installer;
 
 #[derive(Default, Clone, Debug)]
-pub struct PacmanInstaller {
+pub struct EmergeInstaller {
     pub name: String,
     pub version: String,
     pub dependencies: Vec<String>,
-    pub pacman_dependencies: Vec<String>,
+    pub emerge_dependencies: Vec<String>,
     pub packages: Option<Vec<String>>,
     pub postinstall: Option<String>,
     pub version_check: Option<String>,
-    pub non_interactive: bool,
+    pub ask: bool,
+    pub verbose: bool,
     pub provider: String,
 }
 
-impl From<Package> for PacmanInstaller {
+impl From<Package> for EmergeInstaller {
     fn from(pkg: Package) -> Self {
         Self {
             name: pkg.name,
             packages: pkg.packages,
-            pacman_dependencies: pkg.depends_on.unwrap_or(vec![]),
-            provider: "pacman".into(),
+            emerge_dependencies: pkg.depends_on.unwrap_or(vec![]),
+            provider: "emerge".into(),
             version_check: pkg.version_check,
+            ask: pkg.ask.unwrap_or(false),
+            verbose: pkg.verbose.unwrap_or(false),
             ..Default::default()
         }
     }
 }
 
-impl PacmanInstaller {
+impl EmergeInstaller {
     pub fn install_dependencies(&self) -> Result<(), Error> {
-        if self.pacman_dependencies.is_empty() {
+        if self.emerge_dependencies.is_empty() {
             return Ok(());
         }
 
@@ -44,8 +45,8 @@ impl PacmanInstaller {
             "-> Installing dependencies for {}",
             self.name.bright_green()
         );
-        let deps = self.pacman_dependencies.join(" ");
-        pacman_install!(deps);
+        let deps = self.emerge_dependencies.join(" ");
+        emerge_install!(deps, "--ask --verbose");
         Ok(())
     }
 
@@ -63,7 +64,7 @@ impl PacmanInstaller {
     }
 }
 
-impl Installer for PacmanInstaller {
+impl Installer for EmergeInstaller {
     fn install(&self) -> Result<(), Error> {
         if self.is_installed().is_ok() {
             if self.is_installed().unwrap() {
@@ -78,10 +79,18 @@ impl Installer for PacmanInstaller {
         self.install_dependencies()?;
 
         if let Some(packages) = self.packages.clone() {
+            let options = match self.ask {
+                true => "--ask",
+                false => "",
+            };
+            let options = match self.verbose {
+                true => format!("{} --verbose", options),
+                false => format!("{}", options),
+            };
             let packages = packages.join(" ");
-            let command = format!("sudo pacman -S {}", packages);
+            let command = format!("sudo emerge install {} {}", options, packages);
             println!("-> Running {}", command.bright_green());
-            pacman_install!(packages);
+            emerge_install!(packages, options);
         }
 
         self.postinstall()?;

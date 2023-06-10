@@ -2,10 +2,8 @@ use anyhow::Error;
 use owo_colors::OwoColorize;
 use std::{any::Any, io::BufRead, process::Stdio, vec};
 
-use crate::{
-    macros::{check_version, exec_bash_with_output},
-    types::nix::Package,
-};
+use crosup_macros::{check_version, exec_bash_with_output};
+use crosup_types::nix::Package;
 
 use super::Installer;
 

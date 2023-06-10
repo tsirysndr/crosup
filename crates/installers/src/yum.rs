@@ -1,43 +1,39 @@
-use crate::{
-    macros::{apk_add, check_version, exec_sh_with_output},
-    types::apk::Package,
-};
 use anyhow::Error;
+use crosup_macros::{check_version, exec_sh_with_output, yum_install};
+use crosup_types::yum::Package;
 use owo_colors::OwoColorize;
 use std::{any::Any, io::BufRead, process::Stdio};
 
 use super::Installer;
 
 #[derive(Default, Clone, Debug)]
-pub struct ApkInstaller {
+pub struct YumInstaller {
     pub name: String,
     pub version: String,
     pub dependencies: Vec<String>,
-    pub apk_dependencies: Vec<String>,
+    pub yum_dependencies: Vec<String>,
     pub packages: Option<Vec<String>>,
     pub postinstall: Option<String>,
     pub version_check: Option<String>,
-    pub interactive: bool,
     pub provider: String,
 }
 
-impl From<Package> for ApkInstaller {
+impl From<Package> for YumInstaller {
     fn from(pkg: Package) -> Self {
         Self {
             name: pkg.name,
             packages: pkg.packages,
-            apk_dependencies: pkg.depends_on.unwrap_or(vec![]),
-            provider: "apk".into(),
+            yum_dependencies: pkg.depends_on.unwrap_or(vec![]),
+            provider: "yum".into(),
             version_check: pkg.version_check,
-            interactive: pkg.interactive.unwrap_or(false),
             ..Default::default()
         }
     }
 }
 
-impl ApkInstaller {
+impl YumInstaller {
     pub fn install_dependencies(&self) -> Result<(), Error> {
-        if self.apk_dependencies.is_empty() {
+        if self.yum_dependencies.is_empty() {
             return Ok(());
         }
 
@@ -45,8 +41,8 @@ impl ApkInstaller {
             "-> Installing dependencies for {}",
             self.name.bright_green()
         );
-        let deps = self.apk_dependencies.join(" ");
-        apk_add!(deps, "");
+        let deps = self.yum_dependencies.join(" ");
+        yum_install!(deps);
         Ok(())
     }
 
@@ -64,7 +60,7 @@ impl ApkInstaller {
     }
 }
 
-impl Installer for ApkInstaller {
+impl Installer for YumInstaller {
     fn install(&self) -> Result<(), Error> {
         if self.is_installed().is_ok() {
             if self.is_installed().unwrap() {
@@ -79,14 +75,10 @@ impl Installer for ApkInstaller {
         self.install_dependencies()?;
 
         if let Some(packages) = self.packages.clone() {
-            let options = match self.interactive {
-                true => "--interactive",
-                false => "",
-            };
             let packages = packages.join(" ");
-            let command = format!("sudo apk add {} {}", options, packages);
+            let command = format!("sudo yum install -y {}", packages);
             println!("-> Running {}", command.bright_green());
-            apk_add!(packages, options);
+            yum_install!(packages);
         }
 
         self.postinstall()?;

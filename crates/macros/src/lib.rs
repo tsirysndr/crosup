@@ -1,3 +1,4 @@
+#[macro_export]
 macro_rules! pipe_curl {
     ($curl:ident) => {
         let mut child = std::process::Command::new("bash")
@@ -14,6 +15,7 @@ macro_rules! pipe_curl {
     };
 }
 
+#[macro_export]
 macro_rules! pipe_brew_curl {
     ($curl:ident) => {
         let mut child = std::process::Command::new("bash")
@@ -33,6 +35,7 @@ macro_rules! pipe_brew_curl {
     };
 }
 
+#[macro_export]
 macro_rules! append_to_nix_conf {
     ($echo:ident) => {
         let mut tee = std::process::Command::new("bash")
@@ -45,6 +48,7 @@ macro_rules! append_to_nix_conf {
     };
 }
 
+#[macro_export]
 macro_rules! brew_install {
     ($self:ident, $package:expr) => {
         let mut child = std::process::Command::new("brew")
@@ -76,6 +80,7 @@ macro_rules! brew_install {
     };
 }
 
+#[macro_export]
 macro_rules! check_version {
     ($self:ident, $command:expr) => {
         let child = std::process::Command::new("bash")
@@ -107,6 +112,7 @@ macro_rules! check_version {
     };
 }
 
+#[macro_export]
 macro_rules! exec_bash {
     ($command:expr) => {
         let mut child = std::process::Command::new("bash")
@@ -118,6 +124,7 @@ macro_rules! exec_bash {
     };
 }
 
+#[macro_export]
 macro_rules! exec_sh {
     ($command:expr) => {
         let mut child = std::process::Command::new("sh")
@@ -129,6 +136,7 @@ macro_rules! exec_sh {
     };
 }
 
+#[macro_export]
 macro_rules! exec_bash_with_output {
     ($command:expr) => {
         let mut child = std::process::Command::new("bash")
@@ -146,6 +154,7 @@ macro_rules! exec_bash_with_output {
     };
 }
 
+#[macro_export]
 macro_rules! exec_sh_with_output {
     ($command:expr) => {
         let mut child = std::process::Command::new("sh")
@@ -163,6 +172,7 @@ macro_rules! exec_sh_with_output {
     };
 }
 
+#[macro_export]
 macro_rules! apt_install {
     ($package:expr) => {
         let mut child = std::process::Command::new("sh")
@@ -184,6 +194,7 @@ macro_rules! apt_install {
     };
 }
 
+#[macro_export]
 macro_rules! yum_install {
     ($package:expr) => {
         let mut child = std::process::Command::new("sh")
@@ -205,6 +216,7 @@ macro_rules! yum_install {
     };
 }
 
+#[macro_export]
 macro_rules! dnf_install {
     ($package:expr) => {
         let mut child = std::process::Command::new("sh")
@@ -226,6 +238,7 @@ macro_rules! dnf_install {
     };
 }
 
+#[macro_export]
 macro_rules! zypper_install {
     ($package:expr, $options:expr) => {
         let mut child = std::process::Command::new("sh")
@@ -247,6 +260,7 @@ macro_rules! zypper_install {
     };
 }
 
+#[macro_export]
 macro_rules! apk_add {
     ($package:expr, $options:expr) => {
         let mut child = std::process::Command::new("sh")
@@ -268,6 +282,7 @@ macro_rules! apk_add {
     };
 }
 
+#[macro_export]
 macro_rules! pacman_install {
     ($package:expr) => {
         let mut child = std::process::Command::new("sh")
@@ -289,6 +304,7 @@ macro_rules! pacman_install {
     };
 }
 
+#[macro_export]
 macro_rules! emerge_install {
     ($package:expr, $options:expr) => {
         let mut child = std::process::Command::new("sh")
@@ -310,6 +326,7 @@ macro_rules! emerge_install {
     };
 }
 
+#[macro_export]
 macro_rules! exec_sudo {
     ($command:expr) => {
         let mut child = std::process::Command::new("sh")
@@ -321,6 +338,7 @@ macro_rules! exec_sudo {
     };
 }
 
+#[macro_export]
 macro_rules! exec_piped_sudo {
     ($command:expr, $stdin:ident) => {
         let mut child = std::process::Command::new("sh")
@@ -333,6 +351,7 @@ macro_rules! exec_piped_sudo {
     };
 }
 
+#[macro_export]
 macro_rules! add_vertex {
     ($graph:ident, $installer:ident, $config:ident, $pkg_manager:ident, $pkg:ident) => {
         if let Some(pkg_manager) = &$config.$pkg_manager {
@@ -348,6 +367,7 @@ macro_rules! add_vertex {
     };
 }
 
+#[macro_export]
 macro_rules! add_vertex_with_condition {
     ($graph:ident, $installer:ident, $config:ident, $pkg_manager:ident, $pkg:ident) => {
         if let Some(pkg_manager) = &$config.$pkg_manager {
@@ -369,6 +389,7 @@ macro_rules! add_vertex_with_condition {
     };
 }
 
+#[macro_export]
 macro_rules! downcast_installer {
     ($label: expr,$installer: ident, $installer_type: ident) => {
         match $installer.provider() {
@@ -384,6 +405,7 @@ macro_rules! downcast_installer {
     };
 }
 
+#[macro_export]
 macro_rules! convert_generic_installer {
     ($config: ident, $generic_install: ident, $installer: ident) => {
         $config.$installer = Some(
@@ -394,26 +416,3 @@ macro_rules! convert_generic_installer {
         );
     };
 }
-
-pub(crate) use add_vertex;
-pub(crate) use add_vertex_with_condition;
-pub(crate) use apk_add;
-pub(crate) use append_to_nix_conf;
-pub(crate) use apt_install;
-pub(crate) use brew_install;
-pub(crate) use check_version;
-pub(crate) use convert_generic_installer;
-pub(crate) use dnf_install;
-pub(crate) use downcast_installer;
-pub(crate) use emerge_install;
-pub(crate) use exec_bash;
-pub(crate) use exec_bash_with_output;
-pub(crate) use exec_piped_sudo;
-pub(crate) use exec_sh;
-pub(crate) use exec_sh_with_output;
-pub(crate) use exec_sudo;
-pub(crate) use pacman_install;
-pub(crate) use pipe_brew_curl;
-pub(crate) use pipe_curl;
-pub(crate) use yum_install;
-pub(crate) use zypper_install;

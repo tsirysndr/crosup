@@ -1,41 +1,40 @@
-use crate::{
-    macros::{check_version, dnf_install, exec_sh_with_output},
-    types::dnf::Package,
-};
 use anyhow::Error;
+use crosup_macros::{check_version, exec_sh_with_output, pacman_install};
+use crosup_types::pacman::Package;
 use owo_colors::OwoColorize;
 use std::{any::Any, io::BufRead, process::Stdio};
 
 use super::Installer;
 
 #[derive(Default, Clone, Debug)]
-pub struct DnfInstaller {
+pub struct PacmanInstaller {
     pub name: String,
     pub version: String,
     pub dependencies: Vec<String>,
-    pub dnf_dependencies: Vec<String>,
+    pub pacman_dependencies: Vec<String>,
     pub packages: Option<Vec<String>>,
     pub postinstall: Option<String>,
     pub version_check: Option<String>,
+    pub non_interactive: bool,
     pub provider: String,
 }
 
-impl From<Package> for DnfInstaller {
+impl From<Package> for PacmanInstaller {
     fn from(pkg: Package) -> Self {
         Self {
             name: pkg.name,
             packages: pkg.packages,
-            dnf_dependencies: pkg.depends_on.unwrap_or(vec![]),
-            provider: "dnf".into(),
+            pacman_dependencies: pkg.depends_on.unwrap_or(vec![]),
+            provider: "pacman".into(),
             version_check: pkg.version_check,
             ..Default::default()
         }
     }
 }
 
-impl DnfInstaller {
+impl PacmanInstaller {
     pub fn install_dependencies(&self) -> Result<(), Error> {
-        if self.dnf_dependencies.is_empty() {
+        if self.pacman_dependencies.is_empty() {
             return Ok(());
         }
 
@@ -43,8 +42,8 @@ impl DnfInstaller {
             "-> Installing dependencies for {}",
             self.name.bright_green()
         );
-        let deps = self.dnf_dependencies.join(" ");
-        dnf_install!(deps);
+        let deps = self.pacman_dependencies.join(" ");
+        pacman_install!(deps);
         Ok(())
     }
 
@@ -62,7 +61,7 @@ impl DnfInstaller {
     }
 }
 
-impl Installer for DnfInstaller {
+impl Installer for PacmanInstaller {
     fn install(&self) -> Result<(), Error> {
         if self.is_installed().is_ok() {
             if self.is_installed().unwrap() {
@@ -78,9 +77,9 @@ impl Installer for DnfInstaller {
 
         if let Some(packages) = self.packages.clone() {
             let packages = packages.join(" ");
-            let command = format!("sudo dnf install -y {}", packages);
+            let command = format!("sudo pacman -S {}", packages);
             println!("-> Running {}", command.bright_green());
-            dnf_install!(packages);
+            pacman_install!(packages);
         }
 
         self.postinstall()?;
