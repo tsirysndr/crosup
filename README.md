@@ -1,4 +1,4 @@
-# Crosup
+# Crosup 🐧 💻 🚀 ✨
 
 <p>
   <a href="LICENSE" target="./LICENSE">
