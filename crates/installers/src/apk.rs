@@ -3,11 +3,12 @@ use crosup_types::apk::Package;
 
 use anyhow::Error;
 use owo_colors::OwoColorize;
+use ssh2::Session;
 use std::{any::Any, io::BufRead, process::Stdio};
 
 use super::Installer;
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone)]
 pub struct ApkInstaller {
     pub name: String,
     pub version: String,
@@ -18,6 +19,7 @@ pub struct ApkInstaller {
     pub version_check: Option<String>,
     pub interactive: bool,
     pub provider: String,
+    pub session: Option<Session>,
 }
 
 impl From<Package> for ApkInstaller {
@@ -45,7 +47,7 @@ impl ApkInstaller {
             self.name.bright_green()
         );
         let deps = self.apk_dependencies.join(" ");
-        apk_add!(deps, "");
+        apk_add!(deps, "", self.session.clone());
         Ok(())
     }
 
@@ -56,7 +58,7 @@ impl ApkInstaller {
                 command.bright_green()
             );
             for cmd in command.split("\n") {
-                exec_sh_with_output!(cmd);
+                exec_sh_with_output!(cmd, self.session.clone());
             }
         }
         Ok(())
@@ -85,7 +87,7 @@ impl Installer for ApkInstaller {
             let packages = packages.join(" ");
             let command = format!("sudo apk add {} {}", options, packages);
             println!("-> Running {}", command.bright_green());
-            apk_add!(packages, options);
+            apk_add!(packages, options, self.session.clone());
         }
 
         self.postinstall()?;
@@ -98,7 +100,7 @@ impl Installer for ApkInstaller {
                 "-> Checking if {} is already installed",
                 self.name.bright_green()
             );
-            check_version!(self, command);
+            check_version!(self, command, self.session.clone());
             return Ok(true);
         }
         Ok(false)

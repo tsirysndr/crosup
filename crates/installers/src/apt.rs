@@ -1,5 +1,6 @@
 use anyhow::Error;
 use owo_colors::OwoColorize;
+use ssh2::Session;
 use std::{any::Any, io::BufRead, process::Stdio};
 
 use crosup_macros::{apt_install, check_version, exec_bash, exec_bash_with_output, exec_sudo};
@@ -7,7 +8,7 @@ use crosup_types::apt::Package;
 
 use super::Installer;
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone)]
 pub struct AptInstaller {
     pub name: String,
     pub version: String,
@@ -22,6 +23,7 @@ pub struct AptInstaller {
     pub postinstall: Option<String>,
     pub version_check: Option<String>,
     pub provider: String,
+    pub session: Option<Session>,
 }
 
 impl From<Package> for AptInstaller {
@@ -53,7 +55,7 @@ impl AptInstaller {
             self.name.bright_green()
         );
         let deps = self.apt_dependencies.join(" ");
-        apt_install!(deps);
+        apt_install!(deps, self.session.clone());
         Ok(())
     }
 
@@ -64,7 +66,7 @@ impl AptInstaller {
                 command.bright_green()
             );
             for cmd in command.split("\n") {
-                exec_bash_with_output!(cmd);
+                exec_bash_with_output!(cmd, self.session.clone());
             }
         }
         Ok(())
@@ -76,6 +78,12 @@ impl AptInstaller {
         }
 
         println!("-> Running {}", "apt-get update".bright_green());
+
+        if let Some(session) = &self.session {
+            crosup_ssh::exec(session.clone(), "sudo apt-get update")?;
+            return Ok(());
+        }
+
         let mut child = std::process::Command::new("sudo")
             .arg("apt-get")
             .arg("update")
@@ -100,6 +108,12 @@ impl AptInstaller {
 
         let command = format!("wget -c {} -O {}", url, package_name);
         println!("   Running {}", command.bright_green());
+
+        if let Some(session) = &self.session {
+            crosup_ssh::exec(session.clone(), &command)?;
+            return Ok(());
+        }
+
         let mut child = std::process::Command::new("wget")
             .arg("-c")
             .arg(url)
@@ -126,6 +140,12 @@ impl AptInstaller {
 
         let command = format!("sudo apt-get install -y ./{}", package_name);
         println!("   Running {}", command.bright_green());
+
+        if let Some(session) = &self.session {
+            crosup_ssh::exec(session.clone(), &command)?;
+            return Ok(());
+        }
+
         let mut child = std::process::Command::new("sudo")
             .arg("apt-get")
             .arg("install")
@@ -141,6 +161,12 @@ impl AptInstaller {
 
         let command = format!("rm {}", package_name);
         println!("   Running {}", command.bright_green());
+
+        if let Some(session) = &self.session {
+            crosup_ssh::exec(session.clone(), &command)?;
+            return Ok(());
+        }
+
         let mut child = std::process::Command::new("rm")
             .arg(package_name)
             .stdout(Stdio::piped())
@@ -178,18 +204,21 @@ impl Installer for AptInstaller {
                     "-> Adding GPG key {}",
                     "sudo install -m 0755 -d /etc/apt/keyrings".bright_green()
                 );
-                exec_sudo!("install -m 0755 -d /etc/apt/keyrings");
-                exec_bash!(format!(
-                    "curl -fsSL {} | sudo gpg --dearmor -o {}",
-                    gpg_key, gpg_path
-                ));
-                exec_sudo!(format!("chmod a+r {}", gpg_path));
+                exec_sudo!("install -m 0755 -d /etc/apt/keyrings", self.session.clone());
+                exec_bash!(
+                    format!(
+                        "curl -fsSL {} | sudo gpg --dearmor -o {}",
+                        gpg_key, gpg_path
+                    ),
+                    self.session.clone()
+                );
+                exec_sudo!(format!("chmod a+r {}", gpg_path), self.session.clone());
             }
         }
 
         if let Some(setup_repository) = self.setup_repository.clone() {
             println!("-> Adding repository {}", setup_repository.bright_green());
-            exec_bash!(setup_repository);
+            exec_bash!(setup_repository, self.session.clone());
         }
 
         self.apt_update()?;
@@ -205,7 +234,7 @@ impl Installer for AptInstaller {
             let packages = packages.join(" ");
             let command = format!("sudo apt-get install -y {}", packages);
             println!("-> Running {}", command.bright_green());
-            apt_install!(packages);
+            apt_install!(packages, self.session.clone());
         }
 
         self.postinstall()?;
@@ -218,7 +247,7 @@ impl Installer for AptInstaller {
                 "-> Checking if {} is already installed",
                 self.name.bright_green()
             );
-            check_version!(self, command);
+            check_version!(self, command, self.session.clone());
         }
         Ok(false)
     }

@@ -1,6 +1,7 @@
 use anyhow::Error;
 use indexmap::IndexMap;
 use owo_colors::OwoColorize;
+use ssh2::Session;
 use std::{any::Any, io::BufRead, process::Stdio};
 
 use crosup_macros::{check_version, exec_bash_with_output};
@@ -8,7 +9,7 @@ use crosup_types::curl::Script;
 
 use super::Installer;
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone)]
 pub struct CurlInstaller {
     pub name: String,
     pub version: String,
@@ -21,6 +22,7 @@ pub struct CurlInstaller {
     pub env: Option<IndexMap<String, String>>,
     pub shell: String,
     pub provider: String,
+    pub session: Option<Session>,
 }
 
 impl From<Script> for CurlInstaller {
@@ -37,6 +39,7 @@ impl From<Script> for CurlInstaller {
             env: config.env,
             shell: config.shell.unwrap_or("sh".into()),
             provider: "curl".into(),
+            ..Default::default()
         }
     }
 }
@@ -49,7 +52,7 @@ impl CurlInstaller {
                 command.bright_green()
             );
             for cmd in command.split("\n") {
-                exec_bash_with_output!(cmd);
+                exec_bash_with_output!(cmd, self.session.clone());
             }
         }
         Ok(())
@@ -86,6 +89,13 @@ impl Installer for CurlInstaller {
 
         println!("   Running {}", script.bright_green());
 
+        if self.session.is_some() {
+            let session = self.session.as_ref().unwrap();
+            crosup_ssh::exec(session.clone(), &script)?;
+            self.postinstall()?;
+            return Ok(());
+        }
+
         let mut child = std::process::Command::new(&self.shell)
             .arg("-c")
             .arg(script)
@@ -117,7 +127,7 @@ impl Installer for CurlInstaller {
                 "-> Checking if {} is already installed",
                 self.name.bright_green()
             );
-            check_version!(self, command);
+            check_version!(self, command, self.session.clone());
         }
         Ok(false)
     }

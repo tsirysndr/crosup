@@ -133,10 +133,12 @@ dependencies = [
  "anyhow",
  "crosup-installers",
  "crosup-macros",
+ "crosup-ssh",
  "crosup-types",
  "hcl-rs",
  "os-release",
  "owo-colors",
+ "ssh2",
  "toml",
 ]
 
@@ -146,9 +148,11 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "crosup-macros",
+ "crosup-ssh",
  "crosup-types",
  "indexmap",
  "owo-colors",
+ "ssh2",
 ]
 
 [[package]]
@@ -160,6 +164,7 @@ name = "crosup-ssh"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "owo-colors",
  "ssh2",
 ]
 

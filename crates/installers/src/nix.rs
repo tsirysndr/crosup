@@ -1,13 +1,14 @@
 use anyhow::Error;
 use owo_colors::OwoColorize;
-use std::{any::Any, io::BufRead, process::Stdio, vec};
+use ssh2::Session;
+use std::{any::Any, io::BufRead, process::Stdio};
 
 use crosup_macros::{check_version, exec_bash_with_output};
 use crosup_types::nix::Package;
 
 use super::Installer;
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone)]
 pub struct NixInstaller {
     pub name: String,
     pub version: String,
@@ -19,6 +20,7 @@ pub struct NixInstaller {
     pub flake: String,
     pub version_check: Option<String>,
     pub provider: String,
+    pub session: Option<Session>,
 }
 
 impl From<Package> for NixInstaller {
@@ -45,10 +47,13 @@ impl NixInstaller {
         if let Some(command) = self.preinstall.clone() {
             println!("-> Running preinstall command:\n{}", command.bright_green());
             for cmd in command.split("\n") {
-                exec_bash_with_output!(format!(
-                    ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && {}",
-                    cmd
-                ));
+                exec_bash_with_output!(
+                    format!(
+                        ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && {}",
+                        cmd
+                    ),
+                    self.session.clone()
+                );
             }
         }
         Ok(())
@@ -94,7 +99,7 @@ impl Installer for NixInstaller {
 '{}'"#,
             impure, experimental_features, accept_flake_config, self.flake
         );
-        exec_bash_with_output!(command);
+        exec_bash_with_output!(command, self.session.clone());
 
         Ok(())
     }
@@ -105,7 +110,7 @@ impl Installer for NixInstaller {
                 "-> Checking if {} is already installed",
                 self.name.bright_green()
             );
-            check_version!(self, command);
+            check_version!(self, command, self.session.clone());
         }
         Ok(false)
     }

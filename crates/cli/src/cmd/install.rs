@@ -8,38 +8,44 @@ use crosup_types::configuration::Configuration;
 use owo_colors::OwoColorize;
 use ssh2::Session;
 
-use crate::types::InstallArgs;
+use crate::{macros::install, types::InstallArgs};
 
 pub fn execute_install(args: InstallArgs) -> Result<(), Error> {
     let mut config = verify_if_config_file_is_present()?;
 
     ask_confirmation(args.ask, &mut config);
 
+    let mut sessions = Vec::new();
+
     if args.remote_is_present {
-        parse_args(&args)?;
+        sessions = parse_args(&args)?;
     }
 
-    match args.tool {
-        Some(tool) => {
-            let tool = tool.replace(" ", "");
-            let tool = tool.replace("ble.sh", "blesh");
-            let tools = match tool.contains(",") {
-                true => tool.split(",").collect(),
-                false => vec![tool.as_str()],
-            };
-            for tool in tools {
-                let (graph, installers) = build_installer_graph(&mut config);
-                let tool = installers
-                    .into_iter()
-                    .find(|installer| installer.name() == tool)
-                    .ok_or_else(|| Error::msg(format!("{} is not available yet", tool)))?;
-                let mut visited = vec![false; graph.size()];
-                graph.install(tool, &mut visited)?;
-            }
+    match sessions.len() {
+        0 => {
+            install!(args, config, None);
         }
-        None => {
-            let (graph, _) = build_installer_graph(&mut config);
-            graph.install_all()?;
+        _ => {
+            println!(
+                "-> Installing tools on {} machine{}",
+                sessions.len().bold().cyan(),
+                if sessions.len() > 1 { "s" } else { "" }
+            );
+            let mut children = Vec::new();
+            for session in sessions {
+                let args = args.clone();
+                let mut config = config.clone();
+
+                let child = std::thread::spawn(move || {
+                    install!(args, config, Some(session.clone()));
+                    Ok::<(), Error>(())
+                });
+                children.push(child);
+            }
+
+            for child in children {
+                child.join().unwrap()?;
+            }
         }
     }
 
@@ -48,7 +54,7 @@ pub fn execute_install(args: InstallArgs) -> Result<(), Error> {
 
 fn ask_confirmation(ask: bool, config: &mut Configuration) {
     if ask {
-        let (_, installers) = build_installer_graph(config);
+        let (_, installers) = build_installer_graph(config, None);
         println!("-> The following tools will be installed:");
 
         for installer in installers.iter() {

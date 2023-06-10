@@ -2,11 +2,12 @@ use anyhow::Error;
 use crosup_macros::{check_version, dnf_install, exec_sh_with_output};
 use crosup_types::dnf::Package;
 use owo_colors::OwoColorize;
+use ssh2::Session;
 use std::{any::Any, io::BufRead, process::Stdio};
 
 use super::Installer;
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone)]
 pub struct DnfInstaller {
     pub name: String,
     pub version: String,
@@ -16,6 +17,7 @@ pub struct DnfInstaller {
     pub postinstall: Option<String>,
     pub version_check: Option<String>,
     pub provider: String,
+    pub session: Option<Session>,
 }
 
 impl From<Package> for DnfInstaller {
@@ -42,7 +44,7 @@ impl DnfInstaller {
             self.name.bright_green()
         );
         let deps = self.dnf_dependencies.join(" ");
-        dnf_install!(deps);
+        dnf_install!(deps, self.session.clone());
         Ok(())
     }
 
@@ -53,7 +55,7 @@ impl DnfInstaller {
                 command.bright_green()
             );
             for cmd in command.split("\n") {
-                exec_sh_with_output!(cmd);
+                exec_sh_with_output!(cmd, self.session.clone());
             }
         }
         Ok(())
@@ -78,7 +80,7 @@ impl Installer for DnfInstaller {
             let packages = packages.join(" ");
             let command = format!("sudo dnf install -y {}", packages);
             println!("-> Running {}", command.bright_green());
-            dnf_install!(packages);
+            dnf_install!(packages, self.session.clone());
         }
 
         self.postinstall()?;
@@ -91,7 +93,7 @@ impl Installer for DnfInstaller {
                 "-> Checking if {} is already installed",
                 self.name.bright_green()
             );
-            check_version!(self, command);
+            check_version!(self, command, self.session.clone());
             return Ok(true);
         }
         Ok(false)

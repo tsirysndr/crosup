@@ -1,5 +1,6 @@
 use anyhow::Error;
 use owo_colors::OwoColorize;
+use ssh2::Session;
 use std::{any::Any, io::BufRead, process::Stdio};
 
 use crosup_macros::{brew_install, check_version, exec_bash_with_output};
@@ -7,7 +8,7 @@ use crosup_types::brew::{BrewConfiguration, Package};
 
 use super::Installer;
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone)]
 pub struct BrewInstaller {
     pub name: String,
     pub version: String,
@@ -18,6 +19,7 @@ pub struct BrewInstaller {
     pub postinstall: Option<String>,
     pub version_check: Option<String>,
     pub provider: String,
+    pub session: Option<Session>,
 }
 
 impl From<BrewConfiguration> for BrewInstaller {
@@ -53,7 +55,7 @@ impl BrewInstaller {
         if let Some(command) = self.preinstall.clone() {
             println!("-> Running preinstall command:\n{}", command.bright_green());
             for cmd in command.split("\n") {
-                exec_bash_with_output!(cmd);
+                exec_bash_with_output!(cmd, self.session.clone());
             }
         }
         Ok(())
@@ -66,7 +68,7 @@ impl BrewInstaller {
                 command.bright_green()
             );
             for cmd in command.split("\n") {
-                exec_bash_with_output!(cmd);
+                exec_bash_with_output!(cmd, self.session.clone());
             }
         }
         Ok(())
@@ -84,7 +86,7 @@ impl Installer for BrewInstaller {
         }
         println!("-> 🚚 Installing {}", self.name().bright_green());
         self.preinstall()?;
-        brew_install!(self, &self.name);
+        brew_install!(self, &self.name, self.session.clone());
         self.postinstall()?;
         Ok(())
     }
@@ -95,7 +97,7 @@ impl Installer for BrewInstaller {
                 "-> Checking if {} is already installed",
                 self.name.bright_green()
             );
-            check_version!(self, command);
+            check_version!(self, command, self.session.clone());
         }
         Ok(true)
     }

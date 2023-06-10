@@ -1,5 +1,6 @@
 use anyhow::Error;
 use owo_colors::OwoColorize;
+use ssh2::Session;
 use std::{any::Any, io::BufRead, path::Path, process::Stdio};
 
 use crosup_macros::exec_bash_with_output;
@@ -7,7 +8,7 @@ use crosup_types::git::Repository;
 
 use super::Installer;
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone)]
 pub struct GitInstaller {
     pub name: String,
     pub version: String,
@@ -21,6 +22,7 @@ pub struct GitInstaller {
     pub depth: Option<u32>,
     pub shallow_submodules: Option<bool>,
     pub provider: String,
+    pub session: Option<Session>,
 }
 
 impl From<Repository> for GitInstaller {
@@ -38,6 +40,7 @@ impl From<Repository> for GitInstaller {
             depth: config.depth,
             shallow_submodules: config.shallow_submodules,
             provider: "git".into(),
+            ..Default::default()
         }
     }
 }
@@ -47,7 +50,7 @@ impl GitInstaller {
         if let Some(command) = self.preinstall.clone() {
             println!("-> Running preinstall command:\n{}", command.bright_green());
             for cmd in command.split("\n") {
-                exec_bash_with_output!(cmd);
+                exec_bash_with_output!(cmd, self.session.clone());
             }
         }
         Ok(())
@@ -60,7 +63,7 @@ impl GitInstaller {
                 command.bright_green()
             );
             for cmd in command.split("\n") {
-                exec_bash_with_output!(cmd);
+                exec_bash_with_output!(cmd, self.session.clone());
             }
         }
         Ok(())
@@ -139,7 +142,7 @@ impl Installer for GitInstaller {
             self.install.bright_green()
         );
 
-        exec_bash_with_output!(self.install.clone());
+        exec_bash_with_output!(self.install.clone(), self.session.clone());
 
         self.postinstall()?;
         Ok(())

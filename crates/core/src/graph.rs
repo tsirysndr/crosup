@@ -13,8 +13,9 @@ use crosup_types::{
 };
 use os_release::OsRelease;
 use owo_colors::OwoColorize;
+use ssh2::Session;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Vertex {
     name: String,
     dependencies: Vec<String>,
@@ -82,7 +83,7 @@ pub struct Edge {
     to: usize,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct InstallerGraph {
     vertices: Vec<Vertex>,
     edges: Vec<Edge>,
@@ -149,6 +150,7 @@ pub fn autodetect_installer(config: &mut Configuration) {
 
 pub fn build_installer_graph(
     config: &mut Configuration,
+    session: Option<Session>,
 ) -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let mut graph = InstallerGraph::new();
 
@@ -158,6 +160,7 @@ pub fn build_installer_graph(
                 let nix = default_nix_installer();
                 graph.add_vertex(Vertex::from(Box::new(CurlInstaller {
                     name: nix.name.clone(),
+                    session: session.clone(),
                     ..CurlInstaller::from(nix.clone())
                 }) as Box<dyn Installer>));
             }
@@ -170,6 +173,7 @@ pub fn build_installer_graph(
                 let brew = default_brew_installer();
                 graph.add_vertex(Vertex::from(Box::new(CurlInstaller {
                     name: brew.name.clone(),
+                    session: session.clone(),
                     ..CurlInstaller::from(brew.clone())
                 }) as Box<dyn Installer>));
             }
@@ -178,17 +182,17 @@ pub fn build_installer_graph(
 
     autodetect_installer(config);
 
-    add_vertex!(graph, AptInstaller, config, apt, pkg);
-    add_vertex!(graph, CurlInstaller, config, curl, script);
-    add_vertex!(graph, GitInstaller, config, git, repo);
-    add_vertex!(graph, NixInstaller, config, nix, pkg);
-    add_vertex!(graph, YumInstaller, config, yum, pkg);
-    add_vertex!(graph, DnfInstaller, config, dnf, pkg);
-    add_vertex!(graph, ZypperInstaller, config, zypper, pkg);
-    add_vertex!(graph, ApkInstaller, config, apk, pkg);
-    add_vertex!(graph, PacmanInstaller, config, pacman, pkg);
-    add_vertex!(graph, EmergeInstaller, config, emerge, pkg);
-    add_vertex_with_condition!(graph, BrewInstaller, config, brew, pkg);
+    add_vertex!(graph, AptInstaller, config, apt, pkg, session);
+    add_vertex!(graph, CurlInstaller, config, curl, script, session);
+    add_vertex!(graph, GitInstaller, config, git, repo, session);
+    add_vertex!(graph, NixInstaller, config, nix, pkg, session);
+    add_vertex!(graph, YumInstaller, config, yum, pkg, session);
+    add_vertex!(graph, DnfInstaller, config, dnf, pkg, session);
+    add_vertex!(graph, ZypperInstaller, config, zypper, pkg, session);
+    add_vertex!(graph, ApkInstaller, config, apk, pkg, session);
+    add_vertex!(graph, PacmanInstaller, config, pacman, pkg, session);
+    add_vertex!(graph, EmergeInstaller, config, emerge, pkg, session);
+    add_vertex_with_condition!(graph, BrewInstaller, config, brew, pkg, session);
 
     setup_dependencies(&mut graph);
 

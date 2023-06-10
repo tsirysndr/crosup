@@ -2,11 +2,12 @@ use anyhow::Error;
 use crosup_macros::{check_version, exec_sh_with_output, zypper_install};
 use crosup_types::zypper::Package;
 use owo_colors::OwoColorize;
+use ssh2::Session;
 use std::{any::Any, io::BufRead, process::Stdio};
 
 use super::Installer;
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone)]
 pub struct ZypperInstaller {
     pub name: String,
     pub version: String,
@@ -17,6 +18,7 @@ pub struct ZypperInstaller {
     pub version_check: Option<String>,
     pub non_interactive: bool,
     pub provider: String,
+    pub session: Option<Session>,
 }
 
 impl From<Package> for ZypperInstaller {
@@ -44,7 +46,7 @@ impl ZypperInstaller {
             self.name.bright_green()
         );
         let deps = self.zypper_dependencies.join(" ");
-        zypper_install!(deps, "--non-interactive");
+        zypper_install!(deps, "--non-interactive", self.session.clone());
         Ok(())
     }
 
@@ -55,7 +57,7 @@ impl ZypperInstaller {
                 command.bright_green()
             );
             for cmd in command.split("\n") {
-                exec_sh_with_output!(cmd);
+                exec_sh_with_output!(cmd, self.session.clone());
             }
         }
         Ok(())
@@ -84,7 +86,7 @@ impl Installer for ZypperInstaller {
             let packages = packages.join(" ");
             let command = format!("sudo zypper install {} {}", options, packages);
             println!("-> Running {}", command.bright_green());
-            zypper_install!(packages, options);
+            zypper_install!(packages, options, self.session.clone());
         }
 
         self.postinstall()?;
@@ -97,7 +99,7 @@ impl Installer for ZypperInstaller {
                 "-> Checking if {} is already installed",
                 self.name.bright_green()
             );
-            check_version!(self, command);
+            check_version!(self, command, self.session.clone());
             return Ok(true);
         }
         Ok(false)

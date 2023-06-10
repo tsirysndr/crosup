@@ -2,11 +2,12 @@ use anyhow::Error;
 use crosup_macros::{check_version, emerge_install, exec_sh_with_output};
 use crosup_types::emerge::Package;
 use owo_colors::OwoColorize;
+use ssh2::Session;
 use std::{any::Any, io::BufRead, process::Stdio};
 
 use super::Installer;
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone)]
 pub struct EmergeInstaller {
     pub name: String,
     pub version: String,
@@ -18,6 +19,7 @@ pub struct EmergeInstaller {
     pub ask: bool,
     pub verbose: bool,
     pub provider: String,
+    pub session: Option<Session>,
 }
 
 impl From<Package> for EmergeInstaller {
@@ -46,7 +48,7 @@ impl EmergeInstaller {
             self.name.bright_green()
         );
         let deps = self.emerge_dependencies.join(" ");
-        emerge_install!(deps, "--ask --verbose");
+        emerge_install!(deps, "--ask --verbose", self.session.clone());
         Ok(())
     }
 
@@ -57,7 +59,7 @@ impl EmergeInstaller {
                 command.bright_green()
             );
             for cmd in command.split("\n") {
-                exec_sh_with_output!(cmd);
+                exec_sh_with_output!(cmd, self.session.clone());
             }
         }
         Ok(())
@@ -90,7 +92,7 @@ impl Installer for EmergeInstaller {
             let packages = packages.join(" ");
             let command = format!("sudo emerge install {} {}", options, packages);
             println!("-> Running {}", command.bright_green());
-            emerge_install!(packages, options);
+            emerge_install!(packages, options, self.session.clone());
         }
 
         self.postinstall()?;
@@ -103,7 +105,7 @@ impl Installer for EmergeInstaller {
                 "-> Checking if {} is already installed",
                 self.name.bright_green()
             );
-            check_version!(self, command);
+            check_version!(self, command, self.session.clone());
             return Ok(true);
         }
         Ok(false)

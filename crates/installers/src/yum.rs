@@ -2,11 +2,12 @@ use anyhow::Error;
 use crosup_macros::{check_version, exec_sh_with_output, yum_install};
 use crosup_types::yum::Package;
 use owo_colors::OwoColorize;
+use ssh2::Session;
 use std::{any::Any, io::BufRead, process::Stdio};
 
 use super::Installer;
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone)]
 pub struct YumInstaller {
     pub name: String,
     pub version: String,
@@ -16,6 +17,7 @@ pub struct YumInstaller {
     pub postinstall: Option<String>,
     pub version_check: Option<String>,
     pub provider: String,
+    pub session: Option<Session>,
 }
 
 impl From<Package> for YumInstaller {
@@ -42,7 +44,7 @@ impl YumInstaller {
             self.name.bright_green()
         );
         let deps = self.yum_dependencies.join(" ");
-        yum_install!(deps);
+        yum_install!(deps, self.session.clone());
         Ok(())
     }
 
@@ -53,7 +55,7 @@ impl YumInstaller {
                 command.bright_green()
             );
             for cmd in command.split("\n") {
-                exec_sh_with_output!(cmd);
+                exec_sh_with_output!(cmd, self.session.clone());
             }
         }
         Ok(())
@@ -78,7 +80,7 @@ impl Installer for YumInstaller {
             let packages = packages.join(" ");
             let command = format!("sudo yum install -y {}", packages);
             println!("-> Running {}", command.bright_green());
-            yum_install!(packages);
+            yum_install!(packages, self.session.clone());
         }
 
         self.postinstall()?;
@@ -91,7 +93,7 @@ impl Installer for YumInstaller {
                 "-> Checking if {} is already installed",
                 self.name.bright_green()
             );
-            check_version!(self, command);
+            check_version!(self, command, self.session.clone());
             return Ok(true);
         }
         Ok(false)

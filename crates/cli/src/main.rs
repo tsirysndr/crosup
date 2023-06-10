@@ -5,6 +5,7 @@ use crosup_types::configuration::ConfigFormat;
 use types::InstallArgs;
 
 pub mod cmd;
+pub mod macros;
 pub mod types;
 
 fn cli() -> Command<'static> {

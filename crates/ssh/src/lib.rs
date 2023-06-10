@@ -1,45 +1,49 @@
+use anyhow::Error;
+use owo_colors::OwoColorize;
+use ssh2::Session;
 use std::{
     collections::HashMap,
     io::{self, Read},
     process::Command,
 };
 
-use anyhow::Error;
-use ssh2::Session;
-
 pub fn exec(sess: Session, command: &str) -> Result<(), Error> {
     let mut channel = sess.channel_session()?;
+
     channel.exec(command)?;
 
-    let mut output = String::new();
     let mut buffer = [0; 1024];
     loop {
         match channel.read(&mut buffer) {
             Ok(n) => {
                 if n > 0 {
-                    let chunk = std::str::from_utf8(&buffer[..n])?;
-                    output.push_str(chunk);
-                    println!("{}", chunk);
+                    let chunk = String::from_utf8_lossy(&buffer[..n]);
+                    print!("{}", chunk);
                 } else {
                     break;
                 }
             }
             Err(ref err) if err.kind() == io::ErrorKind::WouldBlock => continue,
-            Err(err) => return Err(err.into()),
+            Err(err) => {
+                return Err(err.into());
+            }
         }
     }
 
-    channel.close()?;
-    channel.wait_close()?;
-
     if channel.exit_status()? != 0 {
-        return Err(Error::msg("exit status is not 0"));
+        let command = command.bright_green();
+        return Err(Error::msg(format!(
+            "{} exit status is not 0, exit status = {}",
+            command,
+            channel.exit_status()?
+        )));
     }
 
     Ok(())
 }
 
 pub fn setup_ssh_agent_var() -> Result<(), Error> {
+    println!("-> Setting up ssh-agent {}", "ssh-agent -s".bright_green());
     let child = Command::new("ssh-agent").arg("-s").output()?;
     let output = String::from_utf8(child.stdout)?;
 
@@ -57,6 +61,11 @@ pub fn setup_ssh_agent_var() -> Result<(), Error> {
             }
         }
     }
+
+    println!(
+        "-> Adding ssh key {}",
+        "ssh-add ~/.ssh/id_rsa".bright_green()
+    );
 
     let mut child = Command::new("sh")
         .arg("-c")
@@ -93,8 +102,9 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let session = setup_ssh_connection("192.168.8.101:22", "tsirysandratraina").unwrap();
-        exec(session, "ls -l").unwrap();
+        // let session = setup_ssh_connection("192.168.8.101:22", "tsirysandratraina").unwrap();
+        let session = setup_ssh_connection("localhost:22", "tsirysndr").unwrap();
+        exec(session.clone(), "sh -c 'PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin minikube version'").unwrap();
         assert!(true);
     }
 }

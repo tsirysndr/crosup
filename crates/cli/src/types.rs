@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub struct InstallArgs {
     pub tool: Option<String>,
     pub ask: bool,
