@@ -11,6 +11,7 @@ pub mod emerge;
 pub mod git;
 pub mod nix;
 pub mod pacman;
+pub mod slackpkg;
 pub mod yum;
 pub mod zypper;
 
