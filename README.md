@@ -42,6 +42,7 @@ bash <(curl -sSL https://raw.githubusercontent.com/tsirysndr/crosup/master/insta
 - [x] Alpine
 - [x] Arch
 - [x] Gentoo
+- [x] Slackware
 
 ## 🚀 Usage
 ```
