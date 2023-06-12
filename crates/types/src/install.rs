@@ -1,6 +1,8 @@
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 
+use crate::slackpkg;
+
 use super::{apk, apt, brew, dnf, emerge, pacman, yum, zypper};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
@@ -106,6 +108,12 @@ pub struct Package {
         serialize_with = "hcl::ser::block"
     )]
     pub zypper: Option<zypper::Package>,
+
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "hcl::ser::block"
+    )]
+    pub slackpkg: Option<slackpkg::Package>,
 }
 
 impl Into<brew::BrewConfiguration> for InstallConfiguration {
@@ -224,6 +232,20 @@ impl Into<zypper::ZypperConfiguration> for InstallConfiguration {
     }
 }
 
+impl Into<slackpkg::SlackpkgConfiguration> for InstallConfiguration {
+    fn into(self) -> slackpkg::SlackpkgConfiguration {
+        let pkg = self
+            .pkg
+            .into_iter()
+            .map(|(name, pkg)| match pkg.slackpkg {
+                Some(slackpkg) => (name.clone(), slackpkg),
+                None => (name.clone(), slackpkg::Package { name, ..pkg.into() }),
+            })
+            .collect();
+        slackpkg::SlackpkgConfiguration { pkg }
+    }
+}
+
 impl Into<apk::Package> for Package {
     fn into(self) -> apk::Package {
         apk::Package {
@@ -322,6 +344,18 @@ impl Into<brew::Package> for Package {
         brew::Package {
             name: self.name,
             preinstall: self.preinstall,
+            postinstall: self.postinstall,
+            version_check: self.version_check,
+        }
+    }
+}
+
+impl Into<slackpkg::Package> for Package {
+    fn into(self) -> slackpkg::Package {
+        slackpkg::Package {
+            name: self.name,
+            packages: self.packages,
+            depends_on: self.depends_on,
             postinstall: self.postinstall,
             version_check: self.version_check,
         }

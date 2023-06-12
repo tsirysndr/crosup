@@ -12,6 +12,7 @@ use super::{
     install::InstallConfiguration,
     nix::{default_nix_install, NixConfiguration},
     pacman::PacmanConfiguration,
+    slackpkg::SlackpkgConfiguration,
     yum::YumConfiguration,
     zypper::ZypperConfiguration,
 };
@@ -93,6 +94,12 @@ pub struct Configuration {
         serialize_with = "hcl::ser::labeled_block"
     )]
     pub emerge: Option<IndexMap<String, EmergeConfiguration>>,
+
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "hcl::ser::labeled_block"
+    )]
+    pub slackpkg: Option<IndexMap<String, SlackpkgConfiguration>>,
 }
 
 impl Default for Configuration {
@@ -110,6 +117,7 @@ impl Default for Configuration {
             apk: None,
             pacman: None,
             emerge: None,
+            slackpkg: None,
         }
     }
 }

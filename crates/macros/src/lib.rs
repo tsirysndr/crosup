@@ -423,6 +423,36 @@ macro_rules! emerge_install {
 }
 
 #[macro_export]
+macro_rules! slackpkg_install {
+    ($package:expr, $session:expr) => {
+        match $session {
+            Some(session) => {
+                let command = format!("sudo slackpkg install {}", $package);
+                crosup_ssh::exec(session.clone(), &command)?;
+            }
+            None => {
+                let mut child = std::process::Command::new("sh")
+                    .arg("-c")
+                    .arg(format!("sudo slackpkg {}", $package))
+                    .stdin(Stdio::piped())
+                    .stdout(Stdio::piped())
+                    .spawn()?;
+                let output = child.stdout.take().unwrap();
+                let output = std::io::BufReader::new(output);
+
+                for line in output.lines() {
+                    println!("{}", line?);
+                }
+                let status = child.wait()?;
+                if !status.success() {
+                    return Err(Error::msg(format!("Failed to install {}", $package)));
+                }
+            }
+        };
+    };
+}
+
+#[macro_export]
 macro_rules! exec_sudo {
     ($command:expr, $session:expr) => {
         match $session {

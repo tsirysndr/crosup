@@ -10,6 +10,7 @@ pub mod install;
 pub mod inventory;
 pub mod nix;
 pub mod pacman;
+pub mod slackpkg;
 pub mod yum;
 pub mod zypper;
 

@@ -2,7 +2,8 @@ use anyhow::Error;
 use crosup_installers::{
     apk::ApkInstaller, apt::AptInstaller, brew::BrewInstaller, curl::CurlInstaller,
     dnf::DnfInstaller, emerge::EmergeInstaller, git::GitInstaller, nix::NixInstaller,
-    pacman::PacmanInstaller, yum::YumInstaller, zypper::ZypperInstaller, Installer,
+    pacman::PacmanInstaller, slackpkg::SlackpkgInstaller, yum::YumInstaller,
+    zypper::ZypperInstaller, Installer,
 };
 use crosup_macros::{
     add_vertex, add_vertex_with_condition, convert_generic_installer, downcast_installer,
@@ -31,6 +32,7 @@ pub struct Vertex {
     apk: Option<ApkInstaller>,
     pacman: Option<PacmanInstaller>,
     emerge: Option<EmergeInstaller>,
+    slackpkg: Option<SlackpkgInstaller>,
 }
 
 impl From<Box<dyn Installer + 'static>> for Vertex {
@@ -54,6 +56,7 @@ impl From<Box<dyn Installer + 'static>> for Vertex {
             apk: downcast_installer!("apk", installer, ApkInstaller),
             pacman: downcast_installer!("pacman", installer, PacmanInstaller),
             emerge: downcast_installer!("emerge", installer, EmergeInstaller),
+            slackpkg: downcast_installer!("slackpkg", installer, SlackpkgInstaller),
         }
     }
 }
@@ -72,6 +75,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "apk" => Box::new(self.apk.unwrap()),
             "pacman" => Box::new(self.pacman.unwrap()),
             "emerge" => Box::new(self.emerge.unwrap()),
+            "slackpkg" => Box::new(self.slackpkg.unwrap()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -128,6 +132,10 @@ pub fn autodetect_installer(config: &mut Configuration) {
                     "alpine" => {
                         convert_generic_installer!(config, generic_install, apk);
                         "apk"
+                    }
+                    "slackware" => {
+                        convert_generic_installer!(config, generic_install, slackpkg);
+                        "slackpkg"
                     }
                     _ => panic!("Unsupported OS: {}", os),
                 };
@@ -192,6 +200,7 @@ pub fn build_installer_graph(
     add_vertex!(graph, ApkInstaller, config, apk, pkg, session);
     add_vertex!(graph, PacmanInstaller, config, pacman, pkg, session);
     add_vertex!(graph, EmergeInstaller, config, emerge, pkg, session);
+    add_vertex!(graph, SlackpkgInstaller, config, slackpkg, pkg, session);
     add_vertex_with_condition!(graph, BrewInstaller, config, brew, pkg, session);
 
     setup_dependencies(&mut graph);
