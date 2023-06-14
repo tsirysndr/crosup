@@ -15,7 +15,7 @@ version = "0.2.6"
 [dependencies]
 anyhow = "1.0.71"
 clap = "3.2.20"
-crosup-core = {path = "../core", version = "0.1.1"}
+crosup-core = {path = "../core", version = "0.1.2"}
 crosup-entity = {version = "0.1.0", path = "../entity"}
 crosup-repo = {path = "../repo", version = "0.1.0"}
 crosup-ssh = {path = "../ssh", version = "0.1.0"}
