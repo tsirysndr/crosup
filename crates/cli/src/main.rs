@@ -1,6 +1,7 @@
 use crate::cmd::{init::execute_init, install::execute_install};
 use anyhow::Error;
 use clap::{arg, Command};
+use cmd::diff::execute_diff;
 use crosup_types::configuration::ConfigFormat;
 use types::InstallArgs;
 
@@ -44,6 +45,10 @@ Quickly install your development tools on your new Chromebook or any Linux distr
                     "Install developer tools, possible values are: docker, nix, devbox, homebrew, flox, fish, vscode, ble.sh, atuin, tig, fzf, httpie, kubectl, minikube, tilt, zellij, ripgrep, fd, exa, bat, glow, devenv",
                 ),
         )
+        .subcommand(
+            Command::new("diff")
+                .about("Show the difference between the current configuration and the previous one"),
+        )
 }
 
 #[tokio::main]
@@ -83,6 +88,9 @@ async fn main() -> Result<(), Error> {
                 true => execute_init(ConfigFormat::TOML, inventory)?,
                 false => execute_init(ConfigFormat::HCL, inventory)?,
             }
+        }
+        Some(("diff", _)) => {
+            execute_diff().await?;
         }
         _ => {
             cli().print_help().unwrap();

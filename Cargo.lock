@@ -556,6 +556,7 @@ dependencies = [
  "sea-orm",
  "serde",
  "sha256",
+ "similar",
  "ssh2",
  "tokio",
  "toml 0.7.4",
@@ -575,15 +576,6 @@ dependencies = [
  "owo-colors",
  "ssh2",
  "toml 0.7.4",
-]
-
-[[package]]
-name = "crosup-diff"
-version = "0.1.0"
-dependencies = [
- "crosup-entity",
- "crosup-repo",
- "similar",
 ]
 
 [[package]]

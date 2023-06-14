@@ -26,6 +26,7 @@ owo-colors = "3.5.0"
 sea-orm = {version = "0.11.3", features = ["runtime-tokio-rustls", "sqlx-sqlite"]}
 serde = "1.0.164"
 sha256 = "1.1.4"
+similar = { version = "2.2.1", features = ["inline"] }
 ssh2 = {version = "0.9.4", features = ["vendored-openssl"]}
 tokio = {version = "1.28.2", features = ["full"]}
 toml = "0.7.4"
