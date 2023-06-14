@@ -63,7 +63,9 @@ OPTIONS:
     -V, --version    Print version information
 
 SUBCOMMANDS:
+    diff       Show the difference between the current configuration and the previous one
     help       Print this message or the help of the given subcommand(s)
+    history    Show the change history of the configuration file
     init       Generate a default configuration file
     install    Install developer tools, possible values are: docker, nix, devbox, homebrew,
                    flox, fish, vscode, ble.sh, atuin, tig, fzf, httpie, kubectl, minikube, tilt,
