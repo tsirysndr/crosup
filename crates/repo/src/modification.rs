@@ -27,7 +27,7 @@ impl ModificationRepo {
     pub async fn find_by_file_id(&self, file_id: i32) -> Result<Vec<modification::Model>, DbErr> {
         modification::Entity::find()
             .filter(modification::Column::FileId.eq(file_id))
-            .order_by_asc(modification::Column::Timestamp)
+            .order_by_desc(modification::Column::Timestamp)
             .all(&self.db)
             .await
     }

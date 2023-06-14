@@ -1,7 +1,7 @@
 use crate::cmd::{init::execute_init, install::execute_install};
 use anyhow::Error;
 use clap::{arg, Command};
-use cmd::diff::execute_diff;
+use cmd::{diff::execute_diff, history::execute_history};
 use crosup_types::configuration::ConfigFormat;
 use types::InstallArgs;
 
@@ -49,6 +49,10 @@ Quickly install your development tools on your new Chromebook or any Linux distr
             Command::new("diff")
                 .about("Show the difference between the current configuration and the previous one"),
         )
+        .subcommand(
+            Command::new("history")
+                .about("Show the change history of the configuration file"),
+        )
 }
 
 #[tokio::main]
@@ -91,6 +95,9 @@ async fn main() -> Result<(), Error> {
         }
         Some(("diff", _)) => {
             execute_diff().await?;
+        }
+        Some(("history", _)) => {
+            execute_history().await?;
         }
         _ => {
             cli().print_help().unwrap();

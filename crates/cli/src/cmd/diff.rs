@@ -2,9 +2,11 @@ use anyhow::Error;
 use crosup_core::config::verify_if_config_file_is_present;
 use crosup_repo::{file::FileRepo, modification::ModificationRepo};
 use owo_colors::{OwoColorize, Style};
-use sea_orm::{Database, DatabaseConnection};
+use sea_orm::DatabaseConnection;
 use similar::{ChangeTag, TextDiff};
 use std::fmt;
+
+use super::get_database_connection;
 
 struct Line(Option<usize>);
 
@@ -18,14 +20,9 @@ impl fmt::Display for Line {
 }
 
 pub async fn execute_diff() -> Result<(), Error> {
-    let (mut config, filename, content) = verify_if_config_file_is_present()?;
+    let (_, filename, content) = verify_if_config_file_is_present()?;
 
-    let home = std::env::var("HOME").unwrap();
-    let crosup_dir = format!("{}/.config/crosup", home);
-
-    let database_url = format!("sqlite:{}/modifications.sqlite3?mode=rwc", crosup_dir);
-
-    let db: DatabaseConnection = Database::connect(&database_url).await?;
+    let db: DatabaseConnection = get_database_connection().await?;
     let current_dir = std::env::current_dir()?;
     let path = format!("{}/{}", current_dir.display(), filename);
 
