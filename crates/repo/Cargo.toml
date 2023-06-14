@@ -5,28 +5,13 @@ description = "A simple CLI tool to quickly setup your development environment o
 edition = "2021"
 keywords = ["chromebook", "chromeos", "homebrew", "docker", "nix"]
 license = "MIT"
-name = "crosup"
-readme = "../../README.md"
+name = "crosup-repo"
 repository = "https://github.com/tsirysndr/crosup"
-version = "0.2.5"
+version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 anyhow = "1.0.71"
-clap = "3.2.20"
-crosup-core = {path = "../core", version = "0.1.1"}
 crosup-entity = {version = "0.1.0", path = "../entity"}
-crosup-repo = {path = "../repo", version = "0.1.0"}
-crosup-ssh = {path = "../ssh", version = "0.1.0"}
-crosup-types = {path = "../types", version = "0.1.1"}
-hcl-rs = "0.14.2"
-inquire = "0.6.2"
-owo-colors = "3.5.0"
 sea-orm = {version = "0.11.3", features = ["runtime-tokio-rustls", "sqlx-sqlite"]}
-serde = "1.0.164"
-sha256 = "1.1.4"
-similar = { version = "2.2.1", features = ["inline"] }
-ssh2 = {version = "0.9.4", features = ["vendored-openssl"]}
-tokio = {version = "1.28.2", features = ["full"]}
-toml = "0.7.4"

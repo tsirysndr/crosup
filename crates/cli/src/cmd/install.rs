@@ -3,15 +3,17 @@ use crosup_core::{
     config::{verify_if_config_file_is_present, verify_if_inventory_config_file_is_present},
     graph::build_installer_graph,
 };
+use crosup_repo::{file::FileRepo, modification::ModificationRepo};
 use crosup_ssh::setup_ssh_connection;
 use crosup_types::configuration::Configuration;
 use owo_colors::OwoColorize;
+use sea_orm::{Database, DatabaseConnection};
 use ssh2::Session;
 
 use crate::{macros::install, types::InstallArgs};
 
-pub fn execute_install(args: InstallArgs) -> Result<(), Error> {
-    let mut config = verify_if_config_file_is_present()?;
+pub async fn execute_install(args: InstallArgs) -> Result<(), Error> {
+    let (mut config, filename, content) = verify_if_config_file_is_present()?;
 
     ask_confirmation(args.ask, &mut config);
 
@@ -48,6 +50,23 @@ pub fn execute_install(args: InstallArgs) -> Result<(), Error> {
             }
         }
     }
+
+    let home = std::env::var("HOME").unwrap();
+    let crosup_dir = format!("{}/.config/crosup", home);
+
+    let database_url = format!("sqlite:{}/modifications.sqlite3?mode=rwc", crosup_dir);
+
+    let db: DatabaseConnection = Database::connect(&database_url).await?;
+
+    let current_dir = std::env::current_dir()?;
+    let path = format!("{}/{}", current_dir.display(), filename);
+
+    let file = FileRepo::new(&db).create(&filename, &path).await?;
+
+    let hash = sha256::digest(content.clone());
+    ModificationRepo::new(&db)
+        .create(file.id, &hash, &content)
+        .await?;
 
     Ok(())
 }
