@@ -46,7 +46,8 @@ Quickly install your development tools on your new Chromebook or any Linux distr
         )
 }
 
-fn main() -> Result<(), Error> {
+#[tokio::main]
+async fn main() -> Result<(), Error> {
     let matches = cli().get_matches();
     match matches.subcommand() {
         Some(("install", args)) => {
@@ -72,7 +73,8 @@ fn main() -> Result<(), Error> {
                 username,
                 inventory,
                 port,
-            })?;
+            })
+            .await?;
         }
         Some(("init", args)) => {
             let toml = args.is_present("toml");
