@@ -61,14 +61,12 @@ pub async fn execute_install(args: InstallArgs) -> Result<(), Error> {
     let current_dir = std::env::current_dir()?;
     let path = format!("{}/{}", current_dir.display(), filename);
 
-    let created = FileRepo::new(&db).create(&filename, &path).await?;
+    let file = FileRepo::new(&db).create(&filename, &path).await?;
 
-    if let Some(file) = created {
-        let hash = sha256::digest(content.clone());
-        ModificationRepo::new(&db)
-            .create(file.id, &hash, &content)
-            .await?;
-    }
+    let hash = sha256::digest(content.clone());
+    ModificationRepo::new(&db)
+        .create(file.id, &hash, &content)
+        .await?;
 
     Ok(())
 }

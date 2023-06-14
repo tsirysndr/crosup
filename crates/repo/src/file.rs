@@ -23,21 +23,19 @@ impl FileRepo {
             .await
     }
 
-    pub async fn create(&self, name: &str, path: &str) -> Result<Option<file::Model>, DbErr> {
+    pub async fn create(&self, name: &str, path: &str) -> Result<file::Model, DbErr> {
         let result = self.find_by_path(path).await?;
 
-        if let Some(_) = result {
-            return Ok(None);
+        if let Some(file) = result {
+            return Ok(file);
         }
 
-        Ok(Some(
-            file::ActiveModel {
-                name: Set(name.to_owned()),
-                path: Set(path.to_owned()),
-                ..Default::default()
-            }
-            .insert(&self.db)
-            .await?,
-        ))
+        file::ActiveModel {
+            name: Set(name.to_owned()),
+            path: Set(path.to_owned()),
+            ..Default::default()
+        }
+        .insert(&self.db)
+        .await
     }
 }
