@@ -15,7 +15,7 @@ version = "0.1.2"
 anyhow = "1.0.71"
 crosup-macros = {path = "../macros", version = "0.1.2"}
 crosup-ssh = {path = "../ssh", version = "0.1.0"}
-crosup-types = {path = "../types", version = "0.1.1"}
+crosup-types = {path = "../types", version = "0.1.2"}
 indexmap = {version = "1.9.3", features = ["serde"]}
 owo-colors = "3.5.0"
 ssh2 = {version = "0.9.4", features = ["vendored-openssl"]}
