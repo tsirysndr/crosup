@@ -3,7 +3,7 @@ use crosup_macros::{check_version, exec_sh_with_output, fleek_install};
 use crosup_types::fleek::Package;
 use owo_colors::OwoColorize;
 use ssh2::Session;
-use std::{any::Any, io::BufRead, path::Path, process::Stdio, thread};
+use std::{any::Any, io::BufRead, path::Path, process::Stdio};
 
 use super::Installer;
 

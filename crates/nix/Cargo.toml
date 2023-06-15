@@ -5,18 +5,12 @@ description = "A simple CLI tool to quickly setup your development environment o
 edition = "2021"
 keywords = ["chromebook", "chromeos", "homebrew", "docker", "nix"]
 license = "MIT"
-name = "crosup-installers"
+name = "crosup-nix"
 repository = "https://github.com/tsirysndr/crosup"
-version = "0.1.2"
+version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 anyhow = "1.0.71"
-crosup-macros = {path = "../macros", version = "0.1.2"}
-crosup-nix = {path = "../nix", version = "0.1.0"}
-crosup-ssh = {path = "../ssh", version = "0.1.0"}
-crosup-types = {path = "../types", version = "0.1.2"}
-indexmap = {version = "1.9.3", features = ["serde"]}
-owo-colors = "3.5.0"
-ssh2 = {version = "0.9.4", features = ["vendored-openssl"]}
+nix-editor = "0.3.0"
