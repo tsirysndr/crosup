@@ -1,6 +1,8 @@
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 
+use crate::fleek::FleekConfiguration;
+
 use super::{
     apk::ApkConfiguration,
     apt::{default_apt_install, AptConfiguration},
@@ -100,6 +102,12 @@ pub struct Configuration {
         serialize_with = "hcl::ser::labeled_block"
     )]
     pub slackpkg: Option<IndexMap<String, SlackpkgConfiguration>>,
+
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "hcl::ser::labeled_block"
+    )]
+    pub fleek: Option<IndexMap<String, FleekConfiguration>>,
 }
 
 impl Default for Configuration {
@@ -118,6 +126,7 @@ impl Default for Configuration {
             pacman: None,
             emerge: None,
             slackpkg: None,
+            fleek: None,
         }
     }
 }

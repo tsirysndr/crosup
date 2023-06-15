@@ -5,6 +5,7 @@ pub mod configuration;
 pub mod curl;
 pub mod dnf;
 pub mod emerge;
+pub mod fleek;
 pub mod git;
 pub mod install;
 pub mod inventory;

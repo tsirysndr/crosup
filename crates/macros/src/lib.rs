@@ -198,6 +198,7 @@ macro_rules! exec_sh_with_output {
                 let mut child = std::process::Command::new("sh")
                     .arg("-c")
                     .arg($command)
+                    .stdin(Stdio::piped())
                     .stdout(Stdio::piped())
                     .spawn()?;
                 let output = child.stdout.take().unwrap();
@@ -434,6 +435,36 @@ macro_rules! slackpkg_install {
                 let mut child = std::process::Command::new("sh")
                     .arg("-c")
                     .arg(format!("sudo slackpkg {}", $package))
+                    .stdin(Stdio::piped())
+                    .stdout(Stdio::piped())
+                    .spawn()?;
+                let output = child.stdout.take().unwrap();
+                let output = std::io::BufReader::new(output);
+
+                for line in output.lines() {
+                    println!("{}", line?);
+                }
+                let status = child.wait()?;
+                if !status.success() {
+                    return Err(Error::msg(format!("Failed to install {}", $package)));
+                }
+            }
+        };
+    };
+}
+
+#[macro_export]
+macro_rules! fleek_install {
+    ($package:expr, $options:expr, $session:expr) => {
+        match $session {
+            Some(session) => {
+                let command = format!("bash -c '. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix run github:ublue-os/fleek -- add {} {}'", $options, $package);
+                crosup_ssh::exec(session.clone(), &command)?;
+            }
+            None => {
+                let mut child = std::process::Command::new("bash")
+                    .arg("-c")
+                    .arg(format!(". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix run github:ublue-os/fleek -- add {} {}", $options, $package))
                     .stdin(Stdio::piped())
                     .stdout(Stdio::piped())
                     .spawn()?;
