@@ -1,8 +1,8 @@
 use anyhow::Error;
 use crosup_installers::{
     apk::ApkInstaller, apt::AptInstaller, brew::BrewInstaller, curl::CurlInstaller,
-    dnf::DnfInstaller, emerge::EmergeInstaller, git::GitInstaller, nix::NixInstaller,
-    pacman::PacmanInstaller, slackpkg::SlackpkgInstaller, yum::YumInstaller,
+    dnf::DnfInstaller, emerge::EmergeInstaller, fleek::FleekInstaller, git::GitInstaller,
+    nix::NixInstaller, pacman::PacmanInstaller, slackpkg::SlackpkgInstaller, yum::YumInstaller,
     zypper::ZypperInstaller, Installer,
 };
 use crosup_macros::{
@@ -33,6 +33,7 @@ pub struct Vertex {
     pacman: Option<PacmanInstaller>,
     emerge: Option<EmergeInstaller>,
     slackpkg: Option<SlackpkgInstaller>,
+    fleek: Option<FleekInstaller>,
 }
 
 impl From<Box<dyn Installer + 'static>> for Vertex {
@@ -57,6 +58,7 @@ impl From<Box<dyn Installer + 'static>> for Vertex {
             pacman: downcast_installer!("pacman", installer, PacmanInstaller),
             emerge: downcast_installer!("emerge", installer, EmergeInstaller),
             slackpkg: downcast_installer!("slackpkg", installer, SlackpkgInstaller),
+            fleek: downcast_installer!("fleek", installer, FleekInstaller),
         }
     }
 }
@@ -76,6 +78,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "pacman" => Box::new(self.pacman.unwrap()),
             "emerge" => Box::new(self.emerge.unwrap()),
             "slackpkg" => Box::new(self.slackpkg.unwrap()),
+            "fleek" => Box::new(self.fleek.unwrap()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -162,7 +165,7 @@ pub fn build_installer_graph(
 ) -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let mut graph = InstallerGraph::new();
 
-    if config.clone().nix.is_some() {
+    if config.clone().nix.is_some() || config.clone().fleek.is_some() {
         if let Some(curl) = config.clone().curl {
             if !curl.into_iter().any(|(_, y)| y.script.contains_key("nix")) {
                 let nix = default_nix_installer();
@@ -201,6 +204,7 @@ pub fn build_installer_graph(
     add_vertex!(graph, PacmanInstaller, config, pacman, pkg, session);
     add_vertex!(graph, EmergeInstaller, config, emerge, pkg, session);
     add_vertex!(graph, SlackpkgInstaller, config, slackpkg, pkg, session);
+    add_vertex!(graph, FleekInstaller, config, fleek, pkg, session);
     add_vertex_with_condition!(graph, BrewInstaller, config, brew, pkg, session);
 
     setup_dependencies(&mut graph);

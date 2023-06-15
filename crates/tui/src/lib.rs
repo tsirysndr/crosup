@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 
-use chrono::NaiveDateTime;
-
 pub mod history;
 
 pub struct App {
