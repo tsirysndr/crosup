@@ -63,6 +63,7 @@ OPTIONS:
     -V, --version    Print version information
 
 SUBCOMMANDS:
+    add        Add a new tool to the configuration file
     diff       Show the difference between the current configuration and the previous one
     help       Print this message or the help of the given subcommand(s)
     history    Show the change history of the configuration file
