@@ -55,6 +55,7 @@ Quickly install your development tools on your new Chromebook or any Linux distr
         )
         .subcommand(
             Command::new("add")
+                .arg(arg!(--ask -a "Ask for confirmation before adding a new tool"))
                 .arg(arg!(<tools> "Tool to add to the configuration file, e.g. gh, vim, tig etc."))
                 .about("Add a new tool to the configuration file"),
         )
@@ -106,9 +107,8 @@ async fn main() -> Result<(), Error> {
         }
         Some(("add", args)) => {
             let tools = args.value_of("tools").map(|tool| tool.to_string()).unwrap();
-            // let apply = args.is_present("apply");
-            let apply = true;
-            execute_add(tools, apply).await?;
+            let ask = args.is_present("ask");
+            execute_add(tools, ask).await?;
         }
         _ => {
             cli().print_help().unwrap();
