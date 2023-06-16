@@ -52,6 +52,7 @@
           ] ++ lib.optionals pkgs.stdenv.isDarwin [
             # Additional darwin specific inputs can be set here
             pkgs.libiconv
+            pkgs.darwin.Security
           ];
 
           # Additional environment variables can be set directly
