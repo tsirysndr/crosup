@@ -13,7 +13,7 @@ use ssh2::Session;
 use crate::{macros::install, types::InstallArgs};
 
 pub async fn execute_install(args: InstallArgs) -> Result<(), Error> {
-    let (mut config, filename, content) = verify_if_config_file_is_present()?;
+    let (mut config, filename, content, _) = verify_if_config_file_is_present()?;
 
     ask_confirmation(args.ask, &mut config);
 

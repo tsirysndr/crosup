@@ -73,7 +73,7 @@ SUBCOMMANDS:
 ```
 
 ## 🛠️ Minimal Configuration
-This is a minimal configuration file to install vim and git (on any Linux/MacOS):
+This is a minimal configuration file to install vim and git:
 
 ```toml
 # Crosfile.toml
@@ -83,7 +83,7 @@ packages = [
 ]
 ```
 
-When you run `crosup install`, it will detect your OS and install the appropriate tools using the default package manager.
+When you run `crosup install`, it will detect your OS and install the appropriate tools using nix [home-manager](https://nix-community.github.io/home-manager/) on your system.
 
 ## 📝 Advanced Configuration
 Crosup uses a configuration file to determine which tools to install. The default configuration is embedded in the binary, but you can generate a default configuration file (Crosfile.hcl) using the `crosup init` subcommand, you can specify the default format using the `--toml` flag.
