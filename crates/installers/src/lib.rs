@@ -10,6 +10,7 @@ pub mod dnf;
 pub mod emerge;
 pub mod fleek;
 pub mod git;
+pub mod home_manager;
 pub mod nix;
 pub mod pacman;
 pub mod slackpkg;

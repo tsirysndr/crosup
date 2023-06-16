@@ -1,7 +1,7 @@
 use crate::cmd::{init::execute_init, install::execute_install};
 use anyhow::Error;
 use clap::{arg, Command};
-use cmd::{diff::execute_diff, history::execute_history};
+use cmd::{add::execute_add, diff::execute_diff, history::execute_history};
 use crosup_types::configuration::ConfigFormat;
 use types::InstallArgs;
 
@@ -53,6 +53,12 @@ Quickly install your development tools on your new Chromebook or any Linux distr
             Command::new("history")
                 .about("Show the change history of the configuration file"),
         )
+        .subcommand(
+            Command::new("add")
+                .arg(arg!(--ask -a "Ask for confirmation before adding a new tool"))
+                .arg(arg!(<tools> "Tool to add to the configuration file, e.g. gh, vim, tig etc."))
+                .about("Add a new tool to the configuration file"),
+        )
 }
 
 #[tokio::main]
@@ -98,6 +104,11 @@ async fn main() -> Result<(), Error> {
         }
         Some(("history", _)) => {
             execute_history().await?;
+        }
+        Some(("add", args)) => {
+            let tools = args.value_of("tools").map(|tool| tool.to_string()).unwrap();
+            let ask = args.is_present("ask");
+            execute_add(tools, ask).await?;
         }
         _ => {
             cli().print_help().unwrap();

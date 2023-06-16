@@ -30,6 +30,11 @@ pub struct Configuration {
         skip_serializing_if = "Option::is_none",
         serialize_with = "hcl::ser::block"
     )]
+    pub packages: Option<Vec<String>>,
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "hcl::ser::block"
+    )]
     pub install: Option<InstallConfiguration>,
     #[serde(
         skip_serializing_if = "Option::is_none",
@@ -113,6 +118,7 @@ pub struct Configuration {
 impl Default for Configuration {
     fn default() -> Self {
         Configuration {
+            packages: None,
             install: None,
             brew: Some(default_brew_install()),
             git: Some(default_git_install()),

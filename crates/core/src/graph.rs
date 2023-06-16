@@ -2,8 +2,8 @@ use anyhow::Error;
 use crosup_installers::{
     apk::ApkInstaller, apt::AptInstaller, brew::BrewInstaller, curl::CurlInstaller,
     dnf::DnfInstaller, emerge::EmergeInstaller, fleek::FleekInstaller, git::GitInstaller,
-    nix::NixInstaller, pacman::PacmanInstaller, slackpkg::SlackpkgInstaller, yum::YumInstaller,
-    zypper::ZypperInstaller, Installer,
+    home_manager::HomeManagerInstaller, nix::NixInstaller, pacman::PacmanInstaller,
+    slackpkg::SlackpkgInstaller, yum::YumInstaller, zypper::ZypperInstaller, Installer,
 };
 use crosup_macros::{
     add_vertex, add_vertex_with_condition, convert_generic_installer, downcast_installer,
@@ -34,6 +34,7 @@ pub struct Vertex {
     emerge: Option<EmergeInstaller>,
     slackpkg: Option<SlackpkgInstaller>,
     fleek: Option<FleekInstaller>,
+    home_manager: Option<HomeManagerInstaller>,
 }
 
 impl From<Box<dyn Installer + 'static>> for Vertex {
@@ -59,6 +60,7 @@ impl From<Box<dyn Installer + 'static>> for Vertex {
             emerge: downcast_installer!("emerge", installer, EmergeInstaller),
             slackpkg: downcast_installer!("slackpkg", installer, SlackpkgInstaller),
             fleek: downcast_installer!("fleek", installer, FleekInstaller),
+            home_manager: downcast_installer!("home-manager", installer, HomeManagerInstaller),
         }
     }
 }
@@ -79,6 +81,7 @@ impl Into<Box<dyn Installer>> for Vertex {
             "emerge" => Box::new(self.emerge.unwrap()),
             "slackpkg" => Box::new(self.slackpkg.unwrap()),
             "fleek" => Box::new(self.fleek.unwrap()),
+            "home-manager" => Box::new(self.home_manager.unwrap()),
             _ => panic!("Unknown installer: {}", self.name),
         }
     }
@@ -165,7 +168,10 @@ pub fn build_installer_graph(
 ) -> (InstallerGraph, Vec<Box<dyn Installer>>) {
     let mut graph = InstallerGraph::new();
 
-    if config.clone().nix.is_some() || config.clone().fleek.is_some() {
+    if config.clone().nix.is_some()
+        || config.clone().fleek.is_some()
+        || config.clone().packages.is_some()
+    {
         if let Some(curl) = config.clone().curl {
             if !curl.into_iter().any(|(_, y)| y.script.contains_key("nix")) {
                 let nix = default_nix_installer();
@@ -206,6 +212,18 @@ pub fn build_installer_graph(
     add_vertex!(graph, SlackpkgInstaller, config, slackpkg, pkg, session);
     add_vertex!(graph, FleekInstaller, config, fleek, pkg, session);
     add_vertex_with_condition!(graph, BrewInstaller, config, brew, pkg, session);
+
+    if let Some(package) = config.clone().packages {
+        package.iter().for_each(|name| {
+            graph.add_vertex(Vertex::from(Box::new(HomeManagerInstaller {
+                name: name.clone(),
+                session: session.clone(),
+                provider: "home-manager".into(),
+                packages: Some(vec![name.clone()]),
+                ..Default::default()
+            }) as Box<dyn Installer>));
+        });
+    }
 
     setup_dependencies(&mut graph);
 

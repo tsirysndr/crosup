@@ -77,18 +77,15 @@ This is a minimal configuration file to install vim and git:
 
 ```toml
 # Crosfile.toml
-[install.pkg.vim]
-packages = ["vim"]
-version_check = "vim --version"
-
-[install.pkg.git]
-packages = ["git"]
-version_check = "git --version"
+packages = [
+  "vim",
+  "git"
+]
 ```
 
-When you run `crosup install`, it will detect your OS and install the appropriate tools using the default package manager.
+When you run `crosup install`, it will detect your OS and install the appropriate tools using nix [home-manager](https://nix-community.github.io/home-manager/) on your system.
 
-## 📝 Configuration
+## 📝 Advanced Configuration
 Crosup uses a configuration file to determine which tools to install. The default configuration is embedded in the binary, but you can generate a default configuration file (Crosfile.hcl) using the `crosup init` subcommand, you can specify the default format using the `--toml` flag.
 
 Example of a Crosfile.toml (`crosup init --toml`) for a Debian-based system:

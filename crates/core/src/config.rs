@@ -7,13 +7,14 @@ use crosup_types::{
     INVENTORY_TOML,
 };
 
-pub fn verify_if_config_file_is_present() -> Result<(Configuration, String, String), Error> {
+pub fn verify_if_config_file_is_present() -> Result<(Configuration, String, String, bool), Error> {
     if !Path::new(CROSFILE_HCL).exists() && !Path::new(CROSFILE_TOML).exists() {
         let config = Configuration::default();
         return Ok((
             config.clone(),
             CROSFILE_HCL.into(),
             hcl::to_string(&config)?,
+            false,
         ));
     }
 
@@ -23,13 +24,13 @@ pub fn verify_if_config_file_is_present() -> Result<(Configuration, String, Stri
         let config = std::fs::read_to_string(current_dir.join(CROSFILE_HCL))?;
         let content = config.clone();
         let config = hcl::from_str(&config)?;
-        return Ok((config, CROSFILE_HCL.into(), content));
+        return Ok((config, CROSFILE_HCL.into(), content, true));
     }
 
     let config = std::fs::read_to_string(current_dir.join(CROSFILE_TOML))?;
     let content = config.clone();
     let config = toml::from_str(&config)?;
-    return Ok((config, CROSFILE_TOML.into(), content));
+    return Ok((config, CROSFILE_TOML.into(), content, true));
 }
 
 pub fn verify_if_inventory_config_file_is_present() -> Result<Inventory, Error> {
