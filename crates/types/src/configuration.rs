@@ -26,10 +26,7 @@ pub enum ConfigFormat {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Configuration {
-    #[serde(
-        skip_serializing_if = "Option::is_none",
-        serialize_with = "hcl::ser::block"
-    )]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub packages: Option<Vec<String>>,
     #[serde(
         skip_serializing_if = "Option::is_none",

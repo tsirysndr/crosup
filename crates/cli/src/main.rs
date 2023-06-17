@@ -29,6 +29,7 @@ Quickly install your development tools on your new Chromebook or any Linux distr
             Command::new("init")
             .arg(arg!(--toml "Generate a default configuration file in toml format"))
             .arg(arg!(--inventory -i "Generate a default inventory file"))
+            .arg(arg!([packages]... "List of packages to install"))
             .about("Generate a default configuration file"),
         )
         .subcommand(
@@ -56,7 +57,7 @@ Quickly install your development tools on your new Chromebook or any Linux distr
         .subcommand(
             Command::new("add")
                 .arg(arg!(--ask -a "Ask for confirmation before adding a new tool"))
-                .arg(arg!(<tools>... "Tool to add to the configuration file, e.g. gh, vim, tig etc."))
+                .arg(arg!(<tools>... "Tools to add to the configuration file, e.g. gh, vim, tig etc."))
                 .about("Add a new tool to the configuration file"),
         )
 }
@@ -94,9 +95,15 @@ async fn main() -> Result<(), Error> {
         Some(("init", args)) => {
             let toml = args.is_present("toml");
             let inventory = args.is_present("inventory");
+            let packages = args.values_of("packages").map(|packages| {
+                packages
+                    .into_iter()
+                    .map(|package| package.to_string())
+                    .collect::<Vec<String>>()
+            });
             match toml {
-                true => execute_init(ConfigFormat::TOML, inventory)?,
-                false => execute_init(ConfigFormat::HCL, inventory)?,
+                true => execute_init(ConfigFormat::TOML, inventory, packages)?,
+                false => execute_init(ConfigFormat::HCL, inventory, packages)?,
             }
         }
         Some(("diff", _)) => {
