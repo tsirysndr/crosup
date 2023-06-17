@@ -9,7 +9,11 @@ use crosup_types::{
     inventory::Inventory,
 };
 
-pub fn execute_init(cfg_format: ConfigFormat, inventory: bool) -> Result<(), Error> {
+pub fn execute_init(
+    cfg_format: ConfigFormat,
+    inventory: bool,
+    packages: Option<Vec<String>>,
+) -> Result<(), Error> {
     let ext = match cfg_format {
         ConfigFormat::HCL => "hcl",
         ConfigFormat::TOML => "toml",
@@ -50,7 +54,27 @@ pub fn execute_init(cfg_format: ConfigFormat, inventory: bool) -> Result<(), Err
         return Ok(());
     }
 
-    let config = Configuration::default();
+    let config = match packages {
+        Some(packages) => Configuration {
+            packages: Some(packages),
+            install: None,
+            brew: None,
+            apt: None,
+            pacman: None,
+            git: None,
+            nix: None,
+            curl: None,
+            yum: None,
+            dnf: None,
+            zypper: None,
+            apk: None,
+            emerge: None,
+            slackpkg: None,
+            fleek: None,
+        },
+        None => Configuration::default(),
+    };
+
     let serialized = match cfg_format {
         ConfigFormat::HCL => hcl::to_string(&config).unwrap(),
         ConfigFormat::TOML => toml::to_string_pretty(&config).unwrap(),
