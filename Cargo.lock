@@ -917,10 +917,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "crosup-cli"
-version = "0.3.1"
-
-[[package]]
 name = "crosup-core"
 version = "0.1.5"
 dependencies = [
