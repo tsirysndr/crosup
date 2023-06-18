@@ -10,6 +10,7 @@ pub mod diff;
 pub mod history;
 pub mod init;
 pub mod install;
+pub mod search;
 
 struct Line(Option<usize>);
 

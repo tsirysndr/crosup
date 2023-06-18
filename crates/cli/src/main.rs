@@ -1,9 +1,9 @@
 use crate::cmd::{init::execute_init, install::execute_install};
 use anyhow::Error;
 use clap::{arg, Command};
-use cmd::{add::execute_add, diff::execute_diff, history::execute_history};
+use cmd::{add::execute_add, diff::execute_diff, history::execute_history, search::execute_search};
 use crosup_types::configuration::ConfigFormat;
-use types::InstallArgs;
+use types::{InstallArgs, SearchArgs};
 
 pub mod cmd;
 pub mod macros;
@@ -59,6 +59,13 @@ Quickly install your development tools on your new Chromebook or any Linux distr
                 .arg(arg!(--ask -a "Ask for confirmation before adding a new tool"))
                 .arg(arg!(<tools>... "Tools to add to the configuration file, e.g. gh, vim, tig etc."))
                 .about("Add a new tool to the configuration file"),
+        )
+        .subcommand(
+            Command::new("search")
+                .arg(arg!(--channel -c [channel] "Channel to use when searching for a package"))
+                .arg(arg!(--max-results -m [max_results] "Maximum number of results to return"))
+                .arg(arg!(<package> "Package to search for"))
+                .about("Search for a package in the nixpkgs repository"),
         )
 }
 
@@ -123,6 +130,20 @@ async fn main() -> Result<(), Error> {
                 .unwrap();
             let ask = args.is_present("ask");
             execute_add(tools, ask).await?;
+        }
+        Some(("search", args)) => {
+            let package = args.value_of("package").unwrap();
+            let channel = args.value_of("channel").unwrap_or("unstable");
+            let max_results = args
+                .value_of("max_results")
+                .map(|max_results| max_results.parse::<u32>().unwrap())
+                .unwrap_or(10);
+            let args = SearchArgs {
+                package: package.to_string(),
+                channel: channel.to_string(),
+                max_results,
+            };
+            execute_search(args).await?;
         }
         _ => {
             cli().print_help().unwrap();

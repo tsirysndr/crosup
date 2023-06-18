@@ -1,5 +1,7 @@
 use anyhow::Error;
 
+pub mod search;
+
 pub fn add_package(file: &str, pkg: &str) -> Result<String, Error> {
     let mut packages = nix_editor::read::readvalue(file, "home.packages")?;
     let pkg = match pkg.starts_with("pkgs.") {
