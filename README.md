@@ -71,6 +71,7 @@ SUBCOMMANDS:
     install    Install developer tools, possible values are: docker, nix, devbox, homebrew,
                    flox, fish, vscode, ble.sh, atuin, tig, fzf, httpie, kubectl, minikube, tilt,
                    zellij, ripgrep, fd, exa, bat, glow, devenv
+    search     Search for a package in the nixpkgs repository
 ```
 
 ## 🛠️ Minimal Configuration
