@@ -8,3 +8,10 @@ pub struct InstallArgs {
     pub username: Option<String>,
     pub inventory: Option<String>,
 }
+
+#[derive(Clone, Default)]
+pub struct SearchArgs {
+    pub package: String,
+    pub channel: String,
+    pub max_results: u32,
+}

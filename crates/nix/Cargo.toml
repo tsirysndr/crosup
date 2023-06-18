@@ -7,10 +7,17 @@ keywords = ["chromebook", "chromeos", "homebrew", "docker", "nix"]
 license = "MIT"
 name = "crosup-nix"
 repository = "https://github.com/tsirysndr/crosup"
-version = "0.1.0"
+version = "0.1.1"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 anyhow = "1.0.71"
+async-trait = "0.1.68"
 nix-editor = "0.3.0"
+serde = "1.0.164"
+serde_json = "1.0.97"
+surf = {version = "2.3.2", features = ["h1-client-rustls"], default-features = false}
+
+[dev-dependencies]
+tokio = {version = "1.28.2", features = ["full"]}
