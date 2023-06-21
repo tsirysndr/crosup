@@ -1193,6 +1193,7 @@ version = "0.1.3"
 dependencies = [
  "hcl-rs",
  "indexmap",
+ "os-release",
  "serde",
 ]
 

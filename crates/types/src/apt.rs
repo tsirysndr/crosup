@@ -1,4 +1,5 @@
 use indexmap::IndexMap;
+use os_release::OsRelease;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
@@ -42,40 +43,54 @@ pub struct Package {
 
 pub fn default_apt_install() -> IndexMap<String, AptConfiguration> {
     let mut pkg = IndexMap::new();
-    pkg.insert(
-        "docker".into(),
-        Package {
-            name: "docker".into(),
-            gpg_key: Some("https://download.docker.com/linux/debian/gpg".into()),
-            gpg_path: Some("/etc/apt/keyrings/docker.gpg".into()),
-            setup_repository: Some(
-              r#"echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null"#.into()),
-            apt_update: Some(true),
-            packages: Some(vec![
-              "docker-ce".into(),
-              "docker-ce-cli".into(),
-              "containerd.io".into(),
-              "docker-buildx-plugin".into(),
-              "docker-compose-plugin".into()
-              ]),
-            depends_on: Some(vec!["ca-certificates".into(),"curl".into(), "gnupg".into()]),
-            postinstall: Some("sudo usermod -aG docker $USER && newgrp docker".into()),
-            version_check: Some("docker --version".into()),
-            ..Default::default()
-        },
-    );
 
-    pkg.insert(
-        "vscode".into(),
-        Package {
-            name: "vscode".into(),
-            url: Some(
-                "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64".into(),
-            ),
-            version_check: Some("code --version".into()),
-            ..Default::default()
-        },
-    );
+    // detect linux
+    if cfg!(target_os = "linux") {
+        // determine linux distribution using os-release
+        if let Ok(os_release) = OsRelease::new() {
+            let os = os_release.id.to_lowercase();
+            let os = os.as_str();
+
+            if os == "debian" {
+                pkg.insert(
+                    "docker".into(),
+                    Package {
+                        name: "docker".into(),
+                        gpg_key: Some("https://download.docker.com/linux/debian/gpg".into()),
+                        gpg_path: Some("/etc/apt/keyrings/docker.gpg".into()),
+                        setup_repository: Some(
+                          r#"echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null"#.into()),
+                        apt_update: Some(true),
+                        packages: Some(vec![
+                          "docker-ce".into(),
+                          "docker-ce-cli".into(),
+                          "containerd.io".into(),
+                          "docker-buildx-plugin".into(),
+                          "docker-compose-plugin".into()
+                          ]),
+                        depends_on: Some(vec!["ca-certificates".into(),"curl".into(), "gnupg".into()]),
+                        postinstall: Some("sudo usermod -aG docker $USER && newgrp docker".into()),
+                        version_check: Some("docker --version".into()),
+                        ..Default::default()
+                    },
+                );
+            }
+
+            if os == "debian" || os == "ubuntu" {
+                pkg.insert(
+                    "vscode".into(),
+                    Package {
+                        name: "code".into(),
+                        url: Some(
+                            "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64".into(),
+                        ),
+                        version_check: Some("code --version".into()),
+                        ..Default::default()
+                    },
+                );
+            }
+        }
+    }
 
     let mut apt = IndexMap::new();
     apt.insert("install".into(), AptConfiguration { pkg });

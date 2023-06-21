@@ -50,17 +50,26 @@ macro_rules! append_to_nix_conf {
 
 #[macro_export]
 macro_rules! brew_install {
-    ($self:ident, $package:expr, $session:expr) => {
-        let mut child = std::process::Command::new("brew")
-            .arg("install")
-            .arg($package)
-            .env(
-                "PATH",
-                "/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
-            )
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()?;
+    ($self:ident, $package:expr, $cask:expr, $session:expr) => {
+        let mut child = match $cask {
+            true => std::process::Command::new("brew")
+                .arg("install")
+                .arg($package)
+                .arg("--cask")
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .spawn()?,
+            false => std::process::Command::new("brew")
+                .arg("install")
+                .arg($package)
+                .env(
+                    "PATH",
+                    "/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+                )
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .spawn()?,
+        };
 
         let stdout = child.stdout.take().unwrap();
         let stdout = std::io::BufReader::new(stdout);
