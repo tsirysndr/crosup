@@ -31,7 +31,7 @@ INSTALL_DIR="/usr/local/bin"
 DOWNLOAD_URL=`echo $DOWNLOAD_URL | tr -d '\"'`
 
 # Download the asset
-wget $DOWNLOAD_URL -O /tmp/$ASSET_NAME
+curl -SL $DOWNLOAD_URL -o /tmp/$ASSET_NAME
 
 # Extract the asset
 tar -xzf /tmp/$ASSET_NAME -C /tmp
