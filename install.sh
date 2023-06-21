@@ -70,4 +70,10 @@ Please file an issue if you encounter any problems!
 
 EOF
 
-crosup install --ask
+# Check if the "--skip" argument was provided
+if [[ "$@" != *--skip* ]]; then
+    crosup install --ask
+else
+    echo "Run 'crosup install' to install your development environment"
+fi
+
