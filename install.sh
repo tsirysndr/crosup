@@ -2,7 +2,23 @@
 
 # Define the release information
 RELEASE_URL="https://api.github.com/repos/tsirysndr/crosup/releases/latest"
-ASSET_NAME="_x86_64-unknown-linux-gnu.tar.gz"
+
+# Determine the operating system
+OS=$(uname -s)
+if [ "$OS" = "Darwin" ]; then
+    # Determine the CPU architecture
+    ARCH=$(uname -m)
+    if [ "$ARCH" = "arm64" ]; then
+        ASSET_NAME="_aarch64-apple-darwin.tar.gz"
+    else
+        ASSET_NAME="_x86_64-apple-darwin.tar.gz"
+    fi
+elif [ "$OS" = "Linux" ]; then
+    ASSET_NAME="_x86_64-unknown-linux-gnu.tar.gz"
+else
+    echo "Unsupported operating system: $OS"
+    exit 1
+fi
 
 # Retrieve the download URL for the desired asset
 DOWNLOAD_URL=$(curl -sSL $RELEASE_URL | grep -o "browser_download_url.*$ASSET_NAME\"" | cut -d ' ' -f 2)
@@ -20,11 +36,16 @@ wget $DOWNLOAD_URL -O /tmp/$ASSET_NAME
 # Extract the asset
 tar -xzf /tmp/$ASSET_NAME -C /tmp
 
-# Move the extracted binary to the installation directory
-sudo mv /tmp/crosup $INSTALL_DIR
-
 # Set the correct permissions for the binary
-chmod +x $INSTALL_DIR/crosup
+chmod +x /tmp/crosup
+
+# Move the extracted binary to the installation directory
+# use sudo if OS is Linux
+if [ "$OS" = "Linux" ]; then
+    sudo mv /tmp/crosup $INSTALL_DIR
+else
+    mv /tmp/crosup $INSTALL_DIR
+fi
 
 # Clean up temporary files
 rm /tmp/$ASSET_NAME
