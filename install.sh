@@ -1,5 +1,10 @@
 #!/bin/bash
 
+readonly MAGENTA="$(tput setaf 5 2>/dev/null || echo '')"
+readonly GREEN="$(tput setaf 2 2>/dev/null || echo '')"
+readonly CYAN="$(tput setaf 6 2>/dev/null || echo '')"
+readonly NO_COLOR="$(tput sgr0 2>/dev/null || echo '')"
+
 # Define the release information
 RELEASE_URL="https://api.github.com/repos/tsirysndr/crosup/releases/latest"
 
@@ -57,16 +62,17 @@ rm /tmp/$ASSET_NAME
 echo "Installation completed! 🎉"
 
 cat << EOF
+${CYAN}
              ______                __  __    
             / ____/________  _____/ / / /___ 
            / /   / ___/ __ \/ ___/ / / / __ \\
           / /___/ /  / /_/ (__  ) /_/ / /_/ /
           \____/_/   \____/____/\____/ .___/ 
                                     /_/      
-
+${NO_COLOR}
 Quickly setup your development environment on your new Chromebook/ChromeOS 🚀 ✨
 
-https://github.com/tsirysndr/crosup
+${GREEN}https://github.com/tsirysndr/crosup${NO_COLOR}
 
 Please file an issue if you encounter any problems!
 
@@ -78,6 +84,6 @@ EOF
 if [[ "$@" != *--skip* ]]; then
     crosup install --ask
 else
-    echo "Run 'crosup install' to install your development environment"
+    printf "%s\n" "Run ${GREEN}'crosup install'${NO_COLOR} to install your development environment"
 fi
 
