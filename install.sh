@@ -42,7 +42,11 @@ chmod +x /tmp/crosup
 # Move the extracted binary to the installation directory
 # use sudo if OS is Linux
 if [ "$OS" = "Linux" ]; then
-    sudo mv /tmp/crosup $INSTALL_DIR
+    if command -v sudo >/dev/null 2>&1; then
+        sudo mv /tmp/crosup $INSTALL_DIR
+    else
+        mv /tmp/crosup $INSTALL_DIR
+    fi
 else
     mv /tmp/crosup $INSTALL_DIR
 fi
