@@ -114,6 +114,9 @@ pub struct Package {
         serialize_with = "hcl::ser::block"
     )]
     pub slackpkg: Option<slackpkg::Package>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cask: Option<bool>,
 }
 
 impl Into<brew::BrewConfiguration> for InstallConfiguration {
@@ -346,6 +349,7 @@ impl Into<brew::Package> for Package {
             preinstall: self.preinstall,
             postinstall: self.postinstall,
             version_check: self.version_check,
+            cask: self.cask,
         }
     }
 }

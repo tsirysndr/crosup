@@ -23,6 +23,8 @@ pub struct Package {
     pub postinstall: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub version_check: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cask: Option<bool>,
 }
 
 pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
@@ -43,6 +45,7 @@ sudo sed -i 's/#remember_owner = 1/remember_owner = 0/g' /etc/libvirt/qemu.conf"
                     .into(),
             ),
             version_check: Some("minikube version".into()),
+            ..Default::default()
         },
     );
 
@@ -165,6 +168,25 @@ sudo sed -i 's/#remember_owner = 1/remember_owner = 0/g' /etc/libvirt/qemu.conf"
             ..Default::default()
         },
     );
+
+    if cfg!(target_os = "macos") {
+        pkg.insert(
+            "docker".into(),
+            super::brew::Package {
+                cask: Some(true),
+                version_check: Some("docker --version".into()),
+                ..Default::default()
+            },
+        );
+        pkg.insert(
+            "visual-studio-code".into(),
+            super::brew::Package {
+                cask: Some(true),
+                version_check: Some("code --version".into()),
+                ..Default::default()
+            },
+        );
+    }
 
     brew.insert(
         "install".into(),

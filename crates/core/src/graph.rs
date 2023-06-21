@@ -199,7 +199,21 @@ pub fn build_installer_graph(
 
     autodetect_installer(config);
 
-    add_vertex!(graph, AptInstaller, config, apt, pkg, session);
+    if cfg!(target_os = "linux") {
+        // determine linux distribution using os-release
+        if let Ok(os_release) = OsRelease::new() {
+            let os = os_release.id.to_lowercase();
+            let os = os.as_str();
+
+            match os {
+                "ubuntu" | "debian" | "linuxmint" | "pop" | "elementary" | "zorin" => {
+                    add_vertex!(graph, AptInstaller, config, apt, pkg, session);
+                }
+                _ => {}
+            };
+        }
+    }
+
     add_vertex!(graph, CurlInstaller, config, curl, script, session);
     add_vertex!(graph, GitInstaller, config, git, repo, session);
     add_vertex!(graph, NixInstaller, config, nix, pkg, session);

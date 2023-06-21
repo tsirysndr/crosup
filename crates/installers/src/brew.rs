@@ -20,6 +20,7 @@ pub struct BrewInstaller {
     pub version_check: Option<String>,
     pub provider: String,
     pub session: Option<Session>,
+    pub cask: bool,
 }
 
 impl From<BrewConfiguration> for BrewInstaller {
@@ -45,6 +46,7 @@ impl From<Package> for BrewInstaller {
             postinstall: pkg.postinstall,
             provider: "brew".into(),
             version_check: pkg.version_check,
+            cask: pkg.cask.unwrap_or(false),
             ..Default::default()
         }
     }
@@ -86,7 +88,7 @@ impl Installer for BrewInstaller {
         }
         println!("-> 🚚 Installing {}", self.name().bright_green());
         self.preinstall()?;
-        brew_install!(self, &self.name, self.session.clone());
+        brew_install!(self, &self.name, self.cask, self.session.clone());
         self.postinstall()?;
         Ok(())
     }
