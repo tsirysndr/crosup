@@ -54,8 +54,8 @@ macro_rules! brew_install {
         let mut child = match $cask {
             true => std::process::Command::new("brew")
                 .arg("install")
-                .arg($package)
                 .arg("--cask")
+                .arg($package)
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
                 .spawn()?,
