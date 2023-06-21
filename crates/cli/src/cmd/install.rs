@@ -3,6 +3,8 @@ use crosup_core::{
     config::{verify_if_config_file_is_present, verify_if_inventory_config_file_is_present},
     graph::build_installer_graph,
 };
+use crosup_installers::home_manager::HomeManagerInstaller;
+use crosup_installers::Installer;
 use crosup_repo::{file::FileRepo, modification::ModificationRepo};
 use crosup_ssh::setup_ssh_connection;
 use crosup_types::configuration::Configuration;
