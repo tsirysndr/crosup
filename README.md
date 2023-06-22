@@ -182,6 +182,47 @@ version_check = "code --version"
 
 ```
 
+## 🚀 As a GitHub Action
+
+You can use crosup as a GitHub Action to install developer tools on your CI/CD pipeline.
+
+
+```yaml
+name: Setup Crosup
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  setup-superviseur:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v4
+      - name: Setup Crosup
+        uses: tsirysndr/setup-crosup@v1
+        with:
+          version: 'v0.4.9'
+          # Add packages to install here
+          packages: |
+            deno
+            zig
+      - name: Verify Crosup
+        run: crosup --version
+      - name: Verify Deno
+        run: deno --version
+      - name: Verify Zig
+        run: zig version
+```
+
+See [action.yml](https://github.com/tsirysndr/setup-crosup/blob/master/action.yml) for the full documentation for this action's inputs and outputs.
+
 ## 🤝 Contributing
 Contributions, issues and feature requests are welcome!
 See [CONTRIBUTING](./CONTRIBUTING.md) for more information.
