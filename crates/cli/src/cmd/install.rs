@@ -1,3 +1,5 @@
+use std::fs;
+
 use anyhow::Error;
 use crosup_core::{
     config::{verify_if_config_file_is_present, verify_if_inventory_config_file_is_present},
@@ -75,6 +77,8 @@ pub async fn execute_install(args: InstallArgs) -> Result<(), Error> {
 
     let home = std::env::var("HOME").unwrap();
     let crosup_dir = format!("{}/.config/crosup", home);
+
+    fs::create_dir_all(&crosup_dir)?;
 
     let database_url = format!("sqlite:{}/modifications.sqlite3?mode=rwc", crosup_dir);
 

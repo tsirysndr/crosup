@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, fs};
 
 use anyhow::Error;
 use owo_colors::{OwoColorize, Style};
@@ -26,6 +26,8 @@ impl fmt::Display for Line {
 pub async fn get_database_connection() -> Result<DatabaseConnection, Error> {
     let home = std::env::var("HOME").unwrap();
     let crosup_dir = format!("{}/.config/crosup", home);
+
+    fs::create_dir_all(&crosup_dir)?;
 
     let database_url = format!("sqlite:{}/modifications.sqlite3?mode=rwc", crosup_dir);
 
