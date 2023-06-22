@@ -181,6 +181,13 @@ pub fn build_installer_graph(
                     ..CurlInstaller::from(nix.clone())
                 }) as Box<dyn Installer>));
             }
+        } else {
+            let nix = default_nix_installer();
+            graph.add_vertex(Vertex::from(Box::new(CurlInstaller {
+                name: nix.name.clone(),
+                session: session.clone(),
+                ..CurlInstaller::from(nix.clone())
+            }) as Box<dyn Installer>));
         }
     }
 
@@ -194,6 +201,13 @@ pub fn build_installer_graph(
                     ..CurlInstaller::from(brew.clone())
                 }) as Box<dyn Installer>));
             }
+        } else {
+            let brew = default_brew_installer();
+            graph.add_vertex(Vertex::from(Box::new(CurlInstaller {
+                name: brew.name.clone(),
+                session: session.clone(),
+                ..CurlInstaller::from(brew.clone())
+            }) as Box<dyn Installer>));
         }
     }
 
@@ -234,6 +248,7 @@ pub fn build_installer_graph(
                 session: session.clone(),
                 provider: "home-manager".into(),
                 packages: Some(vec![name.clone()]),
+                dependencies: vec!["nix".into()],
                 ..Default::default()
             }) as Box<dyn Installer>));
         });
