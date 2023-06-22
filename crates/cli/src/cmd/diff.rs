@@ -1,6 +1,7 @@
 use anyhow::Error;
 use crosup_core::config::verify_if_config_file_is_present;
 use crosup_repo::{file::FileRepo, modification::ModificationRepo};
+use migration::MigratorTrait;
 use owo_colors::OwoColorize;
 use sea_orm::DatabaseConnection;
 
@@ -11,9 +12,8 @@ use super::get_database_connection;
 pub async fn execute_diff() -> Result<(), Error> {
     let (_, filename, content, _) = verify_if_config_file_is_present()?;
 
-    migration::run().await;
-
     let db: DatabaseConnection = get_database_connection().await?;
+    migration::Migrator::up(&db, None).await?;
     let current_dir = std::env::current_dir()?;
     let path = format!("{}/{}", current_dir.display(), filename);
 

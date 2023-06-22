@@ -6,6 +6,7 @@ use crosup_core::{
 use crosup_repo::{file::FileRepo, modification::ModificationRepo};
 use crosup_ssh::setup_ssh_connection;
 use crosup_types::configuration::Configuration;
+use migration::MigratorTrait;
 use owo_colors::OwoColorize;
 use sea_orm::{Database, DatabaseConnection};
 use ssh2::Session;
@@ -14,8 +15,6 @@ use crate::{macros::install, types::InstallArgs};
 
 pub async fn execute_install(args: InstallArgs) -> Result<(), Error> {
     let (config, filename, content, _) = verify_if_config_file_is_present()?;
-
-    migration::run().await;
 
     let mut config = match args.tools.clone() {
         Some(packages) => Configuration {
@@ -80,6 +79,8 @@ pub async fn execute_install(args: InstallArgs) -> Result<(), Error> {
     let database_url = format!("sqlite:{}/modifications.sqlite3?mode=rwc", crosup_dir);
 
     let db: DatabaseConnection = Database::connect(&database_url).await?;
+
+    migration::Migrator::up(&db, None).await?;
 
     let current_dir = std::env::current_dir()?;
     let path = format!("{}/{}", current_dir.display(), filename);

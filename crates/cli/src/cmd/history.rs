@@ -5,15 +5,16 @@ use anyhow::Error;
 use crosup_core::config::verify_if_config_file_is_present;
 use crosup_repo::{file::FileRepo, modification::ModificationRepo};
 use crosup_tui::{history::display_history, App};
+use migration::MigratorTrait;
 use owo_colors::OwoColorize;
 use sea_orm::DatabaseConnection;
 
 pub async fn execute_history() -> Result<(), Error> {
     let (_, filename, _, _) = verify_if_config_file_is_present()?;
 
-    migration::run().await;
-
     let db: DatabaseConnection = get_database_connection().await?;
+
+    migration::Migrator::up(&db, None).await?;
 
     let current_dir = std::env::current_dir()?;
     let path = format!("{}/{}", current_dir.display(), filename);
