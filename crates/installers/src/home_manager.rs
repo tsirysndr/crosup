@@ -5,8 +5,6 @@ use owo_colors::OwoColorize;
 use ssh2::Session;
 use std::{any::Any, fs, io::BufRead, path::Path, process::Stdio};
 
-use crate::home_manager;
-
 use super::Installer;
 
 #[derive(Default, Clone)]
