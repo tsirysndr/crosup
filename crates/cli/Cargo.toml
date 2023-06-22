@@ -17,13 +17,13 @@ anyhow = "1.0.71"
 clap = "3.2.20"
 crosup-core = {path = "../core", version = "0.1.8"}
 crosup-entity = {version = "0.1.0", path = "../entity"}
-crosup-installers = {path = "../installers", version = "0.1.10"}
+crosup-installers = {path = "../installers", version = "0.1.11"}
 crosup-migration = {path = "../migration", version = "0.1.0"}
 crosup-nix = {path = "../nix", version = "0.1.1"}
 crosup-repo = {path = "../repo", version = "0.1.0"}
 crosup-ssh = {path = "../ssh", version = "0.1.0"}
 crosup-tui = {path = "../tui", version = "0.1.0"}
-crosup-types = {path = "../types", version = "0.1.6"}
+crosup-types = {path = "../types", version = "0.1.7"}
 hcl-rs = "0.14.2"
 inquire = "0.6.2"
 owo-colors = "3.5.0"

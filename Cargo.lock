@@ -1122,7 +1122,7 @@ dependencies = [
 
 [[package]]
 name = "crosup-installers"
-version = "0.1.10"
+version = "0.1.11"
 dependencies = [
  "anyhow",
  "crosup-macros",
@@ -1191,7 +1191,7 @@ dependencies = [
 
 [[package]]
 name = "crosup-types"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "hcl-rs",
  "indexmap",
