@@ -10,6 +10,8 @@ use crate::{cmd::print_diff, macros::install, types::InstallArgs};
 pub async fn execute_add(tools: Vec<String>, ask: bool) -> Result<(), Error> {
     let (mut current_config, filename, content, is_present) = verify_if_config_file_is_present()?;
 
+    migration::run().await;
+
     current_config.packages = match current_config.packages {
         Some(ref mut packages) => {
             tools.iter().for_each(|x| {

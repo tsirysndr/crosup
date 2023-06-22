@@ -1069,13 +1069,14 @@ dependencies = [
 
 [[package]]
 name = "crosup"
-version = "0.4.5"
+version = "0.4.6"
 dependencies = [
  "anyhow",
  "clap 3.2.25",
  "crosup-core",
  "crosup-entity",
  "crosup-installers",
+ "crosup-migration",
  "crosup-nix",
  "crosup-repo",
  "crosup-ssh",
