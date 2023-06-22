@@ -59,6 +59,14 @@ impl HomeManagerInstaller {
             "nix run home-manager/master -- init".bright_green()
         );
         home_manager_init!(self.session.clone());
+
+        println!(
+            "-> Running {}",
+            "nix profile install home-manager/master".bright_green()
+        );
+        let nix_env = ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh";
+        let command = format!("{} && nix profile install home-manager/master", nix_env);
+        exec_bash_with_output!(command, self.session.clone());
         Ok(())
     }
 
