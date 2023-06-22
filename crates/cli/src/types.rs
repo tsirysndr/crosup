@@ -1,6 +1,6 @@
 #[derive(Clone, Default)]
 pub struct InstallArgs {
-    pub tool: Option<String>,
+    pub tools: Option<Vec<String>>,
     pub ask: bool,
     pub remote_is_present: bool,
     pub remote: Option<String>,

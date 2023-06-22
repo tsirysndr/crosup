@@ -3,8 +3,6 @@ use crosup_core::{
     config::{verify_if_config_file_is_present, verify_if_inventory_config_file_is_present},
     graph::build_installer_graph,
 };
-use crosup_installers::home_manager::HomeManagerInstaller;
-use crosup_installers::Installer;
 use crosup_repo::{file::FileRepo, modification::ModificationRepo};
 use crosup_ssh::setup_ssh_connection;
 use crosup_types::configuration::Configuration;
@@ -15,7 +13,28 @@ use ssh2::Session;
 use crate::{macros::install, types::InstallArgs};
 
 pub async fn execute_install(args: InstallArgs) -> Result<(), Error> {
-    let (mut config, filename, content, _) = verify_if_config_file_is_present()?;
+    let (config, filename, content, _) = verify_if_config_file_is_present()?;
+
+    let mut config = match args.tools.clone() {
+        Some(packages) => Configuration {
+            packages: Some(packages),
+            install: None,
+            brew: None,
+            apt: None,
+            pacman: None,
+            git: None,
+            nix: None,
+            curl: None,
+            yum: None,
+            dnf: None,
+            zypper: None,
+            apk: None,
+            emerge: None,
+            slackpkg: None,
+            fleek: None,
+        },
+        None => config,
+    };
 
     ask_confirmation(args.ask, &mut config);
 
@@ -82,10 +101,17 @@ fn ask_confirmation(ask: bool, config: &mut Configuration) {
             println!("  - {}", installer.name().bright_green());
         }
 
-        println!(
-            "-> Are you sure you want to install these {} tools? [y/N]",
-            installers.len().bold().cyan()
-        );
+        match installers.len() {
+            1 => println!(
+                "-> Are you sure you want to install this {} tool? [y/N]",
+                installers.len().bold().cyan()
+            ),
+            _ => println!(
+                "-> Are you sure you want to install these {} tools? [y/N]",
+                installers.len().bold().cyan()
+            ),
+        }
+
         let mut input = String::new();
         std::io::stdin()
             .read_line(&mut input)

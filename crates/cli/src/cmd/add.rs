@@ -2,8 +2,7 @@ use std::fs;
 
 use anyhow::Error;
 use crosup_core::{config::verify_if_config_file_is_present, graph::build_installer_graph};
-use crosup_installers::home_manager::HomeManagerInstaller;
-use crosup_installers::Installer;
+use crosup_types::configuration::Configuration;
 use owo_colors::OwoColorize;
 
 use crate::{cmd::print_diff, macros::install, types::InstallArgs};
