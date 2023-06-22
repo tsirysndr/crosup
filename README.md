@@ -208,7 +208,7 @@ jobs:
       - name: Setup Crosup
         uses: tsirysndr/setup-crosup@v1
         with:
-          version: 'v0.4.9'
+          version: 'v0.4.10'
           # Add packages to install here
           packages: |
             deno

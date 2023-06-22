@@ -1,4 +1,5 @@
 use indexmap::IndexMap;
+use os_release::OsRelease;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
@@ -30,24 +31,39 @@ pub struct Package {
 pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     let mut brew = IndexMap::new();
     let mut pkg = IndexMap::new();
-    pkg.insert(
-        "minikube".into(),
-        super::brew::Package {
-            name: "minikube".into(),
-            preinstall: Some(
-                "sudo apt-get install -y qemu-system libvirt-clients libvirt-daemon-system".into(),
-            ),
-            postinstall: Some(
-                r#"sudo sed -i 's/#user = "root"/user = "root"/g' /etc/libvirt/qemu.conf
-sudo sed -i 's/#group = "root"/group = "root"/g' /etc/libvirt/qemu.conf
-sudo sed -i 's/#dynamic_ownership = 1/dynamic_ownership = 0/g' /etc/libvirt/qemu.conf
-sudo sed -i 's/#remember_owner = 1/remember_owner = 0/g' /etc/libvirt/qemu.conf"#
-                    .into(),
-            ),
-            version_check: Some("minikube version".into()),
-            ..Default::default()
-        },
-    );
+    let mut minikube = super::brew::Package {
+        name: "minikube".into(),
+        preinstall: None,
+        postinstall: None,
+        version_check: Some("minikube version".into()),
+        ..Default::default()
+    };
+
+    if cfg!(target_os = "linux") {
+        // determine linux distribution using os-release
+        if let Ok(os_release) = OsRelease::new() {
+            let os = os_release.id.to_lowercase();
+            let os = os.as_str();
+            match os {
+                "ubuntu" | "debian" | "linuxmint" | "pop" | "elementary" | "zorin" => {
+                    minikube.preinstall = Some(
+                        "sudo apt-get install -y qemu-system libvirt-clients libvirt-daemon-system"
+                            .into(),
+                    );
+                    minikube.postinstall = Some(
+                        r#"sudo sed -i 's/#user = "root"/user = "root"/g' /etc/libvirt/qemu.conf
+            sudo sed -i 's/#group = "root"/group = "root"/g' /etc/libvirt/qemu.conf
+            sudo sed -i 's/#dynamic_ownership = 1/dynamic_ownership = 0/g' /etc/libvirt/qemu.conf
+            sudo sed -i 's/#remember_owner = 1/remember_owner = 0/g' /etc/libvirt/qemu.conf"#
+                            .into(),
+                    );
+                }
+                _ => {}
+            }
+        }
+    }
+
+    pkg.insert("minikube".into(), minikube);
 
     pkg.insert(
         "tilt".into(),
