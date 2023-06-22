@@ -1,9 +1,11 @@
 use anyhow::Error;
-use crosup_macros::{check_version, exec_bash_with_output};
+use crosup_macros::{check_version, exec_bash_with_output, home_manager_init};
 use crosup_types::home_manager::Package;
 use owo_colors::OwoColorize;
 use ssh2::Session;
 use std::{any::Any, fs, io::BufRead, path::Path, process::Stdio};
+
+use crate::home_manager;
 
 use super::Installer;
 
@@ -58,6 +60,7 @@ impl HomeManagerInstaller {
             "-> Running {}",
             "nix run home-manager/master -- init".bright_green()
         );
+        home_manager_init!(self.session.clone());
         Ok(())
     }
 
