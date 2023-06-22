@@ -50,7 +50,7 @@ pub fn default_git_install() -> IndexMap<String, GitConfiguration> {
         recursive: Some(true),
         depth: Some(1),
         shallow_submodules: Some(true),
-        depends_on: Some(vec!["homebrew".into()]),
+        depends_on: None,
     };
 
     if cfg!(target_os = "linux") {
@@ -69,6 +69,7 @@ pub fn default_git_install() -> IndexMap<String, GitConfiguration> {
 
     if cfg!(target_os = "macos") {
         blesh.preinstall = Some("brew install gawk bash".into());
+        blesh.depends_on = Some(vec!["homebrew".into()]);
     }
 
     repo.insert("blesh".into(), blesh);
