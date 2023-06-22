@@ -68,9 +68,8 @@ SUBCOMMANDS:
     help       Print this message or the help of the given subcommand(s)
     history    Show the change history of the configuration file
     init       Generate a default configuration file
-    install    Install developer tools, possible values are: docker, nix, devbox, homebrew,
-                   flox, fish, vscode, ble.sh, atuin, tig, fzf, httpie, kubectl, minikube, tilt,
-                   zellij, ripgrep, fd, exa, bat, glow, devenv
+    install    Install developer tools, e.g. docker, nix, devbox, homebrew, fish, vscode, ble.sh
+                   ...
     search     Search for a package in the nixpkgs repository
 ```
 

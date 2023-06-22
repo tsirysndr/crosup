@@ -1069,7 +1069,7 @@ dependencies = [
 
 [[package]]
 name = "crosup"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "anyhow",
  "clap 3.2.25",
@@ -1096,7 +1096,7 @@ dependencies = [
 
 [[package]]
 name = "crosup-core"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "anyhow",
  "crosup-installers",
@@ -1121,7 +1121,7 @@ dependencies = [
 
 [[package]]
 name = "crosup-installers"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "crosup-macros",
@@ -1135,7 +1135,7 @@ dependencies = [
 
 [[package]]
 name = "crosup-macros"
-version = "0.1.2"
+version = "0.1.3"
 
 [[package]]
 name = "crosup-migration"
@@ -1190,7 +1190,7 @@ dependencies = [
 
 [[package]]
 name = "crosup-types"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "hcl-rs",
  "indexmap",

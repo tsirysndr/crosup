@@ -22,7 +22,7 @@ fn cli() -> Command<'static> {
           \____/_/   \____/____/\____/ .___/ 
                                     /_/      
 
-Quickly install your development tools on your new Chromebook or any Linux distribution"#,
+Quickly install your development tools on your new Chromebook, MacOS or any Linux distribution"#,
         )
         .author("Tsiry Sandratraina <tsiry.sndr@aol.com>")
         .subcommand(
@@ -35,7 +35,7 @@ Quickly install your development tools on your new Chromebook or any Linux distr
         .subcommand(
             Command::new("install")
                 .arg(arg!(--ask -a "Ask for confirmation before installing tools"))
-                .arg(arg!([tool] "Tool to install, e.g. docker, nix, devbox, homebrew, fish, vscode, ble.sh etc."))
+                .arg(arg!([tools]... "List of tools to install, e.g. docker, nix, devbox, homebrew, fish, vscode, ble.sh ..."))
                 .arg(arg!(--remote -r [ip] "Install tools on a remote machine"))
                 .arg(arg!(--port -p [port] "Port to use when connecting to the remote machine"))
                 .arg(
@@ -43,7 +43,7 @@ Quickly install your development tools on your new Chromebook or any Linux distr
                 )
                 .arg(arg!(--invetory -i [inventory] "Path to the inventory file (list of remote machines) in HCL or TOML format"))
                 .about(
-                    "Install developer tools, possible values are: docker, nix, devbox, homebrew, flox, fish, vscode, ble.sh, atuin, tig, fzf, httpie, kubectl, minikube, tilt, zellij, ripgrep, fd, exa, bat, glow, devenv",
+                    "Install developer tools, e.g. docker, nix, devbox, homebrew, fish, vscode, ble.sh ...",
                 ),
         )
         .subcommand(
@@ -57,7 +57,7 @@ Quickly install your development tools on your new Chromebook or any Linux distr
         .subcommand(
             Command::new("add")
                 .arg(arg!(--ask -a "Ask for confirmation before adding a new tool"))
-                .arg(arg!(<tools>... "Tools to add to the configuration file, e.g. gh, vim, tig etc."))
+                .arg(arg!(<tools>... "Tools to add to the configuration file, e.g. gh, vim, tig ..."))
                 .about("Add a new tool to the configuration file"),
         )
         .subcommand(
@@ -75,7 +75,12 @@ async fn main() -> Result<(), Error> {
     match matches.subcommand() {
         Some(("install", args)) => {
             let ask = args.is_present("ask");
-            let tool = args.value_of("tool").map(|tool| tool.to_string());
+            let tools = args.values_of("tools").map(|tools| {
+                tools
+                    .into_iter()
+                    .map(|tool| tool.to_string())
+                    .collect::<Vec<String>>()
+            });
             let remote_is_present = args.is_present("remote");
             let remote = args.value_of("remote").map(|remote| remote.to_string());
             let port = args
@@ -90,7 +95,7 @@ async fn main() -> Result<(), Error> {
 
             execute_install(InstallArgs {
                 ask,
-                tool,
+                tools,
                 remote_is_present,
                 remote,
                 username,
