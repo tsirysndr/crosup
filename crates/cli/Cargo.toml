@@ -8,14 +8,14 @@ license = "MIT"
 name = "crosup"
 readme = "../../README.md"
 repository = "https://github.com/tsirysndr/crosup"
-version = "0.4.0"
+version = "0.4.1"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 anyhow = "1.0.71"
 clap = "3.2.20"
-crosup-core = {path = "../core", version = "0.1.6"}
+crosup-core = {path = "../core", version = "0.1.7"}
 crosup-entity = {version = "0.1.0", path = "../entity"}
 crosup-installers = {path = "../installers", version = "0.1.4"}
 crosup-nix = {path = "../nix", version = "0.1.1"}
