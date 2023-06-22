@@ -11,6 +11,8 @@ use super::get_database_connection;
 pub async fn execute_diff() -> Result<(), Error> {
     let (_, filename, content, _) = verify_if_config_file_is_present()?;
 
+    migration::run().await;
+
     let db: DatabaseConnection = get_database_connection().await?;
     let current_dir = std::env::current_dir()?;
     let path = format!("{}/{}", current_dir.display(), filename);

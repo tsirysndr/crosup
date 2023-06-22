@@ -10,6 +10,9 @@ use sea_orm::DatabaseConnection;
 
 pub async fn execute_history() -> Result<(), Error> {
     let (_, filename, _, _) = verify_if_config_file_is_present()?;
+
+    migration::run().await;
+
     let db: DatabaseConnection = get_database_connection().await?;
 
     let current_dir = std::env::current_dir()?;
