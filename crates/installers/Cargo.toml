@@ -7,7 +7,7 @@ keywords = ["chromebook", "chromeos", "homebrew", "docker", "nix"]
 license = "MIT"
 name = "crosup-installers"
 repository = "https://github.com/tsirysndr/crosup"
-version = "0.1.6"
+version = "0.1.7"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

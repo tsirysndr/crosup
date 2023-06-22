@@ -523,6 +523,36 @@ macro_rules! home_manager_init {
 }
 
 #[macro_export]
+macro_rules! home_manager_switch {
+    ($session:expr) => {
+        match $session {
+            Some(session) => {
+                let command = format!("bash -c '. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix run home-manager/master -- switch'");
+                crosup_ssh::exec(session.clone(), &command)?;
+            }
+            None => {
+                let mut child = std::process::Command::new("bash")
+                    .arg("-c")
+                    .arg(format!(". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix run home-manager/master -- switch"))
+                    .stdin(Stdio::piped())
+                    .stdout(Stdio::piped())
+                    .spawn()?;
+                let output = child.stdout.take().unwrap();
+                let output = std::io::BufReader::new(output);
+
+                for line in output.lines() {
+                    println!("{}", line?);
+                }
+                let status = child.wait()?;
+                if !status.success() {
+                    return Err(Error::msg(format!("Failed to run home-manager switch")));
+                }
+            }
+        };
+    };
+}
+
+#[macro_export]
 macro_rules! exec_sudo {
     ($command:expr, $session:expr) => {
         match $session {

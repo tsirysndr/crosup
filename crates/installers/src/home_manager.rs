@@ -1,5 +1,5 @@
 use anyhow::Error;
-use crosup_macros::{check_version, exec_bash_with_output, home_manager_init};
+use crosup_macros::{check_version, exec_bash_with_output, home_manager_init, home_manager_switch};
 use crosup_types::home_manager::Package;
 use owo_colors::OwoColorize;
 use ssh2::Session;
@@ -59,14 +59,6 @@ impl HomeManagerInstaller {
             "nix run home-manager/master -- init".bright_green()
         );
         home_manager_init!(self.session.clone());
-
-        println!(
-            "-> Running {}",
-            "nix profile install home-manager/master".bright_green()
-        );
-        let nix_env = ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh";
-        let command = format!("{} && nix profile install home-manager/master", nix_env);
-        exec_bash_with_output!(command, self.session.clone());
         Ok(())
     }
 
@@ -81,14 +73,12 @@ impl HomeManagerInstaller {
         );
         let home = std::env::var("HOME").unwrap();
         let home_nix = format!("{}/.config/home-manager/home.nix", home);
-        let home_nix_content = fs::read_to_string("tests/home.nix").unwrap();
+        let home_nix_content = fs::read_to_string(&home_nix).unwrap();
         let deps = self.hm_dependencies.clone();
         let updated_nix_configs = crosup_nix::add_packages(&home_nix_content, deps)?;
-        fs::write(home_nix, updated_nix_configs)?;
+        fs::write(&home_nix, updated_nix_configs)?;
 
-        let nix_env = ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh";
-        let command = format!("{} && home-manager switch", nix_env);
-        exec_bash_with_output!(command, self.session.clone());
+        home_manager_switch!(self.session.clone());
 
         Ok(())
     }

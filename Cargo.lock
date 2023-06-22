@@ -1121,7 +1121,7 @@ dependencies = [
 
 [[package]]
 name = "crosup-installers"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "anyhow",
  "crosup-macros",
@@ -1135,7 +1135,7 @@ dependencies = [
 
 [[package]]
 name = "crosup-macros"
-version = "0.1.4"
+version = "0.1.5"
 
 [[package]]
 name = "crosup-migration"
