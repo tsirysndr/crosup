@@ -30,7 +30,7 @@ impl From<Repository> for GitInstaller {
         Self {
             name: config.name,
             version: "latest".to_string(),
-            dependencies: vec![],
+            dependencies: config.depends_on.unwrap_or(vec![]),
             url: config.url,
             install: config.install,
             preinstall: config.preinstall,
