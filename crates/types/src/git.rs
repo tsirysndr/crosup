@@ -68,7 +68,7 @@ pub fn default_git_install() -> IndexMap<String, GitConfiguration> {
     }
 
     if cfg!(target_os = "macos") {
-        blesh.preinstall = Some("brew install gawk".into());
+        blesh.preinstall = Some("brew install gawk bash".into());
     }
 
     repo.insert("blesh".into(), blesh);
