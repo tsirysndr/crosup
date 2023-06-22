@@ -1069,7 +1069,7 @@ dependencies = [
 
 [[package]]
 name = "crosup"
-version = "0.4.4"
+version = "0.4.5"
 dependencies = [
  "anyhow",
  "clap 3.2.25",
@@ -1121,7 +1121,7 @@ dependencies = [
 
 [[package]]
 name = "crosup-installers"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "anyhow",
  "crosup-macros",

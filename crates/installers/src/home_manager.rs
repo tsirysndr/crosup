@@ -116,10 +116,7 @@ impl Installer for HomeManagerInstaller {
             let updated_nix_configs = crosup_nix::add_packages(&home_nix_content, packages)?;
             fs::write(home_nix, updated_nix_configs)?;
 
-            println!("-> Running {}", "home-manager switch".bright_green());
-            let nix_env = ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh";
-            let command = format!("{} && home-manager switch", nix_env);
-            exec_bash_with_output!(command, self.session.clone());
+            home_manager_switch!(self.session.clone());
         }
 
         self.postinstall()?;
