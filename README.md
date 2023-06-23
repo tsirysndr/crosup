@@ -199,7 +199,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup-superviseur:
+  setup-crosup:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
