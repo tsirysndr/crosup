@@ -28,8 +28,18 @@ Crosup is a CLI tool to help you quickly setup your development environment on a
 - [x] Installs developer tools like docker, nix, devbox, homebrew, flox, fish, vscode, ble.sh, atuin, tig, fzf, httpie, kubectl, minikube, tilt, zellij, ripgrep, fd, exa, bat, glow, devenv and more!
   
 ## 🚚 Installation
+
 ```sh
 bash <(curl -sSL https://raw.githubusercontent.com/tsirysndr/crosup/master/install.sh)
+```
+
+Compiling from source:
+
+```bash
+git clone https://github.com/tsirysndr/crosup.git
+cd crosup
+nix develop --experimental-features "nix-command flakes"
+cargo install --path crates/cli
 ```
 
 ## 📦 Supported OS
