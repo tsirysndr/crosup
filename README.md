@@ -1,9 +1,10 @@
 # Crosup 🐧 💻 🚀 ✨
 
 <p>
-  <a href="LICENSE" target="./LICENSE">
-    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg" />
+  <a href="https://flakehub.com/flake/tsirysndr/crosup" target="_blank">
+    <img src="https://img.shields.io/endpoint?url=https://flakehub.com/f/tsirysndr/crosup/badge" />
   </a>
+  
   <a href="https://crates.io/crates/crosup" target="_blank">
     <img src="https://img.shields.io/crates/v/crosup.svg" />
   </a>
@@ -14,6 +15,9 @@
 
   <a href="https://github.com/tsirysndr/crosup/actions/workflows/release.yml" target="_blank">
     <img alt="release" src="https://github.com/tsirysndr/crosup/actions/workflows/release.yml/badge.svg" />
+  </a>
+  <a href="LICENSE" target="./LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg" />
   </a>
 </p>
 
