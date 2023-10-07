@@ -40,7 +40,7 @@
           inherit src;
           
           pname = "crosup";
-          version = "0.4.10";
+          version = "0.5.0";
           cargoExtraArgs = "--package=crosup";
 
           buildInputs = [
