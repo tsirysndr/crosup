@@ -7,16 +7,16 @@ keywords = ["chromebook", "chromeos", "homebrew", "docker", "nix"]
 license = "MIT"
 name = "crosup-installers"
 repository = "https://github.com/tsirysndr/crosup"
-version = "0.1.12"
+version = "0.2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 anyhow = "1.0.71"
-crosup-macros = {path = "../macros", version = "0.1.5"}
+crosup-macros = {path = "../macros", version = "0.2.0"}
 crosup-nix = {path = "../nix", version = "0.1.1"}
 crosup-ssh = {path = "../ssh", version = "0.1.0"}
-crosup-types = {path = "../types", version = "0.1.8"}
+crosup-types = {path = "../types", version = "0.2.0"}
 indexmap = {version = "1.9.3", features = ["serde"]}
 owo-colors = "3.5.0"
 ssh2 = {version = "0.9.4", features = ["vendored-openssl"]}

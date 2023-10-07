@@ -94,16 +94,23 @@ macro_rules! check_version {
     ($self:ident, $command:expr, $session:expr) => {
         match $session {
             Some(session) => {
-                let command = format!("sh -c 'PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin {}'", $command);
+                let command = format!("sh -c 'PATH=$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin type {}'", $command);
                 crosup_ssh::exec(session.clone(), &command)?;
             }
             None => {
+                let home = std::env::var("HOME").unwrap();
+                let mut path = std::env::var("PATH").unwrap();
+                path = format!(
+                    "{}/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/home/linuxbrew/.linuxbrew/bin:{}",
+                    home,
+                    path
+                );
                 let child = std::process::Command::new("bash")
                     .arg("-c")
-                    .arg($command)
+                    .arg(format!("type {}", $command))
                     .env(
                         "PATH",
-                        "/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+                        path,
                     )
                     .stdout(Stdio::piped())
                     .spawn()?;

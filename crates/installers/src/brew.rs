@@ -30,7 +30,6 @@ impl From<BrewConfiguration> for BrewInstaller {
             version: "latest".to_string(),
             dependencies: vec!["homebrew".into()],
             pkgs: config.pkgs.unwrap_or(vec![]),
-            provider: "brew".into(),
             ..Default::default()
         }
     }
@@ -94,14 +93,17 @@ impl Installer for BrewInstaller {
     }
 
     fn is_installed(&self) -> Result<bool, Error> {
+        println!(
+            "-> Checking if {} is already installed",
+            self.name.bright_green()
+        );
         if let Some(command) = self.version_check.clone() {
-            println!(
-                "-> Checking if {} is already installed",
-                self.name.bright_green()
-            );
             check_version!(self, command, self.session.clone());
+            return Ok(false);
         }
-        Ok(true)
+        let command = self.name.clone();
+        check_version!(self, command, self.session.clone());
+        Ok(false)
     }
 
     fn name(&self) -> &str {

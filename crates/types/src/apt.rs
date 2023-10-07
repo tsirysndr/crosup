@@ -70,7 +70,6 @@ pub fn default_apt_install() -> IndexMap<String, AptConfiguration> {
                           ]),
                         depends_on: Some(vec!["ca-certificates".into(),"curl".into(), "gnupg".into()]),
                         postinstall: Some("sudo usermod -aG docker $USER && newgrp docker".into()),
-                        version_check: Some("docker --version".into()),
                         ..Default::default()
                     },
                 );
@@ -84,7 +83,7 @@ pub fn default_apt_install() -> IndexMap<String, AptConfiguration> {
                         url: Some(
                             "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64".into(),
                         ),
-                        version_check: Some("code --version".into()),
+                        version_check: Some("code".into()),
                         ..Default::default()
                     },
                 );
