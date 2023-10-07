@@ -89,14 +89,16 @@ impl Installer for PacmanInstaller {
     }
 
     fn is_installed(&self) -> Result<bool, Error> {
+        println!(
+            "-> Checking if {} is already installed",
+            self.name.bright_green()
+        );
         if let Some(command) = self.version_check.clone() {
-            println!(
-                "-> Checking if {} is already installed",
-                self.name.bright_green()
-            );
             check_version!(self, command, self.session.clone());
-            return Ok(true);
+            return Ok(false);
         }
+        let command = self.name.clone();
+        check_version!(self, command, self.session.clone());
         Ok(false)
     }
 

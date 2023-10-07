@@ -107,8 +107,47 @@ Example of a Crosfile.toml (`crosup init --toml`) for a Debian-based system:
 
 ```toml
 # Crosfile.toml
+[brew.install.pkg.minikube]
+preinstall = "sudo apt-get install -y qemu-system libvirt-clients libvirt-daemon-system"
+postinstall = """
+sudo sed -i 's/#user = \"root\"/user = \"root\"/g' /etc/libvirt/qemu.conf
+            sudo sed -i 's/#group = \"root\"/group = \"root\"/g' /etc/libvirt/qemu.conf
+            sudo sed -i 's/#dynamic_ownership = 1/dynamic_ownership = 0/g' /etc/libvirt/qemu.conf
+            sudo sed -i 's/#remember_owner = 1/remember_owner = 0/g' /etc/libvirt/qemu.conf"""
+
+[brew.install.pkg.tilt]
+
+[brew.install.pkg.kubernetes-cli]
+version_check = "kubectl"
+
+[brew.install.pkg.bat]
+
+[brew.install.pkg.direnv]
+
+[brew.install.pkg.exa]
+
+[brew.install.pkg.fd]
+
+[brew.install.pkg.fzf]
+
+[brew.install.pkg.fish]
+
+[brew.install.pkg.glow]
+
+[brew.install.pkg.httpie]
+version_check = "http"
+
+[brew.install.pkg.tig]
+
+[brew.install.pkg.zellij]
+
+[brew.install.pkg.zoxide]
+
+[brew.install.pkg.ripgrep]
+version_check = "rg"
+
 [brew.install.pkg.neovim]
-version_check = "nvim --version"
+version_check = "nvim"
 
 [git.install.repo.blesh]
 url = "https://github.com/akinomyoga/ble.sh.git"
@@ -126,7 +165,6 @@ experimental_features = "nix-command flakes"
 accept_flake_config = true
 preinstall = "echo 'extra-trusted-substituters = https://cache.floxdev.com' | sudo tee -a /etc/nix/nix.conf && echo 'extra-trusted-public-keys = flox-store-public-0:8c/B+kjIaQ+BloCmNkRUKwaVPFWkriSAd0JJvuDu4F0=' | sudo tee -a /etc/nix/nix.conf"
 flake = "github:flox/floxpkgs#flox.fromCatalog"
-version_check = ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && flox --version"
 
 [nix.install.pkg.cachix]
 flake = "github:cachix/cachix"
@@ -139,11 +177,9 @@ sudo pkill nix-daemon
 cachix use devenv"""
 flake = "github:cachix/devenv/latest"
 depends_on = ["cachix"]
-version_check = ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && devenv version"
 
 [curl.install.script.devbox]
 url = "https://get.jetpack.io/devbox"
-version_check = "devbox version"
 shell = "bash"
 depends_on = ["nix"]
 
@@ -152,19 +188,17 @@ FORCE = "1"
 
 [curl.install.script.atuin]
 url = "https://raw.githubusercontent.com/ellie/atuin/main/install.sh"
-version_check = "atuin --version"
 shell = "bash"
 
 [curl.install.script.nix]
 url = "https://install.determinate.systems/nix"
 enable_sudo = true
-version_check = ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix --version"
 args = "install --no-confirm"
 
 [curl.install.script.homebrew]
 url = "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
 postinstall = "echo 'eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)' >> ~/.bashrc"
-version_check = "brew --version"
+version_check = "brew"
 shell = "bash"
 
 [curl.install.script.homebrew.env]
@@ -188,11 +222,10 @@ depends_on = [
     "gnupg",
 ]
 postinstall = "sudo usermod -aG docker $USER && newgrp docker"
-version_check = "docker --version"
 
 [apt.install.pkg.vscode]
 url = "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
-version_check = "code --version"
+version_check = "code"
 
 ```
 

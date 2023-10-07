@@ -35,7 +35,6 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
         name: "minikube".into(),
         preinstall: None,
         postinstall: None,
-        version_check: Some("minikube version".into()),
         ..Default::default()
     };
 
@@ -68,7 +67,6 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     pkg.insert(
         "tilt".into(),
         super::brew::Package {
-            version_check: Some("tilt version".into()),
             ..Default::default()
         },
     );
@@ -76,7 +74,7 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     pkg.insert(
         "kubernetes-cli".into(),
         super::brew::Package {
-            version_check: Some("kubectl version --client".into()),
+            version_check: Some("kubectl".into()),
             ..Default::default()
         },
     );
@@ -84,7 +82,6 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     pkg.insert(
         "bat".into(),
         super::brew::Package {
-            version_check: Some("bat --version".into()),
             ..Default::default()
         },
     );
@@ -92,7 +89,6 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     pkg.insert(
         "direnv".into(),
         super::brew::Package {
-            version_check: Some("direnv --version".into()),
             ..Default::default()
         },
     );
@@ -100,7 +96,6 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     pkg.insert(
         "exa".into(),
         super::brew::Package {
-            version_check: Some("exa --version".into()),
             ..Default::default()
         },
     );
@@ -108,7 +103,6 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     pkg.insert(
         "fd".into(),
         super::brew::Package {
-            version_check: Some("fd --version".into()),
             ..Default::default()
         },
     );
@@ -116,7 +110,6 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     pkg.insert(
         "fzf".into(),
         super::brew::Package {
-            version_check: Some("fzf --version".into()),
             ..Default::default()
         },
     );
@@ -124,7 +117,6 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     pkg.insert(
         "fish".into(),
         super::brew::Package {
-            version_check: Some("fish --version".into()),
             ..Default::default()
         },
     );
@@ -132,7 +124,6 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     pkg.insert(
         "glow".into(),
         super::brew::Package {
-            version_check: Some("glow --version".into()),
             ..Default::default()
         },
     );
@@ -140,7 +131,7 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     pkg.insert(
         "httpie".into(),
         super::brew::Package {
-            version_check: Some("http --version".into()),
+            version_check: Some("http".into()),
             ..Default::default()
         },
     );
@@ -148,7 +139,6 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     pkg.insert(
         "tig".into(),
         super::brew::Package {
-            version_check: Some("tig --version".into()),
             ..Default::default()
         },
     );
@@ -156,7 +146,6 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     pkg.insert(
         "zellij".into(),
         super::brew::Package {
-            version_check: Some("zellij --version".into()),
             ..Default::default()
         },
     );
@@ -164,7 +153,6 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     pkg.insert(
         "zoxide".into(),
         super::brew::Package {
-            version_check: Some("zoxide --version".into()),
             ..Default::default()
         },
     );
@@ -172,7 +160,7 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     pkg.insert(
         "ripgrep".into(),
         super::brew::Package {
-            version_check: Some("rg --version".into()),
+            version_check: Some("rg".into()),
             ..Default::default()
         },
     );
@@ -180,7 +168,7 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     pkg.insert(
         "neovim".into(),
         super::brew::Package {
-            version_check: Some("nvim --version".into()),
+            version_check: Some("nvim".into()),
             ..Default::default()
         },
     );
@@ -190,7 +178,6 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
             "docker".into(),
             super::brew::Package {
                 cask: Some(true),
-                version_check: Some("docker --version".into()),
                 ..Default::default()
             },
         );
@@ -198,7 +185,7 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
             "visual-studio-code".into(),
             super::brew::Package {
                 cask: Some(true),
-                version_check: Some("code --version".into()),
+                version_check: Some("code".into()),
                 ..Default::default()
             },
         );

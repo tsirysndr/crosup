@@ -43,9 +43,6 @@ pub fn default_nix_installer() -> Script {
         name: "nix".into(),
         url: "https://install.determinate.systems/nix".into(),
         enable_sudo: Some(true),
-        version_check: Some(
-            ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix --version".into(),
-        ),
         args: Some("install --no-confirm".into()),
         ..Default::default()
     }
@@ -64,7 +61,7 @@ pub fn default_brew_installer() -> Script {
         name: "homebrew".into(),
         url: "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh".into(),
         postinstall,
-        version_check: Some("brew --version".into()),
+        version_check: Some("brew".into()),
         env: Some(
             [("NONINTERACTIVE".into(), "true".into())]
                 .iter()
@@ -83,7 +80,6 @@ pub fn default_curl_install() -> IndexMap<String, CurlConfiguration> {
         Script {
             name: "devbox".into(),
             url: "https://get.jetpack.io/devbox".into(),
-            version_check: Some("devbox version".into()),
             shell: Some("bash".into()),
             depends_on: Some(vec!["nix".into()]),
             env: Some([("FORCE".into(), "1".into())].iter().cloned().collect()),
@@ -96,7 +92,6 @@ pub fn default_curl_install() -> IndexMap<String, CurlConfiguration> {
         Script {
             name: "atuin".into(),
             url: "https://raw.githubusercontent.com/ellie/atuin/main/install.sh".into(),
-            version_check: Some("atuin --version".into()),
             shell: Some("bash".into()),
             ..Default::default()
         },

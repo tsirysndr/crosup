@@ -42,7 +42,6 @@ pub fn default_nix_install() -> IndexMap<String, NixConfiguration> {
             accept_flake_config: Some(true),
             flake: "github:flox/floxpkgs#flox.fromCatalog".into(),
             preinstall: Some("echo 'extra-trusted-substituters = https://cache.floxdev.com' | sudo tee -a /etc/nix/nix.conf && echo 'extra-trusted-public-keys = flox-store-public-0:8c/B+kjIaQ+BloCmNkRUKwaVPFWkriSAd0JJvuDu4F0=' | sudo tee -a /etc/nix/nix.conf".into()),
-            version_check: Some(". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && flox --version".into()),
             ..Default::default()
         }
     );
@@ -69,10 +68,6 @@ cachix use devenv"#
                     .into(),
             ),
             depends_on: Some(vec!["cachix".into()]),
-            version_check: Some(
-                ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && devenv version"
-                    .into(),
-            ),
             ..Default::default()
         },
     );
