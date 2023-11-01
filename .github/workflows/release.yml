@@ -1,5 +1,4 @@
-name: Rust Build
-
+name: release
 on:
   release:
     types: [created]
@@ -7,40 +6,35 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        extensions:
+          - tar.gz
+          - tar.gz.sha256
+        target:
+          - x86_64-unknown-linux-gnu
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@v1
         with:
-          toolchain: stable
-          profile: minimal
-
-      - name: Build and Copy Target
+          deno-version: v1.37
+      - name: Setup Fluent CI CLI
+        run: deno install -A -r https://cli.fluentci.io -n fluentci
+      - name: Setup Dagger
         run: |
-          docker run --rm -v ${{ github.workspace }}:/app -w /app rust:1.69-bullseye \
-            sh -c "apt-get update && apt-get install -y build-essential && cargo build -p crosup --release \
-
-            "
-
-      - name: Show Artifacts
-        run: |
-          ls -la ${{ github.workspace }}/target/release
+          curl -L https://dl.dagger.io/dagger/install.sh | DAGGER_VERSION=0.8.8 sh
+          sudo mv bin/dagger /usr/local/bin
+          dagger version
       - name: Set env
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-      - name: Packaging final binary
-        shell: bash
-        run: |
-          sudo cp target/release/crosup crosup
-          sudo tar czvf crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz crosup
-          sudo shasum -a 256 crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz > crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz.sha256
-      - name: Releasing assets
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz
-            crosup_${{ env.RELEASE_VERSION }}_x86_64-unknown-linux-gnu.tar.gz.sha256
+      - name: Build
+        run: fluentci run . build
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ env.RELEASE_VERSION }}
+          TARGET: ${{ matrix.target }}
+      - name: Upload release assets
+        run: fluentci run github_pipeline release_upload
+        env:
+          TAG: ${{ env.RELEASE_VERSION }}
+          FILE: /assets/crosup_${{ env.RELEASE_VERSION }}_${{ matrix.target }}.${{ matrix.extensions }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
