@@ -46,8 +46,11 @@ jobs:
           tar czvf crosup_${{ env.RELEASE_VERSION }}_${{ matrix.target }}.tar.gz crosup
           shasum -a 256 crosup_${{ env.RELEASE_VERSION }}_${{ matrix.target }}.tar.gz > crosup_${{ env.RELEASE_VERSION }}_${{ matrix.target }}.tar.gz.sha256
       - name: Upload release assets
-        run: fluentci run github_pipeline release_upload
+        run: |
+          for ext in tar.gz tar.gz.sha256; do
+            export FILE=/assets/crosup_${{ env.RELEASE_VERSION }}_${{ matrix.target }}.$ext
+            fluentci run github_pipeline release_upload
+          done
         env:
           TAG: ${{ env.RELEASE_VERSION }}
-          FILE: target/${{ matrix.target }}/release/crosup_${{ env.RELEASE_VERSION }}_${{ matrix.target }}.${{ matrix.extensions }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
