@@ -43,12 +43,13 @@ jobs:
         shell: bash
         run: |
           cd target/${{ matrix.target }}/release
-          tar czvf crosup_${{ env.RELEASE_VERSION }}_${{ matrix.target }}.tar.gz crosup
-          shasum -a 256 crosup_${{ env.RELEASE_VERSION }}_${{ matrix.target }}.tar.gz > crosup_${{ env.RELEASE_VERSION }}_${{ matrix.target }}.tar.gz.sha256
+          tar czvf ../../../crosup_${{ env.RELEASE_VERSION }}_${{ matrix.target }}.tar.gz crosup
+          shasum -a 256 ../../../crosup_${{ env.RELEASE_VERSION }}_${{ matrix.target }}.tar.gz > ../../../crosup_${{ env.RELEASE_VERSION }}_${{ matrix.target }}.tar.gz.sha256
+          cd ../../../ && rm -rf target
       - name: Upload release assets
         run: |
           for ext in tar.gz tar.gz.sha256; do
-            export FILE=/app/crosup_${{ env.RELEASE_VERSION }}_${{ matrix.target }}.$ext
+            export FILE=crosup_${{ env.RELEASE_VERSION }}_${{ matrix.target }}.$ext
             fluentci run github_pipeline release_upload
           done
         env:
