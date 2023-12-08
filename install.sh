@@ -19,7 +19,16 @@ if [ "$OS" = "Darwin" ]; then
         ASSET_NAME="_x86_64-apple-darwin.tar.gz"
     fi
 elif [ "$OS" = "Linux" ]; then
-    ASSET_NAME="_x86_64-unknown-linux-gnu.tar.gz"
+    # Determine the CPU architecture
+    ARCH=$(uname -m)
+    if [ "$ARCH" = "aarch64" ]; then
+        ASSET_NAME="_aarch64-unknown-linux-gnu.tar.gz"
+    elif [ "$ARCH" = "x86_64" ]; then
+        ASSET_NAME="_x86_64-unknown-linux-gnu.tar.gz"
+    else
+        echo "Unsupported architecture: $ARCH"
+        exit 1
+    fi
 else
     echo "Unsupported operating system: $OS"
     exit 1
