@@ -58,6 +58,7 @@ export const build = async (src = ".") => {
         "TARGET",
         Deno.env.get("TARGET") || "x86_64-unknown-linux-gnu"
       )
+      .withExec(["sh", "-c", "rustup target add $TARGET"])
       .withExec([
         "sh",
         "-c",
