@@ -1069,7 +1069,7 @@ dependencies = [
 
 [[package]]
 name = "crosup"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "anyhow",
  "clap 3.2.25",
