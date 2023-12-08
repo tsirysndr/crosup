@@ -35,12 +35,24 @@ export const build = async (src = ".") => {
       .container()
       .from("rust:1.73-bullseye")
       .withExec(["apt-get", "update"])
-      .withExec(["apt-get", "install", "-y", "build-essential"])
+      .withExec([
+        "apt-get",
+        "install",
+        "-y",
+        "build-essential",
+        "gcc-aarch64-linux-gnu",
+      ])
       .withDirectory("/app", context, { exclude })
       .withWorkdir("/app")
       .withMountedCache("/app/target", client.cacheVolume("target"))
       .withMountedCache("/root/cargo/registry", client.cacheVolume("registry"))
       .withMountedCache("/assets", client.cacheVolume("gh-release-assets"))
+      .withEnvVariable(
+        "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER",
+        Deno.env.get("TARGET") === "aarch64-unknown-linux-gnu"
+          ? "aarch64-linux-gnu-gcc"
+          : ""
+      )
       .withEnvVariable("TAG", Deno.env.get("TAG") || "latest")
       .withEnvVariable(
         "TARGET",
