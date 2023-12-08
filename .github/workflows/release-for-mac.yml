@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Setup Fluent CI
-        uses: fluentci-io/setup-fluentci@v3
+        uses: fluentci-io/setup-fluentci@v2.1
       - name: Installing Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
