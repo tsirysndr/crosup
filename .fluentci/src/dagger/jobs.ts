@@ -13,7 +13,7 @@ export const test = async (src = ".", options: string[] = []) => {
     const ctr = client
       .pipeline(Job.test)
       .container()
-      .from("rust:latest")
+      .from("rust:1.76-bullseye")
       .withDirectory("/app", context, { exclude })
       .withWorkdir("/app")
       .withMountedCache("/app/target", client.cacheVolume("target"))
@@ -33,7 +33,7 @@ export const build = async (src = ".") => {
     const ctr = client
       .pipeline(Job.build)
       .container()
-      .from("rust:1.73-bullseye")
+      .from("rust:1.76-bullseye")
       .withExec(["apt-get", "update"])
       .withExec([
         "apt-get",
