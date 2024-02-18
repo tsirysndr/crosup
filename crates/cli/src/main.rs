@@ -24,7 +24,7 @@ fn cli() -> Command<'static> {
 
 Quickly install your development tools on your new Chromebook, MacOS or any Linux distribution"#,
         )
-        .author("Tsiry Sandratraina <tsiry.sndr@aol.com>")
+        .author("Tsiry Sandratraina <tsiry.sndr@fluentci.io>")
         .subcommand(
             Command::new("init")
             .arg(arg!(--toml "Generate a default configuration file in toml format"))
