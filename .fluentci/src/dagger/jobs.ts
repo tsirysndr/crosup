@@ -64,10 +64,11 @@ export const build = async (src = ".") => {
         "-c",
         "cargo build -p crosup --release --target $TARGET",
       ])
+      .withExec(["sh", "-c", "cp target/${TARGET}/release/crosup ."])
       .withExec([
         "sh",
         "-c",
-        "tar czvf /assets/crosup_${TAG}_${TARGET}.tar.gz target/$TARGET/release/crosup",
+        "tar czvf /assets/crosup_${TAG}_${TARGET}.tar.gz crosup",
       ])
       .withExec([
         "sh",
