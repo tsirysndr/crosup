@@ -20,5 +20,7 @@ crosup-types = {path = "../types", version = "0.2.0"}
 hcl-rs = "0.14.2"
 os-release = "0.1.0"
 owo-colors = "3.5.0"
+reqwest = { version = "0.11.24", features = ["rustls-tls", "blocking"] }
 ssh2 = {version = "0.9.4", features = ["vendored-openssl"]}
 toml = "0.7.4"
+zip = "0.6.6"

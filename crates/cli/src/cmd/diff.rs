@@ -10,7 +10,7 @@ use crate::cmd::print_diff;
 use super::get_database_connection;
 
 pub async fn execute_diff() -> Result<(), Error> {
-    let (_, filename, content, _) = verify_if_config_file_is_present()?;
+    let (_, filename, content, _) = verify_if_config_file_is_present(None).await?;
 
     let db: DatabaseConnection = get_database_connection().await?;
     migration::Migrator::up(&db, None).await?;
