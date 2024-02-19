@@ -7,6 +7,7 @@ pub struct InstallArgs {
     pub port: Option<u16>,
     pub username: Option<String>,
     pub inventory: Option<String>,
+    pub from: Option<String>
 }
 
 #[derive(Clone, Default)]
