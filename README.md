@@ -4,7 +4,9 @@
   <a href="https://flakehub.com/flake/tsirysndr/crosup" target="_blank">
     <img src="https://img.shields.io/endpoint?url=https://flakehub.com/f/tsirysndr/crosup/badge" />
   </a>
-  
+<a href="https://builtwithnix.org" target="_blank">
+    <img src="https://img.shields.io/badge/Built_With-Nix-5277C3.svg?logo=nixos&labelColor=73C3D5" />
+  </a>
   <a href="https://crates.io/crates/crosup" target="_blank">
     <img src="https://img.shields.io/crates/v/crosup.svg" />
   </a>
