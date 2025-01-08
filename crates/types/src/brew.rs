@@ -94,7 +94,7 @@ pub fn default_brew_install() -> IndexMap<String, BrewConfiguration> {
     );
 
     pkg.insert(
-        "exa".into(),
+        "eza".into(),
         super::brew::Package {
             ..Default::default()
         },
