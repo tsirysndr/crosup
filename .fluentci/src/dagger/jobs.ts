@@ -13,7 +13,7 @@ export const test = async (src = ".", options: string[] = []) => {
     const ctr = client
       .pipeline(Job.test)
       .container()
-      .from("rust:1.76-bullseye")
+      .from("rust:1.83-bullseye")
       .withDirectory("/app", context, { exclude })
       .withWorkdir("/app")
       .withMountedCache("/app/target", client.cacheVolume("target"))
@@ -33,7 +33,7 @@ export const build = async (src = ".") => {
     const ctr = client
       .pipeline(Job.build)
       .container()
-      .from("rust:1.76-bullseye")
+      .from("rust:1.83-bullseye")
       .withExec(["apt-get", "update"])
       .withExec([
         "apt-get",
@@ -51,12 +51,12 @@ export const build = async (src = ".") => {
         "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER",
         Deno.env.get("TARGET") === "aarch64-unknown-linux-gnu"
           ? "aarch64-linux-gnu-gcc"
-          : ""
+          : "",
       )
       .withEnvVariable("TAG", Deno.env.get("TAG") || "latest")
       .withEnvVariable(
         "TARGET",
-        Deno.env.get("TARGET") || "x86_64-unknown-linux-gnu"
+        Deno.env.get("TARGET") || "x86_64-unknown-linux-gnu",
       )
       .withExec(["sh", "-c", "rustup target add $TARGET"])
       .withExec([
@@ -84,11 +84,11 @@ export const build = async (src = ".") => {
 export type JobExec = (src?: string) =>
   | Promise<string>
   | ((
-      src?: string,
-      options?: {
-        ignore: string[];
-      }
-    ) => Promise<string>);
+    src?: string,
+    options?: {
+      ignore: string[];
+    },
+  ) => Promise<string>);
 
 export const runnableJobs: Record<Job, JobExec> = {
   [Job.test]: test,
