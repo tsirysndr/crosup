@@ -82,7 +82,14 @@ pub fn execute_init(
 
     let mut file = std::fs::File::create(&filename).unwrap();
     file.write_all(serialized.as_bytes()).unwrap();
-    println!("Created {} ✨", filename.bright_green());
-
+    println!(
+        "{} Created {} ✨",
+        "[✓]".bright_green(),
+        filename.bright_green()
+    );
+    println!(
+        "Run {} to install packages",
+        "`crosup install`".bright_green()
+    );
     Ok(())
 }

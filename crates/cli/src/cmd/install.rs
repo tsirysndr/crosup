@@ -16,7 +16,8 @@ use ssh2::Session;
 use crate::{macros::install, types::InstallArgs};
 
 pub async fn execute_install(args: InstallArgs) -> Result<(), Error> {
-    let (config, filename, content, _) = verify_if_config_file_is_present()?;
+    let (config, filename, content, _) =
+        verify_if_config_file_is_present(args.from.clone()).await?;
 
     let mut config = match args.tools.clone() {
         Some(packages) => Configuration {

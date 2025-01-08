@@ -10,7 +10,7 @@ use owo_colors::OwoColorize;
 use sea_orm::DatabaseConnection;
 
 pub async fn execute_history() -> Result<(), Error> {
-    let (_, filename, _, _) = verify_if_config_file_is_present()?;
+    let (_, filename, _, _) = verify_if_config_file_is_present(None).await?;
 
     let db: DatabaseConnection = get_database_connection().await?;
 

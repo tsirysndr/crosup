@@ -28,20 +28,21 @@ Quickly install your development tools on your new Chromebook, MacOS or any Linu
         .subcommand(
             Command::new("init")
             .arg(arg!(--toml "Generate a default configuration file in toml format"))
-            .arg(arg!(--inventory -i "Generate a default inventory file"))
+            .arg(arg!(-i --inventory "Generate a default inventory file"))
             .arg(arg!([packages]... "List of packages to install"))
             .about("Generate a default configuration file"),
         )
         .subcommand(
             Command::new("install")
-                .arg(arg!(--ask -a "Ask for confirmation before installing tools"))
+                .arg(arg!(-a --ask "Ask for confirmation before installing tools"))
                 .arg(arg!([tools]... "List of tools to install, e.g. docker, nix, devbox, homebrew, fish, vscode, ble.sh ..."))
-                .arg(arg!(--remote -r [ip] "Install tools on a remote machine"))
-                .arg(arg!(--port -p [port] "Port to use when connecting to the remote machine"))
+                .arg(arg!(-r --remote [ip] "Install tools on a remote machine"))
+                .arg(arg!(-p --port [port] "Port to use when connecting to the remote machine"))
                 .arg(
-                    arg!(--username -u [username] "Username to use when connecting to the remote machine"),
+                    arg!(-u --username [username] "Username to use when connecting to the remote machine"),
                 )
-                .arg(arg!(--invetory -i [inventory] "Path to the inventory file (list of remote machines) in HCL or TOML format"))
+                .arg(arg!(-i --inventory [inventory] "Path to the inventory file (list of remote machines) in HCL or TOML format"))
+                .arg(arg!(-f --from [from] "A Github repository to install tools from, e.g. tsirysndr/crosup-example"))
                 .about(
                     "Install developer tools, e.g. docker, nix, devbox, homebrew, fish, vscode, ble.sh ...",
                 ),
@@ -56,14 +57,14 @@ Quickly install your development tools on your new Chromebook, MacOS or any Linu
         )
         .subcommand(
             Command::new("add")
-                .arg(arg!(--ask -a "Ask for confirmation before adding a new tool"))
+                .arg(arg!(-a --ask "Ask for confirmation before adding a new tool"))
                 .arg(arg!(<tools>... "Tools to add to the configuration file, e.g. gh, vim, tig ..."))
                 .about("Add a new tool to the configuration file"),
         )
         .subcommand(
             Command::new("search")
-                .arg(arg!(--channel -c [channel] "Channel to use when searching for a package"))
-                .arg(arg!(--max-results -m [max_results] "Maximum number of results to return"))
+                .arg(arg!(-c --channel [channel] "Channel to use when searching for a package"))
+                .arg(arg!(-m --max [max_results] "Maximum number of results to return"))
                 .arg(arg!(<package> "Package to search for"))
                 .about("Search for a package in the nixpkgs repository"),
         )
@@ -92,6 +93,7 @@ async fn main() -> Result<(), Error> {
             let inventory = args
                 .value_of("inventory")
                 .map(|inventory| inventory.to_string());
+            let from = args.value_of("from").map(|from| from.to_string());
 
             execute_install(InstallArgs {
                 ask,
@@ -101,6 +103,7 @@ async fn main() -> Result<(), Error> {
                 username,
                 inventory,
                 port,
+                from,
             })
             .await?;
         }
